@@ -423,7 +423,8 @@ export default function MortgageCalculator() {
             Remaining balance each year: minimum vs. with extra repayments.
           </p>
 
-          <div className="mt-4 h-72 w-full">
+          {/* 👇 Added `min-w-0` so ResponsiveContainer always gets a positive width */}
+          <div className="mt-4 h-72 w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={chartData}
