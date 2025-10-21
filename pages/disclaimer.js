@@ -92,9 +92,7 @@ export default function DisclaimerPage() {
             </p>
           </div>
 
-          <p className="mt-10 text-xs text-gray-500">
-            © {new Date().getFullYear()} FinToolbox. General information only.
-          </p>
+          
         </div>
       </section>
     </main>

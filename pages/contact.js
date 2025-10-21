@@ -222,9 +222,7 @@ export default function ContactPage() {
             </ul>
           </div>
 
-          <p className="mt-8 text-xs text-gray-500">
-            © {new Date().getFullYear()} FinToolbox — Financial Calculators &amp; Tools for Australians.
-          </p>
+          
         </div>
       </section>
     </main>

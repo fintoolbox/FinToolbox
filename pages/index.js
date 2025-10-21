@@ -4,7 +4,6 @@ import Link from "next/link";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 import ReadingTime from "@/components/ReadingTime";
-import PageHeader from "@/components/ui/PageHeader";
 
 export default function Home({ latestPosts = [] }) {
   return (
@@ -26,9 +25,8 @@ export default function Home({ latestPosts = [] }) {
               "@type": "Organization",
               name: "FinToolbox",
               url: "https://fintoolbox.com.au",
-              logo: "https://fintoolbox.com.au/og-default.png",
-              description:
-                "Financial Calculators & Tools for Australians.",
+              logo: "https://fintoolbox.com.au/logo.png",
+              description: "Financial Calculators & Tools for Australians.",
             }),
           }}
         />
@@ -44,7 +42,8 @@ export default function Home({ latestPosts = [] }) {
               url: "https://fintoolbox.com.au",
               potentialAction: {
                 "@type": "SearchAction",
-                target: "https://fintoolbox.com.au/search?q={search_term_string}",
+                target:
+                  "https://fintoolbox.com.au/search?q={search_term_string}",
                 "query-input": "required name=search_term_string",
               },
             }),
@@ -52,10 +51,32 @@ export default function Home({ latestPosts = [] }) {
         />
       </Head>
 
-      <PageHeader
-        title="FinToolbox"
-        description="Financial Calculators & Tools for Australians."
-      />
+      {/* ===== HERO (optimized spacing) ===== */}
+<section className="bg-gray-50">
+  <div className="mx-auto max-w-5xl px-6 pt-6 pb-14 text-center sm:pt-8 sm:pb-16 lg:pt-10 lg:pb-20">
+    <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+      FinToolbox
+    </h1>
+    <p className="mx-auto mt-2 max-w-xl text-lg text-gray-600">
+      Financial Calculators &amp; Tools for Australians
+    </p>
+    <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <Link
+        href="/calculators/mortgage"
+        className="inline-block rounded-md bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+      >
+        Explore Calculators
+      </Link>
+      <Link
+        href="/blog"
+        className="inline-block rounded-md border border-blue-700 px-6 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
+      >
+        Read the Blog
+      </Link>
+    </div>
+  </div>
+</section>
+
 
       <div className="mx-auto max-w-4xl px-6">
         {/* Calculators */}
@@ -87,7 +108,7 @@ export default function Home({ latestPosts = [] }) {
               latestPosts.map((p) => (
                 <li
                   key={p.slug}
-                  className="border-b last:border-0 border-gray-200 pb-6 last:pb-0"
+                  className="border-b border-gray-200 pb-6 last:border-0 last:pb-0"
                 >
                   <Link
                     href={`/blog/${p.slug}`}
@@ -119,7 +140,9 @@ export default function Home({ latestPosts = [] }) {
                   </div>
 
                   {p.frontmatter.excerpt && (
-                    <p className="mt-2 text-gray-700">{p.frontmatter.excerpt}</p>
+                    <p className="mt-2 text-gray-700">
+                      {p.frontmatter.excerpt}
+                    </p>
                   )}
 
                   <div className="mt-3">
@@ -133,16 +156,20 @@ export default function Home({ latestPosts = [] }) {
                 </li>
               ))
             ) : (
-              <li className="text-gray-600">No posts yet — check back soon.</li>
+              <li className="text-gray-600">
+                No posts yet — check back soon.
+              </li>
             )}
           </ul>
         </CardSection>
 
         {/* Why these calculators */}
         <CardSection title="Why these calculators?" cols={1}>
-          <div className="text-gray-700 leading-relaxed">
-            We built these tools to make Australian money questions simple — no jargon and a clean interface.
-            They’re designed to give quick, accurate answers on tax, investing, and retirement. General information only.
+          <div className="leading-relaxed text-gray-700">
+            We built these tools to make Australian money questions simple — no
+            jargon and a clean interface. They’re designed to give quick,
+            accurate answers on tax, investing, and retirement. General
+            information only.
           </div>
         </CardSection>
       </div>
@@ -179,4 +206,3 @@ export async function getStaticProps() {
 
   return { props: { latestPosts } };
 }
-
