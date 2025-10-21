@@ -3,7 +3,6 @@ import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
 import Breadcrumbs from "./Breadcrumbs";
 
 const links = [
@@ -34,7 +33,7 @@ export default function Layout({ children }) {
     "@type": "Organization",
     name: "FinToolbox",
     url: siteUrl,
-    logo: `${siteUrl}/og-default.png`,
+    logo: `${siteUrl}/logo.png`,
   };
   const websiteJsonLd = {
     "@context": "https://schema.org",
@@ -46,6 +45,31 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <Head>
+        {/* Favicons */}
+        <link rel="icon" href="/favicon.ico" />
+
+        {/* Core SEO */}
+        <title>FinToolbox — Smart Financial Calculators</title>
+        <meta
+          name="description"
+          content="Financial Calculators & Tools for Australians — free, accurate, and easy to use."
+        />
+        <link rel="canonical" href={siteUrl} />
+
+        {/* Open Graph / Social */}
+        <meta property="og:title" content="FinToolbox — Smart Financial Calculators" />
+        <meta property="og:description" content="Financial Calculators & Tools for Australians." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={siteUrl} />
+        <meta property="og:image" content="/og-image.jpg" />
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="FinToolbox — Smart Financial Calculators" />
+        <meta name="twitter:description" content="Financial Calculators & Tools for Australians." />
+        <meta name="twitter:image" content="/og-image.jpg" />
+
+        {/* JSON-LD */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </Head>
@@ -59,9 +83,13 @@ export default function Layout({ children }) {
       </a>
 
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b bg-white">
+      <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-extrabold tracking-tight hover:text-blue-700 transition-colors">
+          <Link
+            href="/"
+            className="text-xl font-bold text-gray-900 transition-colors hover:text-blue-700"
+            aria-label="FinToolbox — Financial Calculators & Tools for Australians"
+          >
             FinToolbox
             <span className="sr-only"> — Financial Calculators &amp; Tools for Australians</span>
           </Link>
@@ -74,7 +102,9 @@ export default function Layout({ children }) {
                 href={l.href}
                 className={[
                   "rounded-md px-2 py-1 transition-colors",
-                  isActive(l.href) ? "text-blue-700 font-semibold" : "text-gray-700 hover:text-blue-800",
+                  isActive(l.href)
+                    ? "text-blue-700 font-semibold bg-blue-50"
+                    : "text-gray-700 hover:text-blue-800",
                 ].join(" ")}
               >
                 {l.label}
@@ -115,34 +145,36 @@ export default function Layout({ children }) {
         )}
       </header>
 
-      {/* Content grid: LEFT sidebar + main content */}
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-6 py-6 lg:grid-cols-[260px_1fr]">
-        {/* Left sidebar (hidden on small screens) */}
-        <Sidebar />
+      {/* Main content (no sidebar) */}
+      <main id="main" className="mx-auto max-w-5xl px-6 py-10">
+        <Breadcrumbs />
+        {children}
 
-        {/* Main content */}
-        <main id="main" className="min-w-0 rounded-2xl">
-          <Breadcrumbs />
-          {children}
-
-          {/* Footer */}
-          <footer className="mt-10 border-t bg-white">
-            <div className="px-6 py-6 text-sm text-gray-600">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <p>
-                  © <Year /> FinToolbox. General information only.
-                </p>
-                <div className="flex gap-4">
-                  <Link href="/about" className="hover:text-blue-700">About</Link>
-                  <Link href="/disclaimer" className="hover:text-blue-700">Disclaimer</Link>
-                  <Link href="/contact" className="hover:text-blue-700">Contact</Link>
-                  <Link href="/blog" className="hover:text-blue-700">Blog</Link>
-                </div>
+        {/* Footer */}
+        <footer className="mt-10 border-t bg-white">
+          <div className="px-6 py-6 text-sm text-gray-600">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p>
+                © <Year /> FinToolbox. General information only.
+              </p>
+              <div className="flex gap-4">
+                <Link href="/about" className="hover:text-blue-700">
+                  About
+                </Link>
+                <Link href="/disclaimer" className="hover:text-blue-700">
+                  Disclaimer
+                </Link>
+                <Link href="/contact" className="hover:text-blue-700">
+                  Contact
+                </Link>
+                <Link href="/blog" className="hover:text-blue-700">
+                  Blog
+                </Link>
               </div>
             </div>
-          </footer>
-        </main>
-      </div>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }
