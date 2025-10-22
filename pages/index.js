@@ -62,7 +62,7 @@ export default function Home({ latestPosts = [] }) {
     </p>
     <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
       <Link
-        href="/calculators/mortgage"
+        href="/calculators/"
         className="inline-block rounded-md bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
       >
         Explore Calculators
@@ -99,6 +99,9 @@ export default function Home({ latestPosts = [] }) {
           >
             Guide based on assets &amp; income.
           </CardLink>
+          <CardLink href="/calculators/account-based-pension" title="Account Based Pension">
+                        How long your super will last in retirement.
+                      </CardLink>
         </CardSection>
 
         {/* Latest from the Blog */}

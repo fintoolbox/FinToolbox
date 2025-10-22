@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 const links = [
   { href: "/", label: "Home" },
   { href: "/calculators/tax-calculator", label: "Income Tax" },
-  { href: "/calculators/investment-growth", label: "Compound Interest" },
+  { href: "/calculators/account-based-pension", label: "Account Based Pension" },
   { href: "/calculators/mortgage", label: "Mortgage" },
   { href: "/calculators/age-pension", label: "Age Pension" },
   { href: "/blog", label: "Blog" },
