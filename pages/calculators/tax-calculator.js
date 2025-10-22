@@ -61,33 +61,47 @@ function medicareLevyAnnual({
   partnerTaxableIncome, // number (0 if single)
 }) {
   const income = Math.max(0, taxableIncome);
-  const combined = maritalStatus === "couple" ? income + Math.max(0, partnerTaxableIncome || 0) : income;
+  const partner = Math.max(0, partnerTaxableIncome || 0);
+  const combined = maritalStatus === "couple" ? income + partner : income;
 
   // base thresholds 2024–25
   const singleLower = saptoEligible ? 43020 : 27222;
-  const singleUpper = saptoEligible ?  /* approximate pivot */ 43020 + (0.02 * 43020) / 0.10 : 34027;
+  // simple pivot for where full 2% kicks in for singles
+  const singleUpper = saptoEligible ? singleLower + (0.02 * singleLower) / 0.10 : 34027;
 
   const familyLowerBase = saptoEligible ? 59886 : 45907;
   const perChildUplift = 4216; // each dependent child after the first
-  const familyLower =
-    familyLowerBase + Math.max(0, dependants - 1) * perChildUplift;
-
-  // A simple "pivot" for where full 2% kicks in for families.
+  const familyLower = familyLowerBase + Math.max(0, dependants - 1) * perChildUplift;
+  // simple pivot for families
   const familyUpper = familyLower + (0.02 * familyLower) / 0.10;
 
-  // Helper to compute levy for a given (combined) amount
-  const levyFrom = (amt, lower, upper) => {
+  // helper to compute levy for a given income using a lower/upper pivot
+  const phasedLevy = (amt, lower, upper) => {
     if (amt <= lower) return 0;
     if (amt <= upper) return 0.10 * (amt - lower); // phased
     return 0.02 * amt; // full rate
   };
 
   if (maritalStatus === "single") {
-    return Math.round(levyFrom(income, singleLower, singleUpper));
+    // Singles: thresholds assessed on your income; levy charged on your income.
+    return Math.round(phasedLevy(income, singleLower, singleUpper));
   }
-  // couple
-  return Math.round(levyFrom(combined, familyLower, familyUpper));
+
+  // Couple:
+  // Use combined income to determine which regime applies,
+  // but ALWAYS charge the levy on *your* income only.
+  if (combined <= familyLower) {
+    // No levy for either spouse when family income is under the lower threshold.
+    return 0;
+  }
+  if (combined <= familyUpper) {
+    // Phase-in zone: apply the phase-in formula to YOUR income against family thresholds.
+    return Math.round(Math.max(0, 0.10 * (income - familyLower)));
+  }
+  // Above the pivot: full levy rate on YOUR income only.
+  return Math.round(0.02 * income);
 }
+
 
 /** ---------- Medicare Levy Surcharge (MLS) 2024–25 ----------
  * Applies if NO private hospital cover for the full year, and income is above thresholds.

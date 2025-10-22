@@ -62,6 +62,11 @@ const DEEMING_THRESHOLD_COUPLE_COMBINED = 106200;
 const DEEMING_LOWER_RATE = 0.0075; // 0.75% p.a.
 const DEEMING_UPPER_RATE = 0.0275; // 2.75% p.a.
 
+// ——— Work Bonus (simplified) ———
+// If eligible, disregard the first $300 of employment income per person per fortnight.
+const WORK_BONUS_FT = 300;
+
+
 // Helpers
 const clamp = (x, max) => Math.max(0, Math.min(x, max));
 const aud0 = (n) =>
@@ -85,6 +90,9 @@ function deemingFt({ status, financialAssets }) {
 export default function AgePensionCalculator() {
   const [status, setStatus] = useState("single"); // 'single' | 'couple'
   const [homeowner, setHomeowner] = useState(true);
+  const [workBonusYou, setWorkBonusYou] = useState(false);
+  const [workBonusPartner, setWorkBonusPartner] = useState(false); // used only if status === 'couple'
+
 
   // — Inputs for tests —
   // Field 1: assets that do NOT attract deeming (home contents, vehicles, etc.)
@@ -111,22 +119,40 @@ export default function AgePensionCalculator() {
 
   // — Income test (standard rules only; transitional not implemented) —
   const incomeTestFt = useMemo(() => {
-    if (status === "single") {
-      const totalIncome = (Number(incomeFt) || 0) + deemedIncomeFt;
-      const excess = Math.max(0, totalIncome - INCOME_FREE_AREA_SINGLE_FT);
-      const reduction = excess * INCOME_TAPER_SINGLE_PER_$;
-      const result = MAX_SINGLE_FT - reduction;
-      return clamp(result, MAX_SINGLE_FT);
-    }
+  // helper to apply work bonus per person
+  const adj = (v, eligible) => Math.max(0, (Number(v) || 0) - (eligible ? WORK_BONUS_FT : 0));
 
-    // couple — combine both partners’ other income, add deemed income once (threshold is combined)
-    const combinedOther = (Number(incomeFt) || 0) + (Number(partnerIncomeFt) || 0);
-    const combinedIncome = combinedOther + deemedIncomeFt;
-    const excess = Math.max(0, combinedIncome - INCOME_FREE_AREA_COUPLE_COMBINED_FT);
-    const reductionCombined = excess * INCOME_TAPER_COUPLE_COMBINED_PER_$;
-    const combinedResult = MAX_COUPLE_COMBINED_FT - reductionCombined;
-    return clamp(combinedResult, MAX_COUPLE_COMBINED_FT);
-  }, [status, incomeFt, partnerIncomeFt, deemedIncomeFt]);
+  if (status === "single") {
+    const otherAdj = adj(incomeFt, workBonusYou);
+    const totalIncome = otherAdj + deemedIncomeFt;
+
+    const excess = Math.max(0, totalIncome - INCOME_FREE_AREA_SINGLE_FT);
+    const reduction = excess * INCOME_TAPER_SINGLE_PER_$;
+    const result = MAX_SINGLE_FT - reduction;
+    return clamp(result, MAX_SINGLE_FT);
+  }
+
+  // couple — apply work bonus to each person's other income separately, then combine
+  const youAdj = adj(incomeFt, workBonusYou);
+  const partnerAdj = adj(partnerIncomeFt, workBonusPartner);
+
+  // combine (work-bonus-adjusted) other income, then add deemed income once (combined threshold)
+  const combinedOther = youAdj + partnerAdj;
+  const combinedIncome = combinedOther + deemedIncomeFt;
+
+  const excess = Math.max(0, combinedIncome - INCOME_FREE_AREA_COUPLE_COMBINED_FT);
+  const reductionCombined = excess * INCOME_TAPER_COUPLE_COMBINED_PER_$;
+  const combinedResult = MAX_COUPLE_COMBINED_FT - reductionCombined;
+  return clamp(combinedResult, MAX_COUPLE_COMBINED_FT);
+}, [
+  status,
+  incomeFt,
+  partnerIncomeFt,
+  deemedIncomeFt,
+  workBonusYou,
+  workBonusPartner
+]);
+
 
   // — Assets test (now uses totalAssets = nonDeemedAssets + finAssets) —
   const assetsTestFt = useMemo(() => {
@@ -162,6 +188,12 @@ export default function AgePensionCalculator() {
     () => Math.min(incomeTestFt, assetsTestFt),
     [incomeTestFt, assetsTestFt]
   );
+// — Derived display amounts —
+const pensionEachFt = status === "couple" ? pensionFt / 2 : pensionFt;
+const annualCombined = pensionFt * 26;
+const annualEach = pensionEachFt * 26;
+
+
 
   const pageUrl = "https://fintoolbox.com.au/calculators/age-pension";
   const pageTitle = "Age Pension Calculator (Australia)";
@@ -228,7 +260,7 @@ export default function AgePensionCalculator() {
       <div className="mx-auto max-w-3xl px-6 py-10">
         {/* <a href="/" className="text-sm text-blue-600 hover:underline">&larr; Back</a> */}
         <h1 className="mt-3 text-3xl font-bold text-gray-900">
-          Age Pension Calculator (Australia) – Updated Estimate
+          Age Pension Calculator (Australia) – Updated 2025
         </h1>
 
         {/* Current settings note */}
@@ -312,6 +344,19 @@ export default function AgePensionCalculator() {
               onChange={(e) => setIncomeFt(e.target.value)}
               className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
             />
+            <label className="mt-2 flex items-center gap-2 text-sm">
+  <input
+    type="checkbox"
+    checked={workBonusYou}
+    onChange={(e) => setWorkBonusYou(e.target.checked)}
+  />
+  I’m eligible for the Work Bonus
+</label>
+<p className="text-xs text-gray-500">
+  If eligible, the first {aud0(WORK_BONUS_FT)} of your employment income each fortnight
+  is not assessed under the income test (simplified).
+</p>
+
 
             {status === "couple" && (
               <>
@@ -323,7 +368,21 @@ export default function AgePensionCalculator() {
                   onChange={(e) => setPartnerIncomeFt(e.target.value)}
                   className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
                 />
+                <label className="mt-2 flex items-center gap-2 text-sm">
+  <input
+    type="checkbox"
+    checked={workBonusPartner}
+    onChange={(e) => setWorkBonusPartner(e.target.checked)}
+  />
+  Partner is eligible for the Work Bonus
+</label>
+<p className="text-xs text-gray-500">
+  If eligible, the first {aud0(WORK_BONUS_FT)} of your partner’s employment income
+  each fortnight is not assessed under the income test (simplified).
+</p>
+
               </>
+              
             )}
           </div>
 
@@ -339,19 +398,58 @@ export default function AgePensionCalculator() {
                 <div className="mt-1 text-2xl font-semibold">{aud0(Math.round(assetsTestFt))}</div>
               </div>
               <div className="col-span-2">
-                <div className="text-sm text-gray-500">Estimated pension (per fortnight)</div>
-                <div className="mt-1 text-2xl font-semibold">{aud0(Math.round(pensionFt))}</div>
+  <div className="text-sm text-gray-500">
+    Estimated pension {status === "couple" ? "(combined, per fortnight)" : "(per fortnight)"}
+  </div>
+  <div className="mt-1 text-2xl font-semibold">
+    {aud0(Math.round(pensionFt))}
+  </div>
 
-                <div className="mt-2 text-sm text-gray-600">
-                  Annual payment:{" "}
-                  <span className="font-semibold">{aud0(Math.round(pensionFt * 26))}</span>
-                </div>
-              </div>
+  {status === "single" ? (
+    <div className="mt-2 text-sm text-gray-600">
+      Annual payment:{" "}
+      <span className="font-semibold">{aud0(Math.round(annualCombined))}</span>
+    </div>
+  ) : (
+    <>
+      {/* Per-person split for couples */}
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="rounded-lg bg-gray-50 p-3">
+          <div className="text-xs text-gray-500">Your pension (per fortnight)</div>
+          <div className="mt-1 text-xl font-semibold">
+            {aud0(Math.round(pensionEachFt))}
+          </div>
+          <div className="mt-1 text-xs text-gray-500">
+            Annual: <span className="font-semibold">{aud0(Math.round(annualEach))}</span>
+          </div>
+        </div>
+        <div className="rounded-lg bg-gray-50 p-3">
+          <div className="text-xs text-gray-500">Partner pension (per fortnight)</div>
+          <div className="mt-1 text-xl font-semibold">
+            {aud0(Math.round(pensionEachFt))}
+          </div>
+          <div className="mt-1 text-xs text-gray-500">
+            Annual: <span className="font-semibold">{aud0(Math.round(annualEach))}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Combined annual summary */}
+      <div className="mt-3 text-sm text-gray-600">
+        Combined annual payment:{" "}
+        <span className="font-semibold">{aud0(Math.round(annualCombined))}</span>
+      </div>
+    </>
+  )}
+</div>
+
             </div>
 
             <div className="mt-2 rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
-              Notes: this is a simplified estimate. For couples, the estimated pension is the total combined pension amount (both members receive 50% of this amount).
-            </div>
+  Notes: this is a simplified estimate. For couples, the combined result is split
+  evenly (50% each) for display; actual payments are assessed per Services Australia rules.
+</div>
+
           </div>
         </div>
 
@@ -362,6 +460,7 @@ export default function AgePensionCalculator() {
             <li>Income test free areas and taper (standard rules): single ${INCOME_FREE_AREA_SINGLE_FT}, couple combined ${INCOME_FREE_AREA_COUPLE_COMBINED_FT}, taper 50c per $ over free area.</li>
             <li>Assets test limits and cut-offs as listed above; taper $3 per $1,000 per fortnight over the full-pension limit.</li>
             <li>Deeming rates & thresholds (20 Sep 2025): 0.75% to ${DEEMING_THRESHOLD_SINGLE.toLocaleString()} (single) / ${DEEMING_THRESHOLD_COUPLE_COMBINED.toLocaleString()} (couple combined), then 2.75%.</li>
+            <li>Work Bonus (simplified): if ticked, we disregard the first {aud0(WORK_BONUS_FT)} of each eligible person’s employment income per fortnight before applying the income test. Carry-forward “Work Bonus balance” is not modelled.</li>
           </ul>
         </div>
       </div>

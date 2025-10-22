@@ -224,22 +224,36 @@ export default function MortgageCalculator() {
       : "N/A";
 
   const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload?.length) return null;
-    const by = Object.fromEntries(payload.map((p) => [p.name, p.value]));
-    return (
-      <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
-        <div className="mb-1 font-semibold">Year {label}</div>
-        <div>
-          Balance (min only):{" "}
-          <span className="font-medium">{fmt(by.BalanceBase || 0)}</span>
-        </div>
-        <div>
-          Balance (with extra):{" "}
-          <span className="font-medium">{fmt(by.BalanceExtra || 0)}</span>
-        </div>
+  if (!active || !payload?.length) return null;
+
+  // Use dataKey so keys match your chartData fields (BalanceBase/BalanceExtra)
+  const byKey = Object.fromEntries(
+    payload.map((p) => [p.dataKey, p.value])
+  );
+
+  // nicer display when one series has already hit zero and drops out
+  const show = (v) =>
+    v == null ? "—" : v.toLocaleString("en-AU", {
+      style: "currency",
+      currency: "AUD",
+      maximumFractionDigits: 0,
+    });
+
+  return (
+    <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
+      <div className="mb-1 font-semibold">Year {label}</div>
+      <div>
+        Balance (min pmt):{" "}
+        <span className="font-medium">{show(byKey.BalanceBase)}</span>
       </div>
-    );
-  };
+      <div>
+        Balance (extra pmt):{" "}
+        <span className="font-medium">{show(byKey.BalanceExtra)}</span>
+      </div>
+    </div>
+  );
+};
+
 
   // ——— SEO constants ———
   const pageUrl = "https://fintoolbox.com.au/calculators/mortgage";
@@ -310,7 +324,7 @@ export default function MortgageCalculator() {
         </h1>
         <p className="mt-2 text-gray-600">
           Compare your loan with minimum repayments vs. adding extra each
-          period. See payoff time, interest, and a full amortisation schedule.
+          period. Calculate payoff time, interest, and a full amortisation schedule.
         </p>
 
         {/* Inputs */}
@@ -389,7 +403,7 @@ export default function MortgageCalculator() {
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg bg-gray-50 p-3">
               <div className="text-xs text-gray-500">
-                Min repayment ({frequency})
+                Min repayments ({frequency})
               </div>
               <div className="mt-1 text-xl font-semibold">
                 {fmt(baseRepayment)}
@@ -397,7 +411,7 @@ export default function MortgageCalculator() {
             </div>
             <div className="rounded-lg bg-gray-50 p-3">
               <div className="text-xs text-gray-500">
-                With extras ({frequency})
+                With extra repayments ({frequency})
               </div>
               <div className="mt-1 text-xl font-semibold">
                 {fmt(baseRepayment + (Number(extra) || 0))}
@@ -405,7 +419,7 @@ export default function MortgageCalculator() {
             </div>
             <div className="rounded-lg bg-gray-50 p-3">
               <div className="text-xs text-gray-500">
-                Payoff time (with extras)
+                Payoff time (with extra repayments)
               </div>
               <div className="mt-1 text-xl font-semibold">
                 {payoffWithExtra
@@ -484,7 +498,7 @@ export default function MortgageCalculator() {
         <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total interest (min only)</div>
+              <div className="text-xs text-gray-500">Total interest (min repayments)</div>
               <div className="mt-1 text-xl font-semibold">
                 {fmt(simBase.totalInterest)}
               </div>
@@ -496,7 +510,7 @@ export default function MortgageCalculator() {
               </div>
             </div>
             <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total interest (with extra)</div>
+              <div className="text-xs text-gray-500">Total interest (with extra repayments)</div>
               <div className="mt-1 text-xl font-semibold">
                 {fmt(simExtra.totalInterest)}
               </div>
@@ -508,7 +522,7 @@ export default function MortgageCalculator() {
               </div>
             </div>
             <div className="rounded-lg bg-blue-50 p-3">
-              <div className="text-xs text-blue-700">Savings with extra</div>
+              <div className="text-xs text-blue-700">Savings with extra repayments</div>
               <div className="mt-1 text-xl font-semibold text-blue-900">
                 {interestSaved != null ? `${fmt(interestSaved)} interest` : "—"}
               </div>
