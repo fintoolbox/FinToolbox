@@ -1,5 +1,5 @@
 // pages/calculators/account-based-pension.js
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Head from "next/head";
 import Tooltip from "../../components/Tooltip";
 import {
@@ -67,6 +67,10 @@ export default function AccountBasedPensionCalculator() {
   // CPI indexing for requested amount
   const [indexByInflation, setIndexByInflation] = useState(true);
   const [inflationPct, setInflationPct] = useState(2.5);
+
+  // Mount guard to avoid zero-size charts on first SSR render / route transitions
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const sim = useMemo(() => {
     const startBal = Math.max(0, Number(openingBalance) || 0);
@@ -152,6 +156,9 @@ export default function AccountBasedPensionCalculator() {
     const firstRate = minDrawdownRate(startAge);
     const firstMin = startBal * firstRate;
     const firstRequested = req0;
+    theFirstPaid: {
+      /* no-op block for readability */
+    }
     const firstPaid = Math.min(startBal, Math.max(firstMin, firstRequested));
 
     return {
@@ -179,7 +186,9 @@ export default function AccountBasedPensionCalculator() {
     return (
       <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
         <div className="mb-1 font-semibold">Age {label}</div>
-        <div>Income paid: <span className="font-semibold">{aud0(v)}</span></div>
+        <div>
+          Income paid: <span className="font-semibold">{aud0(v)}</span>
+        </div>
       </div>
     );
   };
@@ -190,7 +199,9 @@ export default function AccountBasedPensionCalculator() {
     return (
       <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
         <div className="mb-1 font-semibold">Age {label}</div>
-        <div>Balance: <span className="font-semibold">{aud0(v)}</span></div>
+        <div>
+          Balance: <span className="font-semibold">{aud0(v)}</span>
+        </div>
       </div>
     );
   };
@@ -261,12 +272,12 @@ export default function AccountBasedPensionCalculator() {
       <div className="mx-auto max-w-3xl px-6 py-10">
         <h1 className="mt-3 text-3xl font-bold text-gray-900">Account-Based Pension (ABP) Calculator</h1>
         <p className="mt-2 text-gray-600">
-          Use this calculator to work out how long your super will last in retirement. 
+          Use this calculator to work out how long your super will last in retirement.
           Set the balance at commencement, your starting age, rate of return, and optionally increase payments by inflation.
         </p>
 
         {/* Inputs */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm min-w-0">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700">Opening balance ($)</label>
@@ -412,82 +423,86 @@ export default function AccountBasedPensionCalculator() {
         </section>
 
         {/* Chart – Income only */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm min-w-0">
           <h2 className="text-lg font-semibold text-gray-900">Income projection</h2>
           <p className="text-sm text-gray-600 mt-1">
             Your annual pension (indexed by CPI if enabled). When below the minimum, the minimum is paid.
           </p>
 
           <div className="mt-4 h-64 w-full min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={sim.chartIncome} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-                <defs>
-                  <linearGradient id="gIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="age" tickLine={false} axisLine={{ stroke: "#e5e7eb" }} tick={{ fontSize: 12, fill: "#6b7280" }} />
-                <YAxis
-                  tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
-                  width={56}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <RTooltip content={<IncomeTooltip />} />
-                <Legend wrapperStyle={{ paddingTop: 8 }} />
-                <Area
-                  name="Annual income (paid)"
-                  type="monotone"
-                  dataKey="Income"
-                  stroke="#1e3a8a"
-                  fill="url(#gIncome)"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {mounted && (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                <AreaChart data={sim.chartIncome} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
+                  <defs>
+                    <linearGradient id="gIncome" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="age" tickLine={false} axisLine={{ stroke: "#e5e7eb" }} tick={{ fontSize: 12, fill: "#6b7280" }} />
+                  <YAxis
+                    tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
+                    width={56}
+                    tickLine={false}
+                    axisLine={{ stroke: "#e5e7eb" }}
+                    tick={{ fontSize: 12, fill: "#6b7280" }}
+                  />
+                  <RTooltip content={<IncomeTooltip />} />
+                  <Legend wrapperStyle={{ paddingTop: 8 }} />
+                  <Area
+                    name="Annual income (paid)"
+                    type="monotone"
+                    dataKey="Income"
+                    stroke="#1e3a8a"
+                    fill="url(#gIncome)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </section>
 
         {/* NEW Chart – Balance each year */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm min-w-0">
           <h2 className="text-lg font-semibold text-gray-900">Account balance projection</h2>
           <p className="text-sm text-gray-600 mt-1">
             Estimated end-of-year balance after income, earnings and fees.
           </p>
 
           <div className="mt-4 h-64 w-full min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={sim.chartBalance} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-                <defs>
-                  <linearGradient id="gBal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="age" tickLine={false} axisLine={{ stroke: "#e5e7eb" }} tick={{ fontSize: 12, fill: "#6b7280" }} />
-                <YAxis
-                  tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
-                  width={56}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <RTooltip content={<BalanceTooltip />} />
-                <Legend wrapperStyle={{ paddingTop: 8 }} />
-                <Area
-                  name="Balance"
-                  type="monotone"
-                  dataKey="Balance"
-                  stroke="#60a5fa"
-                  fill="url(#gBal)"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {mounted && (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                <AreaChart data={sim.chartBalance} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
+                  <defs>
+                    <linearGradient id="gBal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="age" tickLine={false} axisLine={{ stroke: "#e5e7eb" }} tick={{ fontSize: 12, fill: "#6b7280" }} />
+                  <YAxis
+                    tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
+                    width={56}
+                    tickLine={false}
+                    axisLine={{ stroke: "#e5e7eb" }}
+                    tick={{ fontSize: 12, fill: "#6b7280" }}
+                  />
+                  <RTooltip content={<BalanceTooltip />} />
+                  <Legend wrapperStyle={{ paddingTop: 8 }} />
+                  <Area
+                    name="Balance"
+                    type="monotone"
+                    dataKey="Balance"
+                    stroke="#60a5fa"
+                    fill="url(#gBal)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </section>
 
