@@ -103,6 +103,30 @@ export default function InvestmentGrowth() {
   const pageDescription =
     "Project your investment balance with monthly compounding and regular contributions. Returns shown net of fees. Australia-focused assumptions.";
 
+  // ——— FAQ content (kept in one source of truth to match JSON-LD) ———
+  const faq = [
+    {
+      q: "What does the Investment Growth Calculator do?",
+      a: "It projects how your investment balance grows over time with compound interest and regular contributions, showing final balance, total contributions, and earnings net of fees."
+    },
+    {
+      q: "How does compounding affect my investment?",
+      a: "Compounding means you earn returns on both your initial investment and the returns already earned, causing your balance to accelerate over time. The longer you invest, the stronger the effect."
+    },
+    {
+      q: "Are the results adjusted for inflation?",
+      a: "No. Results are shown in nominal terms unless you manually adjust the return rate for expected inflation. You can use a lower return rate to approximate real (after-inflation) growth."
+    },
+    {
+      q: "Are fees and taxes included?",
+      a: "You can specify annual fees in percentage terms, and the calculator deducts them from returns automatically. It does not include personal tax, which varies by individual circumstances."
+    },
+    {
+      q: "Can I use this calculator for Australian superannuation?",
+      a: "Yes. The calculator works for superannuation or any investment that compounds over time. Just enter your super balance, expected return, and regular contributions to see projections."
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-gray-50">
       <Head>
@@ -158,6 +182,22 @@ export default function InvestmentGrowth() {
             }),
           }}
         />
+
+        {/* JSON-LD: FAQPage (matches visible content below) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faq.map(({ q, a }) => ({
+                "@type": "Question",
+                name: q,
+                acceptedAnswer: { "@type": "Answer", text: a },
+              })),
+            }),
+          }}
+        />
       </Head>
 
       <div className="mx-auto max-w-3xl px-6 py-10">
@@ -179,6 +219,7 @@ export default function InvestmentGrowth() {
                 value={initial}
                 onChange={(e) => setInitial(e.target.value)}
                 className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
+                inputMode="decimal"
               />
             </div>
 
@@ -190,6 +231,7 @@ export default function InvestmentGrowth() {
                 value={contrib}
                 onChange={(e) => setContrib(e.target.value)}
                 className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
+                inputMode="decimal"
               />
             </div>
 
@@ -215,6 +257,7 @@ export default function InvestmentGrowth() {
                 value={years}
                 onChange={(e) => setYears(e.target.value)}
                 className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
+                inputMode="numeric"
               />
             </div>
 
@@ -227,6 +270,7 @@ export default function InvestmentGrowth() {
                 value={returnPct}
                 onChange={(e) => setReturnPct(e.target.value)}
                 className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
+                inputMode="decimal"
               />
             </div>
 
@@ -239,6 +283,7 @@ export default function InvestmentGrowth() {
                 value={feePct}
                 onChange={(e) => setFeePct(e.target.value)}
                 className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
+                inputMode="decimal"
               />
             </div>
           </div>
@@ -363,6 +408,22 @@ export default function InvestmentGrowth() {
           <p className="mt-2 text-xs text-gray-500">
             Assumes even contributions monthly and a constant net return (return − fees) compounded monthly.
           </p>
+        </section>
+
+        {/* ——— Visible FAQ (matches JSON-LD) ——— */}
+        <section id="faq" className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900">FAQs</h2>
+          <div className="mt-3 divide-y">
+            {faq.map(({ q, a }, i) => (
+              <details key={i} className="py-3 group">
+                <summary className="flex cursor-pointer list-none items-center justify-between">
+                  <span className="font-medium text-gray-900">{q}</span>
+                  <span className="ml-4 text-gray-400 transition-transform group-open:rotate-180">▾</span>
+                </summary>
+                <div className="mt-2 text-sm text-gray-700">{a}</div>
+              </details>
+            ))}
+          </div>
         </section>
       </div>
     </main>
