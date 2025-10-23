@@ -4,6 +4,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Breadcrumbs from "./Breadcrumbs";
+import { Analytics } from "@vercel/analytics/next"
 
 const links = [
   { href: "/", label: "Home" },
