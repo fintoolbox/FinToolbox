@@ -10,7 +10,23 @@ import ReadingTime from "@/components/ReadingTime";
 
 export default function BlogPostPage({ source, frontmatter, slug }) {
   const siteUrl = "https://fintoolbox.com.au";
-  const pageUrl = `${siteUrl}/blog/${slug}`;
+
+  // 1. Build the "self URL" for this blog post
+  const blogUrl = `${siteUrl}/blog/${slug}`;
+
+  // 2. If this blog post is intentionally targeting the same intent/keyword
+  //    as a calculator page, nominate the calculator as canonical instead.
+  //
+  //    Add more cases here as you publish more “calculator explainer” posts.
+  //
+  //    Example: mortgage calculator explainer blog post
+  const canonicalOverrideMap = {
+    "mortgage-repayment-calculator-australia": `${siteUrl}/calculators/mortgage`,
+    // "some-other-post-slug": `${siteUrl}/calculators/some-other-calculator`,
+  };
+
+  // pick canonical URL
+  const canonicalUrl = canonicalOverrideMap[slug] || blogUrl;
 
   const title = frontmatter?.title || slug;
   const description = frontmatter?.excerpt || frontmatter?.description || "";
@@ -26,7 +42,7 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
       { "@type": "ListItem", position: 2, name: "Blog", item: `${siteUrl}/blog` },
-      { "@type": "ListItem", position: 3, name: title, item: pageUrl },
+      { "@type": "ListItem", position: 3, name: title, item: blogUrl },
     ],
   };
 
@@ -34,7 +50,7 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
   const blogPostingJsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+    mainEntityOfPage: { "@type": "WebPage", "@id": blogUrl },
     headline: title,
     description,
     image,
@@ -49,14 +65,21 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
     datePublished: published || undefined,
     dateModified: modified || undefined,
     inLanguage: "en-AU",
-    keywords: Array.isArray(frontmatter?.tags) ? frontmatter.tags.join(", ") : undefined,
+    keywords: Array.isArray(frontmatter?.tags)
+      ? frontmatter.tags.join(", ")
+      : undefined,
   };
 
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-3xl px-6 py-10">
         {/* Canonical + base meta via SEO component */}
-        <SEO title={title} description={description} url={pageUrl} image={image} />
+        <SEO
+          title={title}
+          description={description}
+          url={canonicalUrl}         // <-- this is the key change
+          image={image}
+        />
 
         {/* Article-specific meta + JSON-LD */}
         <Head>
@@ -74,11 +97,15 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
           {/* JSON-LD */}
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(breadcrumbJsonLd),
+            }}
           />
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(blogPostingJsonLd),
+            }}
           />
         </Head>
 
@@ -94,7 +121,10 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
               })}
             </time>
           )}
-          <ReadingTime minutes={frontmatter?.readingTime} words={frontmatter?.wordCount} />
+          <ReadingTime
+            minutes={frontmatter?.readingTime}
+            words={frontmatter?.wordCount}
+          />
           {frontmatter?.author && <span>by {frontmatter.author}</span>}
         </div>
 
@@ -116,7 +146,7 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
           <MDXRemote
             {...source}
             components={{
-              Image,   // allow <Image /> inside MDX
+              Image, // allow <Image /> inside MDX
               Tooltip, // allow <Tooltip /> inside MDX
               ...MDXComponents,
             }}

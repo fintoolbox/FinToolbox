@@ -1,6 +1,7 @@
 // pages/calculators/mortgage.js
 import { useMemo, useState } from "react";
 import Head from "next/head";
+import SEO from "@/components/SEO";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -224,38 +225,38 @@ export default function MortgageCalculator() {
       : "N/A";
 
   const CustomTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
+    if (!active || !payload?.length) return null;
 
-  // Use dataKey so keys match your chartData fields (BalanceBase/BalanceExtra)
-  const byKey = Object.fromEntries(
-    payload.map((p) => [p.dataKey, p.value])
-  );
+    // Map keys to values
+    const byKey = Object.fromEntries(
+      payload.map((p) => [p.dataKey, p.value])
+    );
 
-  // nicer display when one series has already hit zero and drops out
-  const show = (v) =>
-    v == null ? "—" : v.toLocaleString("en-AU", {
-      style: "currency",
-      currency: "AUD",
-      maximumFractionDigits: 0,
-    });
+    const show = (v) =>
+      v == null
+        ? "—"
+        : v.toLocaleString("en-AU", {
+            style: "currency",
+            currency: "AUD",
+            maximumFractionDigits: 0,
+          });
 
-  return (
-    <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
-      <div className="mb-1 font-semibold">Year {label}</div>
-      <div>
-        Balance (min pmt):{" "}
-        <span className="font-medium">{show(byKey.BalanceBase)}</span>
+    return (
+      <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
+        <div className="mb-1 font-semibold">Year {label}</div>
+        <div>
+          Balance (min pmt):{" "}
+          <span className="font-medium">{show(byKey.BalanceBase)}</span>
+        </div>
+        <div>
+          Balance (extra pmt):{" "}
+          <span className="font-medium">{show(byKey.BalanceExtra)}</span>
+        </div>
       </div>
-      <div>
-        Balance (extra pmt):{" "}
-        <span className="font-medium">{show(byKey.BalanceExtra)}</span>
-      </div>
-    </div>
-  );
-};
+    );
+  };
 
-
-  // ——— SEO constants ———
+  // SEO constants for this page
   const pageUrl = "https://fintoolbox.com.au/calculators/mortgage";
   const pageTitle = "Mortgage Repayment Calculator (Australia)";
   const pageDescription =
@@ -263,23 +264,27 @@ export default function MortgageCalculator() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <Head>
-        <title>{`${pageTitle} | FinToolbox`}</title>
-        <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={pageUrl} />
+      {/* 1. Centralised SEO: canonical lives here */}
+      <SEO
+        title={pageTitle}
+        description={pageDescription}
+        url={pageUrl}
+        image="https://fintoolbox.com.au/og-default.png"
+      />
 
+      {/* 2. Calculator-specific structured data, OG tweaks, etc */}
+      <Head>
         {/* Open Graph */}
-        <meta property="og:title" content={`${pageTitle} | FinToolbox`} />
-        <meta property="og:description" content={pageDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={pageUrl} />
-        <meta property="og:image" content="https://fintoolbox.com.au/og-default.png" />
+        <meta
+          property="og:image"
+          content="https://fintoolbox.com.au/og-default.png"
+        />
+        <meta property="og:image:alt" content={pageTitle} />
 
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${pageTitle} | FinToolbox`} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://fintoolbox.com.au/og-default.png" />
 
         {/* JSON-LD: WebApplication */}
         <script
@@ -295,8 +300,16 @@ export default function MortgageCalculator() {
               operatingSystem: "All",
               isAccessibleForFree: true,
               inLanguage: "en-AU",
-              offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
-              publisher: { "@type": "Organization", name: "FinToolbox", url: "https://fintoolbox.com.au" }
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "AUD",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "FinToolbox",
+                url: "https://fintoolbox.com.au",
+              },
             }),
           }}
         />
@@ -309,10 +322,25 @@ export default function MortgageCalculator() {
               "@context": "https://schema.org",
               "@type": "BreadcrumbList",
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://fintoolbox.com.au" },
-                { "@type": "ListItem", position: 2, name: "Calculators", item: "https://fintoolbox.com.au/calculators" },
-                { "@type": "ListItem", position: 3, name: "Mortgage" }
-              ]
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://fintoolbox.com.au",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Calculators",
+                  item: "https://fintoolbox.com.au/calculators",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: "Mortgage",
+                  item: pageUrl,
+                },
+              ],
             }),
           }}
         />
@@ -324,7 +352,8 @@ export default function MortgageCalculator() {
         </h1>
         <p className="mt-2 text-gray-600">
           Compare your loan with minimum repayments vs. adding extra each
-          period. Calculate payoff time, interest, and a full amortisation schedule.
+          period. Calculate payoff time, interest, and a full amortisation
+          schedule.
         </p>
 
         {/* Inputs */}
@@ -437,7 +466,6 @@ export default function MortgageCalculator() {
             Remaining balance each year: minimum vs. with extra repayments.
           </p>
 
-          {/* 👇 Added `min-w-0` so ResponsiveContainer always gets a positive width */}
           <div className="mt-4 h-72 w-full min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
@@ -447,11 +475,19 @@ export default function MortgageCalculator() {
                 <defs>
                   <linearGradient id="gBase" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
+                    <stop
+                      offset="100%"
+                      stopColor="#1e3a8a"
+                      stopOpacity={0.05}
+                    />
                   </linearGradient>
                   <linearGradient id="gExtra" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
+                    <stop
+                      offset="100%"
+                      stopColor="#60a5fa"
+                      stopOpacity={0.05}
+                    />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -498,7 +534,9 @@ export default function MortgageCalculator() {
         <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total interest (min repayments)</div>
+              <div className="text-xs text-gray-500">
+                Total interest (min repayments)
+              </div>
               <div className="mt-1 text-xl font-semibold">
                 {fmt(simBase.totalInterest)}
               </div>
@@ -510,7 +548,9 @@ export default function MortgageCalculator() {
               </div>
             </div>
             <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total interest (with extra repayments)</div>
+              <div className="text-xs text-gray-500">
+                Total interest (with extra repayments)
+              </div>
               <div className="mt-1 text-xl font-semibold">
                 {fmt(simExtra.totalInterest)}
               </div>
@@ -522,9 +562,13 @@ export default function MortgageCalculator() {
               </div>
             </div>
             <div className="rounded-lg bg-blue-50 p-3">
-              <div className="text-xs text-blue-700">Savings with extra repayments</div>
+              <div className="text-xs text-blue-700">
+                Savings with extra repayments
+              </div>
               <div className="mt-1 text-xl font-semibold text-blue-900">
-                {interestSaved != null ? `${fmt(interestSaved)} interest` : "—"}
+                {interestSaved != null
+                  ? `${fmt(interestSaved)} interest`
+                  : "—"}
               </div>
               <div className="text-sm text-blue-900 mt-1">
                 {timeSaved
