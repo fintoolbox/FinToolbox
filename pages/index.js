@@ -81,6 +81,9 @@ export default function Home({ latestPosts = [] }) {
       <div className="mx-auto max-w-4xl px-6">
         {/* Calculators */}
         <CardSection title="Calculators">
+          <CardLink href="/calculators/debt-recycling" title="Debt Recycling">
+                        Model paying off your home loan vs recycling into investments.
+                      </CardLink>
           <CardLink href="/calculators/tax-calculator" title="Income Tax (AU)">
             Estimate tax payable and take-home pay.
           </CardLink>

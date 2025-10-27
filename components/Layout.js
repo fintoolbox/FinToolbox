@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 const links = [
   { href: "/", label: "Home" },
   { href: "/calculators/tax-calculator", label: "Income Tax" },
+  { href: "/calculators/debt-recycling", label: "Debt Recycling" },
   { href: "/calculators/account-based-pension", label: "Account Based Pension" },
   { href: "/calculators/mortgage", label: "Mortgage" },
   { href: "/calculators/age-pension", label: "Age Pension" },

@@ -19,6 +19,9 @@ export default function CalculatorsIndex() {
           <h1 className="text-3xl font-bold mb-6">Calculators</h1>
 
           <CardSection cols={2}>
+            <CardLink href="/calculators/debt-recycling" title="Debt Recycling">
+              Model paying off your home loan vs recycling into investments.
+            </CardLink>
             <CardLink href="/calculators/tax-calculator" title="Income Tax (AU)">
               Estimate tax payable and take-home pay.
             </CardLink>
