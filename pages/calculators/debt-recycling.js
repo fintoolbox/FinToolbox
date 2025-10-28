@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Head from "next/head";
 // import Layout from "../../components/Layout"; // not needed here
 import Tooltip from "../../components/Tooltip";
+import Link from "next/link";
 
 import {
   LineChart,
@@ -533,14 +534,14 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
           loan.
         </p>
         <p className="mt-3 text-xs text-indigo-700 font-medium">
-    Not sure how debt recycling works?{" "}
-    <a
-      href="/blog/debt-recycling-strategy-australia"
-      className="underline hover:no-underline"
-    >
-      Read the full guide →
-    </a>
-  </p>
+  Not sure how debt recycling works?{" "}
+  <Link
+    href="/blog/debt-recycling-strategy-australia"
+    className="underline hover:no-underline"
+  >
+    Read the full guide →
+  </Link>
+</p>
       </header>
 
       {/* INPUT CARD */}
