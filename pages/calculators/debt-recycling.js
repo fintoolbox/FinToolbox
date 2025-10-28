@@ -1219,8 +1219,8 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                 split (non-deductible debt).
               </li>
               <li>
-                The following year's sweep from investments (after-tax
-                distributions + franking refunds + negative gearing benefit) is
+                The following year&rsquo;s sweep from investments (after-tax
+                distributions plus franking refunds and negative gearing benefit) is
                 then thrown at the non-deductible home loan split, not spent.
               </li>
             </ul>
