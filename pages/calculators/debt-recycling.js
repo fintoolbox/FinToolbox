@@ -1161,8 +1161,8 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             <span className="text-gray-800 font-medium">Strategy B</span>: You
             pay down your non-deductible home loan and then redraw that
             principal as a separate investment loan (deductible debt) and invest
-            it. After-tax investment cashflow (including franking and negative
-            gearing benefits) is redirected into the home loan in future years.
+            it. After-tax investment cashflow (including franking and any negative
+            gearing benefits) is redirected into the home loan.
           </li>
 
           <li>
@@ -1174,35 +1174,18 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             <ul className="list-disc pl-5 space-y-1 mt-1">
               <li>
                 You take that amount from offset and pay it into the home loan,
-                shrinking non-deductible debt.
+                reducing your non-deductible debt.
               </li>
               <li>
-                You immediately redraw the same amount as investment debt
-                (deductible) and invest it.
+                You immediately redraw the same amount as an investment loan
+                (deductible) and invest the proceeds.
               </li>
             </ul>
             Strategy A leaves that cash in offset instead (more liquidity, less
             gearing).
           </li>
 
-          <li>
-            <span className="text-gray-800 font-medium">
-              Monthly repayment floor / cashflow:
-            </span>{" "}
-            “Monthly repayment ($/mo)” is what you say you currently pay each
-            month. We also calculate a single P&amp;I repayment on the{" "}
-            <span className="font-medium text-gray-800">combined debt</span>{" "}
-            (home + any investment split) over the remaining term you entered.
-            That figure is frozen at the start and shown as{" "}
-            <span className="font-medium text-gray-800">
-              Minimum required to keep the total debt on track
-            </span>
-            . If you typed a lower number, we still model the higher number. We
-            assume you keep making at least that payment every month, rather
-            than increasing your lifestyle cost.
-          </li>
-
-          <li>
+                    <li>
             <span className="text-gray-800 font-medium">
               How repayments are allocated:
             </span>{" "}
@@ -1215,17 +1198,16 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
               </li>
               <li>
                 That repayment is first allocated to the investment split
-                (deductible debt), then whatever remains services the home loan
+                (deductible debt) as a minimum repayment, then whatever remains services the home loan
                 split (non-deductible debt).
               </li>
               <li>
-                The following year&rsquo;s sweep from investments (after-tax
-                distributions plus franking refunds and negative gearing benefit) is
-                then thrown at the non-deductible home loan split, not spent.
+                The following year&rsquo;s income from investments (after-tax
+                distributions plus franking refunds and any negative gearing benefit) is
+                then paid into the non-deductible home loan split.
               </li>
             </ul>
-            The goal is to convert bad debt into deductible debt without
-            forcing you to spend more each month.
+            
           </li>
 
           <li>
@@ -1261,14 +1243,14 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                 (price growth).
               </li>
             </ul>
-            We assume ~40% Australian shares / ~60% international. Only
+            We have assumed the default portfolio comprises ~40% Australian shares / ~60% international. Only
             Australian dividends are franked. We gross up franked income using
-            30% company tax and treat franking credits as refundable.
+            30% company tax and treat franking credits as refundable. Set your own parameters for investment returns.
           </li>
 
           <li>
             <span className="text-gray-800 font-medium">
-              After-tax cashflow sweep:
+              After-tax cashflow to home loan:
             </span>{" "}
             Each model year we:
             <ul className="list-disc pl-5 space-y-1 mt-1">
@@ -1297,27 +1279,25 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                 franking refund plus any negative gearing tax benefit.
               </li>
             </ul>
-            We assume you are disciplined and direct{" "}
+            We assume that you direct{" "}
             <span className="font-medium text-gray-800">
-              100% of that after-tax cash
+              100% of that after-tax investment income
             </span>{" "}
-            to reduce the non-deductible home loan split over the{" "}
+            as additional repayments to your non-deductible home loan split over the{" "}
             <span className="font-medium text-gray-800">
               following 12 months
             </span>
-            . We assume you do not spend it.
           </li>
 
           <li>
             <span className="text-gray-800 font-medium">
-              “Wipeout surplus?”:
+              “When will I be debt free?”:
             </span>{" "}
             For each year we ask: if you sold the entire portfolio at that
             year-end value, paid CGT (with a 50% discount) at your marginal tax
             rate (incl Medicare levy), then paid off both the home loan and the
-            investment loan, would you have money left? We maintain a running
-            cost base that increases every time you gear in new money (kickstart
-            + redraws).
+            investment loan, would you have surplus assets? We maintain a running
+            cost base that increases every time you gear in new money.
           </li>
 
           <li>
@@ -1332,8 +1312,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             do not model lender servicing rules, LVR caps, refinance costs,
             offset changes over time, changes in your income/living costs,
             market volatility, market crashes, tax timing differences, or
-            behavioural drift. We also assume you always tip tax refunds /
-            franking refunds / negative gearing benefits into the home loan.
+            behavioural drift. These factors are outside the scope of this calculator.
           </li>
 
           <li>
@@ -1345,10 +1324,8 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
       {/* FOOTNOTE DISCLAIMER */}
       <section className="mt-6 text-[11px] text-gray-500 leading-snug max-w-3xl">
-        This calculator is a simplified projection tool. Real debt recycling
-        involves lender structuring, tax advice, and discipline in consistently
-        directing surplus cash to your home loan. Speak to a qualified
-        professional before implementing.
+        This calculator is a simplified projection tool. Speak to a qualified
+        tax professional before implementing.
       </section>
     </>
   );
