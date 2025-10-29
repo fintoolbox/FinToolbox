@@ -530,8 +530,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
           <span className="font-medium text-gray-900">Strategy B</span>: pay
           down non-deductible debt, redraw it as deductible investment debt,
           invest it, and use all after-tax investment cashflow (including
-          franking credits and negative gearing benefits) to attack the home
-          loan.
+          franking credits and negative gearing benefits) to pay off your home loan.
         </p>
         <p className="mt-3 text-xs text-indigo-700 font-medium">
   Not sure how debt recycling works?{" "}
