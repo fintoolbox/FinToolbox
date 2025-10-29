@@ -39,7 +39,11 @@ export default function ContactPage() {
 
       if (!res.ok) throw new Error("Request failed");
 
-      setStatus({ state: "success", msg: "Thanks! We’ll get back to you soon." });
+      setStatus({
+  state: "success",
+  msg: "Thanks — message received. I'll reply by email if needed.",
+});
+
       form.reset();
     } catch {
       setStatus({
