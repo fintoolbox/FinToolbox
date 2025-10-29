@@ -4,7 +4,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Breadcrumbs from "./Breadcrumbs";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const links = [
   { href: "/", label: "Home" },
@@ -25,11 +25,13 @@ function Year() {
 export default function Layout({ children }) {
   const [open, setOpen] = useState(false);
   const { pathname } = useRouter();
-  const isActive = (href) => pathname === href || (href !== "/" && pathname.startsWith(href));
+  const isActive = (href) =>
+    pathname === href || (href !== "/" && pathname.startsWith(href));
 
   const siteUrl = "https://fintoolbox.com.au";
 
-  // JSON-LD (site-wide)
+  // Site-wide JSON-LD (these describe the business / site as a whole,
+  // not individual pages, so it's safe to include globally)
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -48,38 +50,43 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <Head>
         {/* Favicons & App Icons */}
-<link rel="icon" href="/favicon.ico" sizes="any" />
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<link rel="manifest" href="/site.webmanifest" />
-<meta name="theme-color" content="#ffffff" />
-
-
-        {/* Core SEO */}
-        <title>FinToolbox — Smart Financial Calculators</title>
-        <meta
-          name="description"
-          content="Financial Calculators & Tools for Australians — free, accurate, and easy to use."
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
         />
-        <link rel="canonical" href={siteUrl} />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content="#ffffff" />
 
-        {/* Open Graph / Social */}
-        <meta property="og:title" content="FinToolbox — Smart Financial Calculators" />
-        <meta property="og:description" content="Financial Calculators & Tools for Australians." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={siteUrl} />
-        <meta property="og:image" content="/og-image.jpg" />
+        {/* IMPORTANT:
+           We intentionally do NOT set:
+           - <title>
+           - <meta name="description">
+           - <meta property="og:*">
+           - <meta name="twitter:*">
+           - <link rel="canonical">
+           Those must now be provided per page via <SEO /> or local <Head>.
+           This prevents every page from claiming the homepage as canonical.
+        */}
 
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="FinToolbox — Smart Financial Calculators" />
-        <meta name="twitter:description" content="Financial Calculators & Tools for Australians." />
-        <meta name="twitter:image" content="/og-image.jpg" />
-
-        {/* JSON-LD */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        {/* Global structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
       </Head>
 
       {/* Skip link for accessibility */}
@@ -90,7 +97,7 @@ export default function Layout({ children }) {
         Skip to content
       </a>
 
-      {/* Header */}
+      {/* Header / nav */}
       <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link
@@ -99,11 +106,17 @@ export default function Layout({ children }) {
             aria-label="FinToolbox — Financial Calculators & Tools for Australians"
           >
             FinToolbox
-            <span className="sr-only"> — Financial Calculators &amp; Tools for Australians</span>
+            <span className="sr-only">
+              {" "}
+              — Financial Calculators &amp; Tools for Australians
+            </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-5 text-sm sm:flex" aria-label="Primary">
+          <nav
+            className="hidden items-center gap-5 text-sm sm:flex"
+            aria-label="Primary"
+          >
             {links.map((l) => (
               <Link
                 key={l.href}
@@ -135,7 +148,10 @@ export default function Layout({ children }) {
         {/* Mobile dropdown */}
         {open && (
           <div className="sm:hidden border-t bg-white" id="mobile-nav">
-            <nav className="mx-auto max-w-6xl px-6 py-3 text-sm" aria-label="Primary mobile">
+            <nav
+              className="mx-auto max-w-6xl px-6 py-3 text-sm"
+              aria-label="Primary mobile"
+            >
               <div className="grid gap-2">
                 {links.map((l) => (
                   <Link
@@ -153,9 +169,10 @@ export default function Layout({ children }) {
         )}
       </header>
 
-      {/* Main content (no sidebar) */}
+      {/* Main content */}
       <main id="main" className="mx-auto max-w-5xl px-6 py-10">
         <Breadcrumbs />
+
         {children}
 
         {/* Footer */}
@@ -183,6 +200,9 @@ export default function Layout({ children }) {
           </div>
         </footer>
       </main>
+
+      {/* Vercel Speed Insights (optional perf analytics) */}
+      <SpeedInsights />
     </div>
   );
 }

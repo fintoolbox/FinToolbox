@@ -11,6 +11,7 @@ export async function getServerSideProps({ res }) {
   // Static core pages
   const staticPaths = [
     "",
+    "/calculators",
     "/blog",
     ...calculators, // reuse the shared list
   ];

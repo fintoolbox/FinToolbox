@@ -1,17 +1,28 @@
-// pages/calculators/index.js
 import Head from "next/head";
+import SEO from "@/components/SEO";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 
 export default function CalculatorsIndex() {
+  const pageUrl = "https://fintoolbox.com.au/calculators";
+  const pageTitle = "All Financial Calculators (Australia) | FinToolbox";
+  const pageDescription =
+    "Browse free Australian financial calculators: tax, mortgage, compound interest, retirement, Age Pension and more.";
+
   return (
     <main className="min-h-screen bg-white">
+      {/* canonical, title, desc, OG, etc */}
+      <SEO
+        title={pageTitle}
+        description={pageDescription}
+        url={pageUrl}
+        image="https://fintoolbox.com.au/og-default.png"
+      />
+
+      {/* You can still have extra <Head> tags here if you want, like page-specific JSON-LD */}
       <Head>
-        <title>Calculators | FinToolbox</title>
-        <meta
-          name="description"
-          content="Financial Calculators & Tools for Australians. Browse all financial calculators: tax, compound interest, mortgage, and age pension."
-        />
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
       </Head>
 
       <section className="py-10">
