@@ -39,11 +39,7 @@ export default function ContactPage() {
 
       if (!res.ok) throw new Error("Request failed");
 
-      setStatus({
-  state: "success",
-  msg: "Thanks — message received. I'll reply by email if needed.",
-});
-
+      setStatus({ state: "success", msg: "Thanks! We’ll get back to you soon." });
       form.reset();
     } catch {
       setStatus({
@@ -225,10 +221,9 @@ export default function ContactPage() {
               <li>Feature ideas: links or screenshots help a lot.</li>
             </ul>
           </div>
-
-          
         </div>
       </section>
     </main>
   );
 }
+
