@@ -3,8 +3,16 @@
 import { useState, useMemo } from "react";
 import Head from "next/head";
 // import Layout from "../../components/Layout"; // not needed here
-import Tooltip from "../../components/Tooltip";
-import Link from "next/link";
+import Tooltip from "@/components/Tooltip";
+import ChartTooltip from "@/components/ChartTooltip";
+import SectionCard from "@/components/SectionCard";
+import PageIntro from "@/components/PageIntro";
+import SubtleCtaLink from "@/components/SubtleCtaLink";
+import SummaryGrid from "@/components/SummaryGrid";
+import SummaryCard from "@/components/SummaryCard";
+
+
+
 
 import {
   LineChart,
@@ -517,46 +525,59 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
       </Head>
 
       {/* Intro */}
-      <header className="max-w-3xl">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Debt Recycling Calculator
-        </h1>
-        <p className="mt-2 text-gray-700 text-sm leading-relaxed">
-          Model two strategies:
-          <br />
-          <span className="font-medium text-gray-900">Strategy A</span>: keep
-          paying off your home loan and leave cash in offset.
-          <br />
-          <span className="font-medium text-gray-900">Strategy B</span>: pay
-          down non-deductible debt, redraw it as deductible investment debt,
-          invest it, and use all after-tax investment cashflow (including
-          franking credits and negative gearing benefits) to pay off your home loan.
-        </p>
-        <p className="mt-3 text-xs text-indigo-700 font-medium">
-  Not sure how debt recycling works?{" "}
-  <Link
-    href="/blog/debt-recycling-strategy-australia"
-    className="underline hover:no-underline"
-  >
-    Read the full guide →
-  </Link>
-</p>
-      </header>
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
+  <h1 className="text-2xl font-bold text-slate-900">
+    Debt Recycling Calculator
+  </h1>
+</header>
+  
+<div className="max-w-5xl mx-auto px-4 mt-4">
+{/* Intro info section */}
+<PageIntro tone="blue">
+  <div className="space-y-2">
+    <p>
+      <span className="font-semibold">Debt recycling</span>{" "}
+      is a financial strategy where you make additional payments into your home loan,
+      then redraw those repayments as a separate <em>tax-deductible</em> investment loan and
+      invest it. Over time, investment income (and the tax benefits of 
+      negative gearing) help accelerate your home loan repayments while you build a portfolio. 
+      Additional lump sum payments to your home loan and the redrawn annually and invested. 
+      'Bad' debt is recycled into 'good' debt over time.
+    </p>
 
-      {/* INPUT CARD */}
-      <section className="bg-white rounded-xl shadow p-4 space-y-6 mt-8 text-sm text-gray-700">
-        <h2 className="text-lg font-semibold text-gray-900">Your assumptions</h2>
+  <p>
+    This debt recycling calculator reflects Australian tax rules, including franking credits and
+    the potential benefit of negative gearing. Use the calculator to compare the benefits of debt recycling versus
+    keeping cash in an offset account. Use the calculator to compare net wealth projections, loan balances,
+    investment growth, and time to be debt free.
+  </p>
 
+      </div>
+</PageIntro>
+
+<div className="prose prose-sm mt-6 text-slate-700">
+  
+</div>
+
+<SubtleCtaLink className="mt-3" href="/blog/debt-recycling-strategy-australia">
+  Not sure how debt recycling works? Read the full guide →
+</SubtleCtaLink>
+
+
+            {/* INPUT CARD */}
+      <div className="mt-6">
+      <SectionCard title="Your assumptions">
+        <div className="space-y-6">
         {/* Property & Home Loan */}
         <div>
-          <h3 className="font-medium text-gray-800 flex items-center gap-2 text-sm mb-2">
+          <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
             Property &amp; Home Loan
-            <Tooltip text="Your current home value and mortgage position. We assume constant rates and treat home vs investment debt as separate splits." />
+            <Tooltip text="Your current property value, offset account balance and mortgage position." />
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
+              <span className="text-slate-600 flex items-center gap-1">
                 Home value ($)
               </span>
               <input
@@ -568,9 +589,9 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
+              <span className="text-slate-600 flex items-center gap-1">
                 Home value growth % p.a.
-                <Tooltip text="Expected long-run property growth per year." />
+                <Tooltip text="Expected property price growth per year." />
               </span>
               <input
                 type="number"
@@ -582,7 +603,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
+              <span className="text-slate-600 flex items-center gap-1">
                 Home loan balance ($)
               </span>
               <input
@@ -594,9 +615,8 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
-                Offset balance ($)
-                <Tooltip text="Cash in offset today. Strategy A leaves this alone. Strategy B may partially deploy it via 'Kickstart from offset'." />
+              <span className="text-slate-600 flex items-center gap-1">
+                Offset account balance ($)
               </span>
               <input
                 type="number"
@@ -607,9 +627,9 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
-                Kickstart from offset ($)
-                <Tooltip text="We assume you move this from offset into the home loan, then immediately redraw it as a deductible investment split and invest it on day one. Strategy A does not invest this." />
+              <span className="text-slate-600 flex items-center gap-1">
+                Initial deposit from offset ($)
+                <Tooltip text="The starting amount transferred from your offset into your home loan, then immediately redrawn as a deductible investment loan." />
               </span>
               <input
                 type="number"
@@ -622,9 +642,9 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
+              <span className="text-slate-600 flex items-center gap-1">
                 Years remaining on home loan
-                <Tooltip text="How long until the loan would be gone on your current path. We use this to set the repayment floor and keep it flat." />
+                <Tooltip text="The length of your current home loan. We use this to calculate the minimum monthly repayment." />
               </span>
               <input
                 type="number"
@@ -637,7 +657,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600">Home loan rate % p.a.</span>
+              <span className="text-slate-600">Home loan rate % p.a.</span>
               <input
                 type="number"
                 step="0.01"
@@ -648,7 +668,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600">
+              <span className="text-slate-600">
                 Investment loan rate % p.a.
               </span>
               <input
@@ -664,16 +684,15 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
         {/* Cashflow / Repayments */}
         <div>
-          <h3 className="font-medium text-gray-800 flex items-center gap-2 text-sm mb-2">
+          <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
             Monthly Repayment
-            <Tooltip text="Enter what you actually pay on the mortgage per month right now, out of pocket. We’ll compare that to the minimum required to clear the debt in the time you entered. If you enter less than the minimum, we’ll use the higher figure in the projection." />
+            <Tooltip text="Your current monthly repayments. Adjust the figure to see what difference increasing your payment makes. If you enter less than the calculated minimum, we use the minimum repayment in the projection." />
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
             <label className="flex flex-col">
-              <span className="text-gray-600 flex items-center gap-1">
+              <span className="text-slate-600 flex items-center gap-1">
                 Monthly repayment ($/mo)
-                <Tooltip text="Your current monthly mortgage payment today. We keep this broadly flat through the model instead of assuming you spend more every year." />
               </span>
               <input
                 type="number"
@@ -685,21 +704,11 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
               />
 
               {results.yearsArr?.length > 0 && (
-                <div className="text-[11px] text-gray-500 mt-1 leading-snug">
+                <div className="text-[11px] text-slate-500 mt-1 leading-snug">
+                  
                   <div>
-                    You entered:{" "}
-                    <span className="font-medium text-gray-700">
-                      {aud0(
-                        results.yearsArr[
-                          results.yearsArr.length - 1
-                        ].userBaseMonthlyRepayment
-                      )}
-                      /mo
-                    </span>
-                  </div>
-                  <div>
-                    Minimum required to keep the total debt on track:{" "}
-                    <span className="font-medium text-gray-700">
+                    Calculated minimum monthly repayment:{" "}
+                    <span className="font-medium text-slate-700">
                       {aud0(
                         results.yearsArr[
                           results.yearsArr.length - 1
@@ -708,7 +717,6 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                       /mo
                     </span>
                   </div>
-                  <div>We’ve used the higher figure in projections.</div>
                 </div>
               )}
             </label>
@@ -717,14 +725,14 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
         {/* Investment Assumptions */}
         <div>
-          <h3 className="font-medium text-gray-800 flex items-center gap-2 text-sm mb-2">
+          <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
             Investment Assumptions
-            <Tooltip text="We split return into cash income (distributions/dividends) and capital growth. We model franking on the Australian share portion and allow investment loan interest to create a negative gearing tax benefit." />
+            <Tooltip text="Enter the expected investment portfolio growth, income yield and % of income which is fully franked." />
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
             <label className="flex flex-col">
-              <span className="text-gray-600">Capital growth % p.a.</span>
+              <span className="text-slate-600">Capital growth % p.a.</span>
               <input
                 type="number"
                 step="0.1"
@@ -735,7 +743,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600">Cash yield % p.a.</span>
+              <span className="text-Slate-600">Cash yield % p.a.</span>
               <input
                 type="number"
                 step="0.1"
@@ -746,7 +754,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600">% of yield that is franked</span>
+              <span className="text-slate-600">% of yield that is franked</span>
               <input
                 type="number"
                 step="1"
@@ -760,18 +768,14 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
         {/* Tax & Projection */}
         <div>
-          <h3 className="font-medium text-gray-800 flex items-center gap-2 text-sm mb-2">
+          <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
             Tax &amp; Projection Settings
-            <Tooltip text={`Your marginal tax rate (including Medicare levy) is used to:
-• tax franked + unfranked income
-• apply franking credit refunds
-• model negative gearing (deductible investment interest creating a tax saving)
-• model CGT if you sold (50% discount).`} />
+            <Tooltip text="Enter your marginal tax rate (including Medicare levy) between 0% and 47%" />
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
             <label className="flex flex-col">
-              <span className="text-gray-600">Marginal tax rate %</span>
+              <span className="text-slate-600">Marginal tax rate %</span>
               <input
                 type="number"
                 className="border rounded px-2 py-1"
@@ -783,7 +787,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-gray-600">Projection length (years)</span>
+              <span className="text-slate-600">Projection length (years)</span>
               <input
                 type="number"
                 className="border rounded px-2 py-1"
@@ -795,537 +799,408 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
           </div>
         </div>
-      </section>
-
-      {/* CHART CARD */}
-      <section className="rounded-xl border bg-white p-4 shadow mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          Net Wealth Over Time
-        </h2>
-
-        <div className="w-full h-64">
-          <ResponsiveContainer>
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="year"
-                tick={{ fontSize: 10, fill: "#4b5563" }}
-              />
-              <YAxis
-                tickFormatter={(v) =>
-                  (isFinite(v) ? v : 0).toLocaleString("en-AU", {
-                    style: "currency",
-                    currency: "AUD",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })
-                }
-                tick={{ fontSize: 10, fill: "#4b5563" }}
-              />
-
-              <RTooltip
-                contentStyle={{
-                  fontSize: "11px",
-                  padding: "6px 8px",
-                }}
-                itemStyle={{
-                  fontSize: "11px",
-                }}
-                labelStyle={{
-                  fontSize: "11px",
-                  fontWeight: 500,
-                }}
-                formatter={(value) =>
-                  (isFinite(value) ? value : 0).toLocaleString("en-AU", {
-                    style: "currency",
-                    currency: "AUD",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })
-                }
-              />
-
-              <Legend
-                wrapperStyle={{
-                  fontSize: "11px",
-                  paddingTop: "4px",
-                }}
-                iconSize={8}
-              />
-
-              <Line
-                type="monotone"
-                dataKey="Strategy A Net Wealth"
-                stroke="#93c5fd"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                type="monotone"
-                dataKey="Strategy B Net Wealth"
-                stroke="#1e3a8a"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
         </div>
-      </section>
+      </SectionCard>
+    </div>
 
-      {/* SUMMARY CARD */}
-      <section className="rounded-xl border bg-white p-4 shadow text-sm text-gray-700 grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-        <div>
-          <div className="text-xs text-gray-500">
-            Final net wealth
-            <br />
-            (Strategy A)
+            {/* CHART CARD */}
+      <div className="mt-8">
+        <SectionCard title="Net Wealth Over Time">
+          <div className="w-full h-64">
+            <ResponsiveContainer>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="year"
+                  tick={{ fontSize: 10, fill: "#4b5563" }}
+                />
+                <YAxis
+                  tickFormatter={(v) =>
+                    (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                      style: "currency",
+                      currency: "AUD",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })
+                  }
+                  tick={{ fontSize: 10, fill: "#4b5563" }}
+                />
+
+                <RTooltip content={<ChartTooltip 
+                valueFormatter={aud0} 
+                labelFormatter={(l) => `Year ${l}`}
+                />} />
+
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    paddingTop: "4px",
+                  }}
+                  iconSize={8}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="Strategy A Net Wealth"
+                  stroke="#93c5fd"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Strategy B Net Wealth"
+                  stroke="#1e3a8a"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-          <div className="text-base font-semibold text-gray-900">
-            {results.yearsArr?.length
-              ? aud0(
-                  results.yearsArr[results.yearsArr.length - 1]
-                    .netWealthA
-                )
-              : "—"}
-          </div>
-        </div>
-
-        <div>
-          <div className="text-xs text-gray-500">
-            Final net wealth
-            <br />
-            (Strategy B)
-          </div>
-
-          <div className="text-base font-semibold text-gray-900">
-            {results.yearsArr?.length
-              ? aud0(
-                  results.yearsArr[results.yearsArr.length - 1]
-                    .netWealthB
-                )
-              : "—"}
-          </div>
-
-          {results.yearsArr?.length > 0 && (
-            <div className="text-[11px] text-gray-500 mt-1">
-              vs A:&nbsp;
-              <span
-                className={
-                  results.yearsArr[
-                    results.yearsArr.length - 1
-                  ].netWealthB -
-                    results.yearsArr[
-                      results.yearsArr.length - 1
-                    ].netWealthA >
-                  0
-                    ? "text-green-600 font-medium"
-                    : "text-red-600 font-medium"
-                }
-              >
-                {(() => {
-                  const diff =
-                    results.yearsArr[
-                      results.yearsArr.length - 1
-                    ].netWealthB -
-                    results.yearsArr[
-                      results.yearsArr.length - 1
-                    ].netWealthA;
-                  return `${diff >= 0 ? "+" : ""}${aud0(
-                    diff
-                  )}`;
-                })()}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div>
-          <div className="text-xs text-gray-500">
-            Year you could clear
-            <br />
-            all debt*
-          </div>
-          <div className="text-base font-semibold text-gray-900">
-            {wipeoutYear
-              ? `Year ${wipeoutYear}`
-              : "Not within projection"}
-          </div>
-        </div>
-      </section>
-
-      {/* DEBT-FREE CHART */}
-<section className="rounded-xl border bg-white p-4 shadow mt-6">
-  <h2 className="text-lg font-semibold text-gray-900 mb-2">
-    When will I be debt free?
-  </h2>
-  <p className="text-[11px] text-gray-600 leading-snug mb-4 max-w-3xl">
-    This compares how much you still owe on your home loan under{" "}
-    <span className="font-medium text-gray-800">Strategy A</span> against how much surplus you’d have if you sold your investments,
-    paid capital gains tax, and cleared <em>all</em> debts under{" "}
-    <span className="font-medium text-gray-800">Strategy B</span>.
-    When the dark bar turns positive, you’re debt free.
-  </p>
-
-
-        <div className="w-full h-64">
-          <ResponsiveContainer>
-            <BarChart data={wipeoutChartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="year"
-                tick={{ fontSize: 10, fill: "#4b5563" }}
-              />
-              <YAxis
-                tickFormatter={(v) =>
-                  (isFinite(v) ? v : 0).toLocaleString("en-AU", {
-                    style: "currency",
-                    currency: "AUD",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })
-                }
-                tick={{ fontSize: 10, fill: "#4b5563" }}
-              />
-
-              <RTooltip
-                contentStyle={{
-                  fontSize: "11px",
-                  padding: "6px 8px",
-                }}
-                itemStyle={{
-                  fontSize: "11px",
-                }}
-                labelStyle={{
-                  fontSize: "11px",
-                  fontWeight: 500,
-                }}
-                formatter={(value) =>
-                  (isFinite(value) ? value : 0).toLocaleString("en-AU", {
-                    style: "currency",
-                    currency: "AUD",
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  })
-                }
-              />
-
-              <Legend
-                wrapperStyle={{
-                  fontSize: "11px",
-                  paddingTop: "4px",
-                }}
-                iconSize={8}
-              />
-
-              <Bar
-                dataKey="Strategy A Remaining Home Loan"
-                fill="#93c5fd"
-              />
-              <Bar
-                dataKey="Strategy B Debt Free Position"
-                fill="#1e3a8a"
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
-
-
-      <p className="text-[11px] text-gray-500 leading-snug max-w-3xl mt-2">
-        *“Clear all debt” means: if you sold the portfolio in that
-        year, paid capital gains tax (with a 50% CGT discount on
-        gains) at your marginal tax rate, then used the after-tax
-        proceeds to pay off both the home loan and the investment
-        loan — would the leftover cash be positive?
-      </p>
-
-      {/* COMPARISON TABLE */}
-      <section className="mt-10 space-y-6">
-        <div className="bg-white rounded-xl shadow p-4 overflow-x-auto border">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            Year-by-Year Comparison
-          </h2>
-
-          <table className="min-w-[900px] text-xs text-left">
-            <thead className="text-gray-600 border-b text-[11px]">
-              <tr className="border-b align-top">
-                <th className="py-2 pr-4 font-medium">Year</th>
-
-                <th className="py-2 pr-4 font-medium">
-                  Home loan (A)
-                  <div className="text-[10px] text-gray-500 font-normal">
-                    Non-deductible
-                  </div>
-                </th>
-
-                <th className="py-2 pr-4 font-medium">
-                  Net wealth (A)
-                  <div className="text-[10px] text-gray-500 font-normal">
-                    Total assets − debt
-                  </div>
-                </th>
-
-                <th className="py-2 pr-4 font-medium">
-                  Home loan (B)
-                  <div className="text-[10px] text-gray-500 font-normal">
-                    Non-deductible
-                  </div>
-                </th>
-
-                <th className="py-2 pr-4 font-medium">
-                  Investment loan (B)
-                  <div className="text-[10px] text-gray-500 font-normal">
-                    Deductible
-                  </div>
-                </th>
-
-                <th className="py-2 pr-4 font-medium">
-                  Portfolio value (B)
-                  <div className="text-[10px] text-gray-500 font-normal">
-                    Investments
-                  </div>
-                </th>
-
-                <th className="py-2 pr-4 font-medium">
-                  Net wealth (B)
-                  <div className="text-[10px] text-gray-500 font-normal">
-                    Total assets − debt
-                  </div>
-                </th>
-
-                <th className="py-2 pr-4 font-medium">
-  Am I debt free (B)?
-  <div className="text-[10px] text-gray-500 font-normal">
-    After CGT, would I be debt free?
-  </div>
-</th>
-
-              </tr>
-            </thead>
-            <tbody className="text-gray-800">
-              {results.yearsArr?.map((row) => (
-                <tr
-                  key={row.year}
-                  className="border-b last:border-0 align-top"
-                >
-                  <td className="py-2 pr-4 font-medium text-gray-900 whitespace-nowrap">
-                    {row.year}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.homeLoanA)}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.netWealthA)}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.homeLoanB)}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.investLoanB)}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.portfolioB)}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.netWealthB)}
-                  </td>
-
-                  <td className="py-2 pr-4 whitespace-nowrap">
-                    {aud0(row.surplusIfLiquidated)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      {/* ASSUMPTIONS & REFERENCES */}
-      <div className="mt-10 rounded-2xl border bg-white p-5 text-sm text-gray-600 shadow-sm space-y-2">
-        <p className="font-medium">Assumptions &amp; references</p>
-
-        <ul className="list-disc pl-5 space-y-1">
-          <li>
-            <span className="text-gray-800 font-medium">Strategy A</span>: You
-            do not implement debt recycling. You keep paying your mortgage. Your
-            offset account balance stays in offset, reducing interest on the
-            home loan. You do not invest borrowed money.
-            <br />
-            <span className="text-gray-800 font-medium">Strategy B</span>: You
-            pay down your non-deductible home loan and then redraw that
-            principal as a separate investment loan (deductible debt) and invest
-            it. After-tax investment cashflow (including franking and any negative
-            gearing benefits) is redirected into the home loan.
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">
-              Kickstart / offset cash:
-            </span>{" "}
-            “Kickstart from offset ($)” is the cash you’re willing to deploy on
-            day one. In Strategy B we assume:
-            <ul className="list-disc pl-5 space-y-1 mt-1">
-              <li>
-                You take that amount from offset and pay it into the home loan,
-                reducing your non-deductible debt.
-              </li>
-              <li>
-                You immediately redraw the same amount as an investment loan
-                (deductible) and invest the proceeds.
-              </li>
-            </ul>
-            Strategy A leaves that cash in offset instead (more liquidity, less
-            gearing).
-          </li>
-
-                    <li>
-            <span className="text-gray-800 font-medium">
-              How repayments are allocated:
-            </span>{" "}
-            We treat the home loan and investment loan like two splits under one
-            facility:
-            <ul className="list-disc pl-5 space-y-1 mt-1">
-              <li>
-                The total monthly repayment is treated as broadly flat instead
-                of stepping up each year.
-              </li>
-              <li>
-                That repayment is first allocated to the investment split
-                (deductible debt) as a minimum repayment, then whatever remains services the home loan
-                split (non-deductible debt).
-              </li>
-              <li>
-                The following year&rsquo;s income from investments (after-tax
-                distributions plus franking refunds and any negative gearing benefit) is
-                then paid into the non-deductible home loan split.
-              </li>
-            </ul>
-            
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">
-              Timing of redraws:
-            </span>{" "}
-            We model debt recycling annually. At the end of each model year we
-            check how much the non-deductible home loan actually fell. At the{" "}
-            <span className="font-medium text-gray-800">
-              start of the next year
-            </span>{" "}
-            we assume you redraw that amount as new deductible investment debt
-            and invest it. We do not count that redraw in the previous year’s
-            closing balances; it appears in the next year’s opening position.
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">
-              Investment returns:
-            </span>{" "}
-            We split total return into:
-            <ul className="list-disc pl-5 space-y-1 mt-1">
-              <li>
-                <span className="font-medium text-gray-800">
-                  Cash yield % p.a.
-                </span>{" "}
-                (distributions/dividends actually paid to you),
-              </li>
-              <li>
-                <span className="font-medium text-gray-800">
-                  Capital growth % p.a.
-                </span>{" "}
-                (price growth).
-              </li>
-            </ul>
-            We have assumed the default portfolio comprises ~40% Australian shares / ~60% international. Only
-            Australian dividends are franked. We gross up franked income using
-            30% company tax and treat franking credits as refundable. Set your own parameters for investment returns.
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">
-              After-tax cashflow to home loan:
-            </span>{" "}
-            Each model year we:
-            <ul className="list-disc pl-5 space-y-1 mt-1">
-              <li>
-                Calculate cash distributions on the portfolio based on its
-                balance at the start of that year.
-              </li>
-              <li>
-                Add franking credits (imputation credits) on the Australian
-                portion and gross that up as assessable income.
-              </li>
-              <li>
-                Subtract the year’s investment loan interest as a{" "}
-                <span className="font-medium text-gray-800">
-                  tax-deductible expense
-                </span>{" "}
-                (negative gearing). If interest exceeds income, that creates a
-                tax loss (a tax saving).
-              </li>
-              <li>
-                Apply your marginal tax rate (including Medicare levy). The
-                result can be a refund.
-              </li>
-              <li>
-                Final cash = distributions minus any tax payable plus any
-                franking refund plus any negative gearing tax benefit.
-              </li>
-            </ul>
-            We assume that you direct{" "}
-            <span className="font-medium text-gray-800">
-              100% of that after-tax investment income
-            </span>{" "}
-            as additional repayments to your non-deductible home loan split over the{" "}
-            <span className="font-medium text-gray-800">
-              following 12 months
-            </span>
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">
-              “When will I be debt free?”:
-            </span>{" "}
-            For each year we ask: if you sold the entire portfolio at that
-            year-end value, paid CGT (with a 50% discount) at your marginal tax
-            rate (incl Medicare levy), then paid off both the home loan and the
-            investment loan, would you have surplus assets? We maintain a running
-            cost base that increases every time you gear in new money.
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">Interest rates:</span>{" "}
-            We assume both the home loan rate and the investment loan rate
-            remain constant for the full projection. Both are modelled as
-            principal &amp; interest, not interest-only.
-          </li>
-
-          <li>
-            <span className="text-gray-800 font-medium">Exclusions:</span> We
-            do not model lender servicing rules, LVR caps, refinance costs,
-            offset changes over time, changes in your income/living costs,
-            market volatility, market crashes, tax timing differences, or
-            behavioural drift. These factors are outside the scope of this calculator.
-          </li>
-
-          <li>
-            General information only. This is not personal tax, credit, or
-            financial advice.
-          </li>
-        </ul>
+        </SectionCard>
       </div>
 
-      {/* FOOTNOTE DISCLAIMER */}
-      <section className="mt-6 text-[11px] text-gray-500 leading-snug max-w-3xl">
-        This calculator is a simplified projection tool. Speak to a qualified
-        tax professional before implementing.
-      </section>
-    </>
+
+{/* SUMMARY – cards-in-card */}
+<div className="mt-8">
+  <SectionCard>
+    <SummaryGrid>
+      {/* Strategy A */}
+      <SummaryCard
+        label="Final net wealth (Strategy A)"
+        value={
+          results.yearsArr?.length
+            ? aud0(results.yearsArr[results.yearsArr.length - 1].netWealthA)
+            : "—"
+        }
+      />
+
+      {/* Strategy B with diff pill */}
+      {(() => {
+        const has = results.yearsArr?.length > 0;
+        const a = has ? results.yearsArr[results.yearsArr.length - 1].netWealthA : 0;
+        const b = has ? results.yearsArr[results.yearsArr.length - 1].netWealthB : 0;
+        const diff = b - a;
+        const tone = !has ? "neutral" : diff > 0 ? "positive" : diff < 0 ? "negative" : "neutral";
+        const badge = !has ? null : `${diff >= 0 ? "+" : ""}${aud0(diff)} vs A`;
+
+        return (
+          <SummaryCard
+            label="Final net wealth (Strategy B)"
+            value={has ? aud0(b) : "—"}
+            badgeText={badge}
+            badgeTone={tone}
+          />
+        );
+      })()}
+
+      {/* Debt-free year */}
+      <SummaryCard
+        label="Year you could clear all debt*"
+        value={wipeoutYear ? `Year ${wipeoutYear}` : "Not within projection"}
+        note="*If you sold investments, paid CGT, and cleared all loans."
+      />
+    </SummaryGrid>
+  </SectionCard>
+</div>
+
+
+
+
+            {/* DEBT-FREE CHART */}
+      <div className="mt-8">
+        <SectionCard title="When will I be debt free?">
+          <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
+            This compares how much you still owe on your home loan under{" "}
+            <span className="font-medium text-slate-800">Strategy A</span>{" "}
+            against how much surplus you’d have if you sold your investments,
+            paid capital gains tax, and cleared <em>all</em> debts under{" "}
+            <span className="font-medium text-slate-800">Strategy B</span>.
+            When the dark bar turns positive, you’re debt free.
+          </p>
+
+          <div className="w-full h-64">
+            <ResponsiveContainer>
+              <BarChart data={wipeoutChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="year"
+                  tick={{ fontSize: 10, fill: "#4b5563" }}
+                />
+                <YAxis
+                  tickFormatter={(v) =>
+                    (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                      style: "currency",
+                      currency: "AUD",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    })
+                  }
+                  tick={{ fontSize: 10, fill: "#4b5563" }}
+                />
+
+                <RTooltip
+  content={
+    <ChartTooltip
+      valueFormatter={aud0}
+      labelFormatter={(l) => `Year ${l}`}
+      showTotal={false}  // set true if you want a sum row
+    />
+  }
+/>
+
+
+                <Legend
+                  wrapperStyle={{
+                    fontSize: "11px",
+                    paddingTop: "4px",
+                  }}
+                  iconSize={8}
+                />
+
+                <Bar
+                  dataKey="Strategy A Remaining Home Loan"
+                  fill="#93c5fd"
+                />
+                <Bar
+                  dataKey="Strategy B Debt Free Position"
+                  fill="#1e3a8a"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <p className="text-[11px] text-slate-500 leading-snug max-w-3xl mt-4">
+            *“<b>Debt Free Position</b>” - if you sold your investment portfolio in that
+            year and paid CGT (including 50% CGT discount), would you have enough cash to
+            pay off both your home loan and your investment loan?
+          </p>
+        </SectionCard>
+      </div>
+
+
+            {/* COMPARISON TABLE */}
+      <div className="mt-8">
+        <SectionCard title="Year-by-Year Comparison">
+          <div className="overflow-x-auto">
+            <table className="min-w-[900px] text-xs text-left">
+              <thead className="text-slate-600 border-b text-[11px]">
+                <tr className="border-b align-top">
+                  <th className="py-2 pr-4 font-medium">Year</th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Home loan (A)
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      Non-deductible
+                    </div>
+                  </th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Net wealth (A)
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      Total assets − debt
+                    </div>
+                  </th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Home loan (B)
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      Non-deductible
+                    </div>
+                  </th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Investment loan (B)
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      Deductible
+                    </div>
+                  </th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Portfolio value (B)
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      Investments
+                    </div>
+                  </th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Net wealth (B)
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      Total assets − debt
+                    </div>
+                  </th>
+
+                  <th className="py-2 pr-4 font-medium">
+                    Am I debt free (B)?
+                    <div className="text-[10px] text-slate-500 font-normal">
+                      After CGT, would I be debt free?
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="text-slate-800">
+                {results.yearsArr?.map((row) => (
+                  <tr
+                    key={row.year}
+                    className="border-b last:border-0 align-top"
+                  >
+                    <td className="py-2 pr-4 font-medium text-slate-900 whitespace-nowrap">
+                      {row.year}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.homeLoanA)}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.netWealthA)}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.homeLoanB)}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.investLoanB)}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.portfolioB)}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.netWealthB)}
+                    </td>
+
+                    <td className="py-2 pr-4 whitespace-nowrap">
+                      {aud0(row.surplusIfLiquidated)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </SectionCard>
+      </div>
+
+
+            {/* ASSUMPTIONS & REFERENCES */}
+      <div className="mt-8">
+        <SectionCard title="How this calculator works">
+          <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
+            
+            <li>
+              <span className="text-slate-800 font-medium">
+                How repayments are allocated:
+              </span>{" "}
+              We treat the home loan and investment loan as two splits under one
+              facility:
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                <li>
+                  The total monthly repayment remains static throughout the projection.
+                </li>
+                <li>
+                  The monthly repayment is first allocated to the investment loan
+                  as a minimum repayment, then the balance is paid into the home loan.
+                </li>
+                <li>
+                  The following year&rsquo;s income from investments (after tax, plus any negative gearing benefit) is
+                  then paid into the home loan.
+                </li>
+              </ul>
+            </li>
+
+            <li>
+              <span className="text-slate-800 font-medium">
+                Timing of redraws:
+              </span>{" "}
+              We model debt recycling annually. At the end of each year we
+              check how much the home loan actually fell, above the minimum repayments. At the start of the next year
+              we assume you redraw that amount as a new tax-deductible investment loan
+              and invest it. 
+            </li>
+
+            <li>
+              <span className="text-slate-800 font-medium">
+                Investment returns:
+              </span>{" "}
+              We split total return into:
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                <li>
+                  <span className="font-medium text-slate-800">
+                    Cash yield % p.a.
+                  </span>{" "}
+                  (distributions/dividends actually paid to you),
+                </li>
+                <li>
+                  <span className="font-medium text-slate-800">
+                    Capital growth % p.a.
+                  </span>{" "}
+                  (price growth).
+                </li>
+              </ul>
+              
+            </li>
+
+            <li>
+              <span className="text-slate-800 font-medium">
+                After-tax cashflow to home loan:
+              </span>{" "}
+              Annually we:
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                <li>
+                  Calculate cash distributions on the portfolio based on its
+                  balance at the start of that year.
+                </li>
+                <li>
+                  Add franking credits based on the % input and gross that up as assessable income.
+                </li>
+                <li>
+                  Subtract the year’s investment loan interest as a tax-deductible expense. 
+                  If interest exceeds income, that creates a tax loss (negative gearing).
+                </li>
+                <li>
+                  Apply your marginal tax rate (including Medicare levy). The
+                  result can be a refund or amount payable.
+                </li>
+                <li>
+                  Final cash applied to the home loan = distributions +/- any tax refund / payable.
+                </li>
+              </ul>
+              We assume that you direct 100% of that after-tax investment income
+              as additional repayments to your non-deductible home loan split over the following 12 months.
+            </li>
+
+            <li>
+              <span className="text-slate-800 font-medium">
+                “When will I be debt free?”:
+              </span>{" "}
+              For each year we calculate if you sold your entire investment portfolio at that
+              year-end value, paid CGT (with a 50% discount) at your marginal tax
+              rate (incl Medicare levy), would you have enough cash to repay your home loan and investment loan? 
+              We maintain a running cost base that increases every time new money is added to the portfolio.
+            </li>
+
+            <li>
+              <span className="text-slate-800 font-medium">Interest rates:</span>{" "}
+              We assume both the home loan and investment loan interest rates
+              remain constant for the full projection. Both are modelled as
+              principal &amp; interest, not interest-only.
+            </li>
+                     
+          </ul>
+
+        </SectionCard>
+      </div>
+</div>
+<div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+  <p>
+    This calculator is general information only. It does not consider your
+    personal objectives, financial situation, or needs. Speak to a qualified
+    tax professional before implementing.
+  </p>
+</div>
+
+      </>
   );
 }

@@ -1,11 +1,27 @@
 // pages/calculators/tax-calculator.js
 import { useMemo, useState } from "react";
 import Head from "next/head";
-import Tooltip from "../../components/Tooltip";
 
-// helpers for display
-const fmtMoney = (n) => `$${Math.round(n).toLocaleString()}`;
-const fmtOffset = (n) => (n > 0 ? `−${fmtMoney(n)}` : "$0");
+import Tooltip from "@/components/Tooltip";
+import SectionCard from "@/components/SectionCard";
+import PageIntro from "@/components/PageIntro";
+import SubtleCtaLink from "@/components/SubtleCtaLink";
+import SummaryGrid from "@/components/SummaryGrid";
+import SummaryCard from "@/components/SummaryCard";
+
+// Currency formatter (house style)
+function aud0(n) {
+  if (!isFinite(n)) return "$0";
+  return (Math.round(n) || 0).toLocaleString("en-AU", {
+    style: "currency",
+    currency: "AUD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+// For offsets shown as negative benefits (e.g., LITO/SAPTO)
+const fmtOffsetAud = (n) => (n > 0 ? `-${aud0(n)}` : "$0");
 
 
 /** ---------- Resident bracket tax (from 1 July 2024) ----------
@@ -268,195 +284,262 @@ export default function TaxCalculator() {
   }, [annualIncome]);
 
   const per = (n) => Math.round(n / divider);
-
+  const takeHomeAnnual = netAnnual;
+  const takeHomeMonthly = Math.round(netAnnual / 12);
+  const takeHomeFortnightly = Math.round(netAnnual / 26);
   // ——— SEO constants ———
   const pageUrl = "https://fintoolbox.com.au/calculators/tax-calculator";
   const pageTitle = "Income Tax Calculator (Australia)";
   const pageDescription =
-    "Estimate Australian income tax with 2024–25 resident brackets. Toggle Medicare levy, LITO, SAPTO and MLS. Shows take-home pay by pay frequency.";
+    "Estimate Australian income tax with 2025–26 resident tax brackets. Toggle Medicare levy, LITO, SAPTO and MLS. Shows take-home pay by pay frequency.";
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Head>
-        <title>{`${pageTitle} | FinToolbox`}</title>
-        <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={pageUrl} />
+    <main>
+  {/* Keep your existing <Head> block exactly as-is above */}
 
-        {/* Open Graph */}
-        <meta property="og:title" content={`${pageTitle} | FinToolbox`} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={pageUrl} />
-        <meta property="og:image" content="https://fintoolbox.com.au/og-default.png" />
+  {/* Heading (matches Debt Recycling) */}
+  <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
+    <h1 className="text-2xl font-bold text-slate-900">Income Tax Calculator (Australia)</h1>
+  </header>
 
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${pageTitle} | FinToolbox`} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://fintoolbox.com.au/og-default.png" />
-
-        {/* JSON-LD: WebApplication */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebApplication",
-              name: "Income Tax Calculator (Australia)",
-              url: pageUrl,
-              description: pageDescription,
-              applicationCategory: "FinanceApplication",
-              operatingSystem: "All",
-              isAccessibleForFree: true,
-              inLanguage: "en-AU",
-              offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
-              publisher: { "@type": "Organization", name: "FinToolbox", url: "https://fintoolbox.com.au" }
-            }),
-          }}
-        />
-
-        {/* JSON-LD: Breadcrumbs */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://fintoolbox.com.au" },
-                { "@type": "ListItem", position: 2, name: "Calculators", item: "https://fintoolbox.com.au/calculators" },
-                { "@type": "ListItem", position: 3, name: "Income Tax" }
-              ]
-            }),
-          }}
-        />
-      </Head>
-
-      <div className="mx-auto max-w-3xl px-6 py-10">
-        {/* <a href="/" className="text-sm text-blue-600 hover:underline">&larr; Back</a> */}
-        <h1 className="mt-3 text-3xl font-bold text-gray-900">Income Tax Calculator (Australia)</h1>
-        <p className="mt-2 text-gray-600">
-          Resident brackets from 1 July 2024. Toggles for Medicare levy, LITO, SAPTO, and MLS.
+  <div className="max-w-5xl mx-auto px-4 mt-4">
+    {/* Blue intro card (PageIntro) */}
+    <PageIntro tone="blue">
+      <div className="space-y-2">
+        <p>
+          Estimate your Australian resident income tax (from 1 July 2024), including Medicare levy, SAPTO and the
+          Medicare Levy Surcharge (MLS). Toggle options and switch pay frequency to see take-home pay.
         </p>
+        <p className="mt-2">
+          Enter your income and household details below. We’ll show annual tax plus per-pay figures.
+        </p>
+      </div>
+    </PageIntro>
 
-        {/* Inputs */}
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border bg-white p-5 shadow-sm space-y-3">
-            <label className="block text-sm font-medium text-gray-700">Income</label>
-            <input type="number" min="0" value={income} onChange={(e) => setIncome(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2" placeholder="e.g. 90000" />
+    {/* Optional guide link */}
+    <SubtleCtaLink className="mt-3" href="/blog/lito-explained">Not sure how LITO works? Read the explainer →</SubtleCtaLink> 
 
-            <label className="block text-sm font-medium text-gray-700">Frequency</label>
-            <select value={frequency} onChange={(e) => setFrequency(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2">
-              <option value="annual">Annual</option>
-              <option value="monthly">Monthly</option>
-              <option value="fortnightly">Fortnightly</option>
-              <option value="weekly">Weekly</option>
-            </select>
+    {/* INPUTS – single card, grouped, 3-col grid */}
+    <div className="mt-6">
+      <SectionCard title="Your assumptions">
+        <div className="space-y-6">
 
-            <label className="block text-sm font-medium text-gray-700">Status</label>
-            <select value={maritalStatus} onChange={(e) => setMaritalStatus(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2">
-              <option value="single">Single</option>
-              <option value="couple">Couple</option>
-            </select>
+          {/* Income & frequency */}
+          <div>
+            <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+              Income &amp; frequency
+              <Tooltip text="Enter your gross pay and frequency. We annualise it for tax calculations." />
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+              <label className="flex flex-col">
+                <span className="text-slate-600">Income</span>
+                <input
+                  type="number"
+                  min="0"
+                  className="border rounded px-2 py-1"
+                  value={income}
+                  onChange={(e) => setIncome(Number(e.target.value))}
+                  placeholder="e.g. 90000"
+                />
+              </label>
 
-            {maritalStatus === "couple" && (
-              <>
-                <label className="block text-sm font-medium text-gray-700">Partner income (annual)</label>
-                <input type="number" min="0" value={partnerIncome} onChange={(e) => setPartnerIncome(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2" placeholder="e.g. 80000" />
-              </>
-            )}
+              <label className="flex flex-col">
+                <span className="text-slate-600">Frequency</span>
+                <select
+                  className="border rounded px-2 py-1"
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
+                >
+                  <option value="annual">Annual</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="fortnightly">Fortnightly</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </label>
 
-            <label className="block text-sm font-medium text-gray-700">Dependent children</label>
-            <input type="number" min="0" value={dependants} onChange={(e) => setDependants(e.target.value)} className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2" />
+              <label className="flex flex-col">
+                <span className="text-slate-600">Marginal rate (bracket)</span>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 bg-slate-50"
+                  value={`${marginalRate}%`}
+                  readOnly
+                />
+              </label>
+            </div>
+          </div>
 
-            <div className="mt-2 space-y-2 text-sm">
+          {/* Household */}
+          <div>
+            <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+              Household
+              <Tooltip text="Status and dependants affect Medicare levy thresholds and MLS family thresholds." />
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+              <label className="flex flex-col">
+                <span className="text-slate-600">Status</span>
+                <select
+                  className="border rounded px-2 py-1"
+                  value={maritalStatus}
+                  onChange={(e) => setMaritalStatus(e.target.value)}
+                >
+                  <option value="single">Single</option>
+                  <option value="couple">Couple</option>
+                </select>
+              </label>
+
+              {maritalStatus === "couple" && (
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Partner income (annual)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="border rounded px-2 py-1"
+                    value={partnerIncome}
+                    onChange={(e) => setPartnerIncome(Number(e.target.value))}
+                    placeholder="e.g. 80000"
+                  />
+                </label>
+              )}
+
+              <label className="flex flex-col">
+                <span className="text-slate-600">Dependent children</span>
+                <input
+                  type="number"
+                  min="0"
+                  className="border rounded px-2 py-1"
+                  value={dependants}
+                  onChange={(e) => setDependants(Number(e.target.value))}
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Offsets & levies */}
+          <div>
+            <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+              Offsets &amp; levies
+              <Tooltip text="Toggle whether to apply LITO, SAPTO and the Medicare levy. MLS applies if no private cover and thresholds are exceeded." />
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={includeMedicare} onChange={(e) => setIncludeMedicare(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={includeMedicare}
+                  onChange={(e) => setIncludeMedicare(e.target.checked)}
+                />
                 Include Medicare levy
               </label>
+
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={includeLITO} onChange={(e) => setIncludeLITO(e.target.checked)} />
-                Apply LITO (Low-Income Tax Offset)
-                <Tooltip text="LITO: reduces tax for low-to-middle incomes (max $700, tapers to $0 at ~$67k)." />
+                <input
+                  type="checkbox"
+                  checked={includeLITO}
+                  onChange={(e) => setIncludeLITO(e.target.checked)}
+                />
+                Apply LITO
+                <Tooltip text="LITO: max $700; tapers to $0 at ~$66,667." />
               </label>
+
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={privateHospitalCover} onChange={(e) => setPrivateHospitalCover(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={privateHospitalCover}
+                  onChange={(e) => setPrivateHospitalCover(e.target.checked)}
+                />
                 I had private hospital cover all year (disables MLS)
-                <Tooltip text="If you don’t have cover and earn above the MLS threshold ($97k single / $194k family), a 1–1.5% surcharge applies." />
+                <Tooltip text="Without cover and above the MLS threshold, a 1.0–1.5% surcharge applies." />
               </label>
-              <div className="rounded-lg bg-yellow-50 p-2">
-                <div className="font-medium">SAPTO (estimate)</div>
+            </div>
+
+            {/* SAPTO panel */}
+            <div className="mt-3 rounded-lg bg-yellow-50 p-3 text-sm">
+              <div className="font-medium">SAPTO (estimate)</div>
+              <label className="mt-1 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={saptoYou}
+                  onChange={(e) => setSaptoYou(e.target.checked)}
+                />
+                I’m eligible for SAPTO
+                <Tooltip text="Seniors & Pensioners Tax Offset – estimate only." />
+              </label>
+              {maritalStatus === "couple" && (
                 <label className="mt-1 flex items-center gap-2">
-                  <input type="checkbox" checked={saptoYou} onChange={(e) => setSaptoYou(e.target.checked)} />
-                  I’m eligible for SAPTO
-                  <Tooltip text="SAPTO: Seniors & Pensioners Tax Offset – available if you meet Age Pension age & income criteria." />
+                  <input
+                    type="checkbox"
+                    checked={saptoPartner}
+                    onChange={(e) => setSaptoPartner(e.target.checked)}
+                  />
+                  Partner is eligible for SAPTO
                 </label>
-                {maritalStatus === "couple" && (
-                  <label className="mt-1 flex items-center gap-2">
-                    <input type="checkbox" checked={saptoPartner} onChange={(e) => setSaptoPartner(e.target.checked)} />
-                    Partner is eligible for SAPTO
-                  </label>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-900 space-y-1">
-              <div><span className="font-medium">Annualised:</span> ${annualIncome.toLocaleString()}</div>
-              <div><span className="font-medium">Marginal rate (bracket):</span> {marginalRate}%</div>
+              )}
             </div>
           </div>
 
-          {/* Results */}
-          <div className="rounded-2xl border bg-white p-5 shadow-sm space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <div className="text-sm text-gray-500">Bracket tax (annual)</div>
-                <div className="mt-1 text-2xl font-semibold">{fmtMoney(bracketTax)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">LITO (annual)</div>
-                <div className="mt-1 text-2xl font-semibold">{fmtOffset(lito)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">SAPTO (annual)</div>
-                <div className="mt-1 text-2xl font-semibold">{fmtOffset(sapto)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">Medicare levy (annual)</div>
-                <div className="mt-1 text-2xl font-semibold">{fmtMoney(medicare)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">MLS (annual)</div>
-                <div className="mt-1 text-2xl font-semibold">{fmtMoney(mls)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">Total tax ({frequency})</div>
-                <div className="mt-1 text-2xl font-semibold">{fmtMoney(per(totalTaxAnnual))}</div>
-              </div>
-            </div>
-
-            <div className="mt-2 rounded-lg bg-gray-50 p-3">
-              <div className="text-sm text-gray-500">Take-home pay ({frequency})</div>
-              <div className="mt-1 text-2xl font-semibold">{fmtMoney(per(netAnnual))}</div>
-            </div>
-
-            <div className="mt-2 text-xs text-gray-500">
-              MLS uses taxable income for simplicity. Real MLS uses “income for MLS purposes” (adds fringe benefits etc).
-            </div>
-          </div>
         </div>
+      </SectionCard>
+    </div>
 
-        {/* Notes */}
-        <div className="mt-6 rounded-2xl border bg-white p-5 text-sm text-gray-600 shadow-sm space-y-2">
-          <p className="font-medium">Notes & assumptions</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Medicare levy full rate 2%, with low-income thresholds (2024–25) – higher seniors thresholds when SAPTO checked.</li>
-            <li>MLS tiers 2024–25 (no hospital cover): singles &gt; $97k, families &gt; $194k (+$1,500 per child after first) at 1.0% / 1.25% / 1.5%.</li>
-            <li>SAPTO is a non-refundable offset; simple estimate only. Real rules use “rebate income” and eligibility for Age Pension.</li>
-            <li>General information only; not tax advice.</li>
-          </ul>
+    {/* RESULTS – Summary cards */}
+    <div className="mt-8">
+      <SectionCard>
+        <SummaryGrid>
+          <SummaryCard label="Bracket tax (annual)" value={aud0(bracketTax)} />
+          <SummaryCard label="LITO (annual)" value={fmtOffsetAud(lito)} />
+          <SummaryCard label="SAPTO (annual)" value={fmtOffsetAud(sapto)} />
+          <SummaryCard label="Medicare levy (annual)" value={aud0(medicare)} />
+          <SummaryCard label="MLS (annual)" value={aud0(mls)} />
+          <SummaryCard label={`Total tax (${frequency})`} value={aud0(per(totalTaxAnnual))} />
+          {/* Take-home results (highlighted) */}
+<SummaryCard
+  label="Take-home pay"
+  value={aud0(takeHomeAnnual)}
+  suffix="per annum"
+  className="bg-blue-50 border-blue-100"
+/>
+<SummaryCard
+  label="Take-home pay"
+  value={aud0(takeHomeMonthly)}
+  suffix="per month"
+  className="bg-blue-50 border-blue-100"
+/>
+<SummaryCard
+  label="Take-home pay"
+  value={aud0(takeHomeFortnightly)}
+  suffix="per fortnight"
+  className="bg-blue-50 border-blue-100"
+/>
+
+        </SummaryGrid>
+        <div className="mt-3 text-[11px] text-slate-500 leading-snug">
+          MLS uses taxable income for simplicity. Real MLS uses “income for MLS purposes” (adds fringe benefits etc).
         </div>
-      </div>
-    </main>
+      </SectionCard>
+    </div>
+
+    {/* ASSUMPTIONS */}
+    <div className="mt-8">
+      <SectionCard title="Assumptions & references">
+        <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
+          <li>Resident brackets from 1 July 2024 (excludes Medicare/offsets until applied below).</li>
+          <li>Medicare levy 2% with low-income thresholds (2024–25), higher seniors thresholds when SAPTO is ticked.</li>
+          <li>MLS tiers 2024–25 (no cover): singles &gt; $97k; families &gt; $194k (+$1,500 per child after first): 1.0% / 1.25% / 1.5%.</li>
+          <li>SAPTO is a non-refundable offset; estimate only. Actual rules use “rebate income” and Age Pension eligibility.</li>
+          <li>General information only; not tax advice.</li>
+        </ul>
+      </SectionCard>
+    </div>
+  </div>
+
+  {/* Footer disclaimer (house style) */}
+  <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+    <p>
+      This calculator is general information only. It does not consider your personal objectives, financial situation,
+      or needs. Consider speaking with a qualified professional.
+    </p>
+  </div>
+</main>
+
   );
 }

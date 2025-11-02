@@ -2,6 +2,14 @@
 import { useMemo, useState } from "react";
 import Head from "next/head";
 import SEO from "@/components/SEO";
+import Tooltip from "@/components/Tooltip";
+import SectionCard from "@/components/SectionCard";
+import PageIntro from "@/components/PageIntro";
+import SubtleCtaLink from "@/components/SubtleCtaLink";
+import SummaryGrid from "@/components/SummaryGrid";
+import SummaryCard from "@/components/SummaryCard";
+import ChartTooltip from "@/components/ChartTooltip";
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -30,7 +38,7 @@ export default function MortgageCalculator() {
   const [extra, setExtra] = useState(0); // extra repayment per chosen frequency
 
   // Table view toggle
-  const [scheduleMode, setScheduleMode] = useState("period"); // 'period' | 'annual'
+  const [scheduleMode, setScheduleMode] = useState("annual"); // 'period' | 'annual'
 
   const periods =
     frequency === "weekly" ? 52 : frequency === "fortnightly" ? 26 : 12;
@@ -224,38 +232,6 @@ export default function MortgageCalculator() {
         })
       : "N/A";
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (!active || !payload?.length) return null;
-
-    // Map keys to values
-    const byKey = Object.fromEntries(
-      payload.map((p) => [p.dataKey, p.value])
-    );
-
-    const show = (v) =>
-      v == null
-        ? "—"
-        : v.toLocaleString("en-AU", {
-            style: "currency",
-            currency: "AUD",
-            maximumFractionDigits: 0,
-          });
-
-    return (
-      <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
-        <div className="mb-1 font-semibold">Year {label}</div>
-        <div>
-          Balance (min pmt):{" "}
-          <span className="font-medium">{show(byKey.BalanceBase)}</span>
-        </div>
-        <div>
-          Balance (extra pmt):{" "}
-          <span className="font-medium">{show(byKey.BalanceExtra)}</span>
-        </div>
-      </div>
-    );
-  };
-
   // SEO constants for this page
   const pageUrl = "https://fintoolbox.com.au/calculators/mortgage";
   const pageTitle = "Mortgage Repayment Calculator (Australia)";
@@ -263,29 +239,23 @@ export default function MortgageCalculator() {
     "Compare minimum vs extra repayments, see payoff time and interest, and view a full amortisation schedule. Australian mortgage calculator.";
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* 1. Centralised SEO: canonical lives here */}
+    <main>
+      {/* Site-wide heading bar */}
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
+        <h1 className="text-2xl font-bold text-slate-900">
+          Mortgage Repayment Calculator
+        </h1>
+      </header>
+
+      {/* Centralised SEO (kept) */}
       <SEO
         title={pageTitle}
         description={pageDescription}
         url={pageUrl}
         image="https://fintoolbox.com.au/og-default.png"
       />
-
-      {/* 2. Calculator-specific structured data, OG tweaks, etc */}
+      {/* Extra meta / JSON-LD that aren’t in SEO */}
       <Head>
-        {/* Open Graph */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={pageUrl} />
-        <meta
-          property="og:image"
-          content="https://fintoolbox.com.au/og-default.png"
-        />
-        <meta property="og:image:alt" content={pageTitle} />
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-
         {/* JSON-LD: WebApplication */}
         <script
           type="application/ld+json"
@@ -300,11 +270,7 @@ export default function MortgageCalculator() {
               operatingSystem: "All",
               isAccessibleForFree: true,
               inLanguage: "en-AU",
-              offers: {
-                "@type": "Offer",
-                price: "0",
-                priceCurrency: "AUD",
-              },
+              offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
               publisher: {
                 "@type": "Organization",
                 name: "FinToolbox",
@@ -313,368 +279,323 @@ export default function MortgageCalculator() {
             }),
           }}
         />
-
-        {/* JSON-LD: Breadcrumbs */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                {
-                  "@type": "ListItem",
-                  position: 1,
-                  name: "Home",
-                  item: "https://fintoolbox.com.au",
-                },
-                {
-                  "@type": "ListItem",
-                  position: 2,
-                  name: "Calculators",
-                  item: "https://fintoolbox.com.au/calculators",
-                },
-                {
-                  "@type": "ListItem",
-                  position: 3,
-                  name: "Mortgage",
-                  item: pageUrl,
-                },
-              ],
-            }),
-          }}
-        />
       </Head>
 
-      <div className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="mt-3 text-3xl font-bold text-gray-900">
-          Mortgage Repayment Calculator
-        </h1>
-        <p className="mt-2 text-gray-600">
-          Compare your loan with minimum repayments vs. adding extra each
-          period. Calculate payoff time, interest, and a full amortisation
-          schedule.
-        </p>
-
-        {/* Inputs */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Loan amount
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={loanAmount}
-                onChange={(e) => setLoanAmount(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Interest rate (p.a. %)
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={interest}
-                onChange={(e) => setInterest(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Term (years)
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={termYears}
-                onChange={(e) => setTermYears(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Repayment frequency
-              </label>
-              <select
-                value={frequency}
-                onChange={(e) => setFrequency(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-              >
-                <option value="monthly">Monthly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="weekly">Weekly</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Extra repayments ({frequency})
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={extra}
-                onChange={(e) => setExtra(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-              />
-            </div>
-          </div>
-
-          {/* KPIs */}
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">
-                Min repayments ({frequency})
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {fmt(baseRepayment)}
-              </div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">
-                With extra repayments ({frequency})
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {fmt(baseRepayment + (Number(extra) || 0))}
-              </div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">
-                Payoff time (with extra repayments)
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {payoffWithExtra
-                  ? `${payoffWithExtra.years}y ${payoffWithExtra.months}m`
-                  : "N/A"}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Chart */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Projection</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Remaining balance each year: minimum vs. with extra repayments.
+      <div className="max-w-5xl mx-auto px-4 mt-4">
+        {/* Blue intro card */}
+        <PageIntro tone="blue">
+          <p>
+            Compare your home loan under <strong>minimum repayments</strong> vs{" "}
+            <strong>adding extra each period</strong>. See remaining balance,
+            payoff time, total interest, and a full amortisation schedule.
           </p>
+        </PageIntro>
 
-          <div className="mt-4 h-72 w-full min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={chartData}
-                margin={{ top: 10, right: 20, bottom: 0, left: -10 }}
-              >
-                <defs>
-                  <linearGradient id="gBase" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3} />
-                    <stop
-                      offset="100%"
-                      stopColor="#1e3a8a"
-                      stopOpacity={0.05}
-                    />
-                  </linearGradient>
-                  <linearGradient id="gExtra" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
-                    <stop
-                      offset="100%"
-                      stopColor="#60a5fa"
-                      stopOpacity={0.05}
-                    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="year"
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <YAxis
-                  tickFormatter={(v) =>
-                    v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`
-                  }
-                  width={56}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <RTooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ paddingTop: 8 }} />
-                <Area
-                  name="Balance (min only)"
-                  type="monotone"
-                  dataKey="BalanceBase"
-                  stroke="#1e3a8a"
-                  fill="url(#gBase)"
-                  strokeWidth={2}
-                />
-                <Area
-                  name="Balance (with extra)"
-                  type="monotone"
-                  dataKey="BalanceExtra"
-                  stroke="#60a5fa"
-                  fill="url(#gExtra)"
-                  strokeWidth={2}
-                  strokeDasharray="2 3"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
+        <SubtleCtaLink className="mt-3" href="/blog/mortgage-extra-repayments-explained">
+          New to extra repayments? Read the explainer →
+        </SubtleCtaLink>
 
-        {/* Totals & Savings */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">
-                Total interest (min repayments)
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {fmt(simBase.totalInterest)}
-              </div>
-              <div className="text-xs text-gray-500 mt-2">Payoff time</div>
-              <div className="font-medium">
-                {payoffBase
-                  ? `${payoffBase.years}y ${payoffBase.months}m`
-                  : "N/A"}
-              </div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">
-                Total interest (with extra repayments)
-              </div>
-              <div className="mt-1 text-xl font-semibold">
-                {fmt(simExtra.totalInterest)}
-              </div>
-              <div className="text-xs text-gray-500 mt-2">Payoff time</div>
-              <div className="font-medium">
-                {payoffWithExtra
-                  ? `${payoffWithExtra.years}y ${payoffWithExtra.months}m`
-                  : "N/A"}
-              </div>
-            </div>
-            <div className="rounded-lg bg-blue-50 p-3">
-              <div className="text-xs text-blue-700">
-                Savings with extra repayments
-              </div>
-              <div className="mt-1 text-xl font-semibold text-blue-900">
-                {interestSaved != null
-                  ? `${fmt(interestSaved)} interest`
-                  : "—"}
-              </div>
-              <div className="text-sm text-blue-900 mt-1">
-                {timeSaved
-                  ? `${timeSaved.years}y ${timeSaved.months}m faster`
-                  : "—"}
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* INPUTS – grouped like the house style */}
+        <div className="mt-6">
+          <SectionCard title="Loan details">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+              <label className="flex flex-col">
+                <span className="text-slate-600">Loan amount ($)</span>
+                <input
+                  type="number"
+                  min="0"
+                  className="border rounded px-2 py-1"
+                  value={loanAmount}
+                  onChange={(e) => setLoanAmount(e.target.value)}
+                />
+              </label>
 
-        {/* Amortisation Schedule */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-sm font-medium text-gray-700">
-              Amortisation schedule (with extra)
-            </div>
-            <div className="inline-flex rounded-lg border bg-white p-0.5">
-              <button
-                type="button"
-                onClick={() => setScheduleMode("period")}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  scheduleMode === "period"
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Per period
-              </button>
-              <button
-                type="button"
-                onClick={() => setScheduleMode("annual")}
-                className={`px-3 py-1 text-sm rounded-md ${
-                  scheduleMode === "annual"
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                Annual summary
-              </button>
-            </div>
-          </div>
+              <label className="flex flex-col">
+                <span className="text-slate-600 flex items-center gap-2">
+                  Interest rate (% p.a.)
+                  <Tooltip text="Nominal annual interest rate. Assumes constant rate for the life of the loan." />
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="border rounded px-2 py-1"
+                  value={interest}
+                  onChange={(e) => setInterest(e.target.value)}
+                />
+              </label>
 
-          <div className="overflow-x-auto">
-            {scheduleMode === "period" ? (
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500">
-                    <th className="py-1 pr-4">Period</th>
-                    <th className="py-1 pr-4">Min repayment</th>
-                    <th className="py-1 pr-4">Extra repayment</th>
-                    <th className="py-1 pr-4">Total repayment</th>
-                    <th className="py-1 pr-4">Interest</th>
-                    <th className="py-1 pr-4">Principal</th>
-                    <th className="py-1 pr-4">Balance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {simExtra.rows.map((r) => (
-                    <tr key={r.period} className="border-t">
-                      <td className="py-1 pr-4">{r.period}</td>
-                      <td className="py-1 pr-4">{fmt(r.minPayment)}</td>
-                      <td className="py-1 pr-4">{fmt(r.extraPayment)}</td>
-                      <td className="py-1 pr-4">{fmt(r.repayment)}</td>
-                      <td className="py-1 pr-4">{fmt(r.interest)}</td>
-                      <td className="py-1 pr-4">{fmt(r.principal)}</td>
-                      <td className="py-1 pr-4">{fmt(r.balance)}</td>
+              <label className="flex flex-col">
+                <span className="text-slate-600">Term (years)</span>
+                <input
+                  type="number"
+                  min="1"
+                  className="border rounded px-2 py-1"
+                  value={termYears}
+                  onChange={(e) => setTermYears(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700 mt-4">
+              <label className="flex flex-col">
+                <span className="text-slate-600">Repayment frequency</span>
+                <select
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
+                  className="border rounded px-2 py-1"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="fortnightly">Fortnightly</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col">
+                <span className="text-slate-600">
+                  Extra repayments ({frequency})
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  className="border rounded px-2 py-1"
+                  value={extra}
+                  onChange={(e) => setExtra(e.target.value)}
+                />
+              </label>
+            </div>
+          </SectionCard>
+        </div>
+
+        {/* KPI SUMMARY – house style */}
+        <div className="mt-8">
+          <SectionCard>
+            <SummaryGrid>
+              <SummaryCard
+                label={`Minimum repayment (${frequency})`}
+                value={fmt(baseRepayment)}
+              />
+              <SummaryCard
+                label={`With extra (${frequency})`}
+                value={fmt(baseRepayment + (Number(extra) || 0))}
+              />
+              <SummaryCard
+                label="Payoff time (min only)"
+                value={
+                  payoffBase
+                    ? `${payoffBase.years}y ${payoffBase.months}m`
+                    : "N/A"
+                }
+              />
+              <SummaryCard
+                label="Payoff time (with extra)"
+                value={
+                  payoffWithExtra
+                    ? `${payoffWithExtra.years}y ${payoffWithExtra.months}m`
+                    : "N/A"
+                }
+              />
+              <SummaryCard
+                label="Total interest (min only)"
+                value={fmt(simBase.totalInterest)}
+              />
+              <SummaryCard
+                label="Total interest (with extra)"
+                value={fmt(simExtra.totalInterest)}
+              />
+              <SummaryCard
+                label="Interest saved with extra"
+                value={
+                  interestSaved != null ? fmt(interestSaved) : "—"
+                }
+              />
+              <SummaryCard
+                label="Time saved with extra"
+                value={
+                  timeSaved ? `${timeSaved.years}y ${timeSaved.months}m` : "—"
+                }
+              />
+            </SummaryGrid>
+          </SectionCard>
+        </div>
+
+        {/* CHART – balances by year */}
+        <div className="mt-8">
+          <SectionCard title="Balance projection">
+            <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
+              Remaining balance at the end of each year under minimum repayments vs. with your extra amount.
+            </p>
+
+            <div className="w-full h-72">
+              <ResponsiveContainer>
+                <AreaChart data={chartData} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
+                  <defs>
+                    <linearGradient id="gBase" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
+                    </linearGradient>
+                    <linearGradient id="gExtra" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="year"
+                    tick={{ fontSize: 10, fill: "#4b5563" }}
+                  />
+                  <YAxis
+                    tickFormatter={(v) =>
+                      (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                        style: "currency",
+                        currency: "AUD",
+                        maximumFractionDigits: 0,
+                      })
+                    }
+                    tick={{ fontSize: 10, fill: "#4b5563" }}
+                  />
+                  <RTooltip
+                    content={
+                      <ChartTooltip
+                        valueFormatter={(v) =>
+                          (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                            style: "currency",
+                            currency: "AUD",
+                            maximumFractionDigits: 0,
+                          })
+                        }
+                        labelFormatter={(l) => `Year ${l}`}
+                      />
+                    }
+                  />
+                  <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }} iconSize={8} />
+                  <Area
+                    name="Balance (min only)"
+                    type="monotone"
+                    dataKey="BalanceBase"
+                    stroke="#1e3a8a"
+                    fill="url(#gBase)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    name="Balance (with extra)"
+                    type="monotone"
+                    dataKey="BalanceExtra"
+                    stroke="#60a5fa"
+                    fill="url(#gExtra)"
+                    strokeWidth={2}
+                    strokeDasharray="2 3"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SectionCard>
+        </div>
+
+        {/* AMORTISATION TABLE */}
+        <div className="mt-8">
+          <SectionCard title="Amortisation schedule (with extra)">
+            <div className="flex items-center justify-between mb-3">
+              <div />
+              <div className="inline-flex rounded-lg border bg-white p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setScheduleMode("period")}
+                  className={`px-3 py-1 text-sm rounded-md ${
+                    scheduleMode === "period"
+                      ? "bg-gray-800 text-white"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  Per period
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScheduleMode("annual")}
+                  className={`px-3 py-1 text-sm rounded-md ${
+                    scheduleMode === "annual"
+                      ? "bg-gray-800 text-white"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  Annual summary
+                </button>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              {scheduleMode === "period" ? (
+                <table className="min-w-[900px] text-xs text-left">
+                  <thead className="text-slate-600 border-b text-[11px]">
+                    <tr className="border-b align-top">
+                      <th className="py-2 pr-4 font-medium">Period</th>
+                      <th className="py-2 pr-4 font-medium">Min repayment</th>
+                      <th className="py-2 pr-4 font-medium">Extra repayment</th>
+                      <th className="py-2 pr-4 font-medium">Total repayment</th>
+                      <th className="py-2 pr-4 font-medium">Interest</th>
+                      <th className="py-2 pr-4 font-medium">Principal</th>
+                      <th className="py-2 pr-4 font-medium">Balance</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="text-left text-gray-500">
-                    <th className="py-1 pr-4">Year</th>
-                    <th className="py-1 pr-4">Min repayment</th>
-                    <th className="py-1 pr-4">Extra repayment</th>
-                    <th className="py-1 pr-4">Total repayment</th>
-                    <th className="py-1 pr-4">Interest</th>
-                    <th className="py-1 pr-4">Principal</th>
-                    <th className="py-1 pr-4">Ending balance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {annualRows.map((r) => (
-                    <tr key={r.year} className="border-t">
-                      <td className="py-1 pr-4">{r.year}</td>
-                      <td className="py-1 pr-4">{fmt(r.minPayment)}</td>
-                      <td className="py-1 pr-4">{fmt(r.extraPayment)}</td>
-                      <td className="py-1 pr-4">{fmt(r.repayment)}</td>
-                      <td className="py-1 pr-4">{fmt(r.interest)}</td>
-                      <td className="py-1 pr-4">{fmt(r.principal)}</td>
-                      <td className="py-1 pr-4">{fmt(r.balance)}</td>
+                  </thead>
+                  <tbody className="text-slate-800">
+                    {simExtra.rows.map((r) => (
+                      <tr key={r.period} className="border-b last:border-0 align-top">
+                        <td className="py-2 pr-4">{r.period}</td>
+                        <td className="py-2 pr-4">{fmt(r.minPayment)}</td>
+                        <td className="py-2 pr-4">{fmt(r.extraPayment)}</td>
+                        <td className="py-2 pr-4">{fmt(r.repayment)}</td>
+                        <td className="py-2 pr-4">{fmt(r.interest)}</td>
+                        <td className="py-2 pr-4">{fmt(r.principal)}</td>
+                        <td className="py-2 pr-4">{fmt(r.balance)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="min-w-[900px] text-xs text-left">
+                  <thead className="text-slate-600 border-b text-[11px]">
+                    <tr className="border-b align-top">
+                      <th className="py-2 pr-4 font-medium">Year</th>
+                      <th className="py-2 pr-4 font-medium">Min repayment</th>
+                      <th className="py-2 pr-4 font-medium">Extra repayment</th>
+                      <th className="py-2 pr-4 font-medium">Total repayment</th>
+                      <th className="py-2 pr-4 font-medium">Interest</th>
+                      <th className="py-2 pr-4 font-medium">Principal</th>
+                      <th className="py-2 pr-4 font-medium">Ending balance</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                  </thead>
+                  <tbody className="text-slate-800">
+                    {annualRows.map((r) => (
+                      <tr key={r.year} className="border-b last:border-0 align-top">
+                        <td className="py-2 pr-4">{r.year}</td>
+                        <td className="py-2 pr-4">{fmt(r.minPayment)}</td>
+                        <td className="py-2 pr-4">{fmt(r.extraPayment)}</td>
+                        <td className="py-2 pr-4">{fmt(r.repayment)}</td>
+                        <td className="py-2 pr-4">{fmt(r.interest)}</td>
+                        <td className="py-2 pr-4">{fmt(r.principal)}</td>
+                        <td className="py-2 pr-4">{fmt(r.balance)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
 
-          <p className="mt-2 text-xs text-gray-500">
-            Minimum = scheduled payment without extra; Extra = additional amount
-            you chose. Final period may be lower than the usual payment.
-            Assumes constant rate/frequency.
+            <p className="mt-2 text-[11px] text-slate-600">
+              Minimum = scheduled payment without extra; Extra = the additional amount you chose.
+              Final period may be lower than the usual payment. Assumes constant rate/frequency.
+            </p>
+          </SectionCard>
+        </div>
+
+        {/* Footer disclaimer (house style) */}
+        <div className="max-w-5xl mx-auto mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+          <p>
+            This calculator is general information only. It does not consider your personal objectives, financial situation,
+            or needs. Consider speaking with a qualified professional.
           </p>
-        </section>
+        </div>
       </div>
     </main>
   );
