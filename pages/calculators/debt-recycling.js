@@ -743,7 +743,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             </label>
 
             <label className="flex flex-col">
-              <span className="text-Slate-600">Cash yield % p.a.</span>
+              <span className="text-slate-600">Cash yield % p.a.</span>
               <input
                 type="number"
                 step="0.1"
@@ -943,7 +943,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
     <ChartTooltip
       valueFormatter={aud0}
       labelFormatter={(l) => `Year ${l}`}
-      showTotal={false}  // set true if you want a sum row
+      showTotal={false}  
     />
   }
 />
