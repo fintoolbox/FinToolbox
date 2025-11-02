@@ -542,7 +542,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
       invest it. Over time, investment income (and the tax benefits of 
       negative gearing) help accelerate your home loan repayments while you build a portfolio. 
       Additional lump sum payments to your home loan and the redrawn annually and invested. 
-      'Bad' debt is recycled into 'good' debt over time.
+      &lsquo;Bad&rsquo; debt is recycled into &lsquo;good&rsquo; debt over time.
     </p>
 
   <p>
