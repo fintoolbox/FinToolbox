@@ -1,6 +1,13 @@
 // pages/calculators/investment-growth.js
 import { useMemo, useState } from "react";
 import Head from "next/head";
+import Tooltip from "@/components/Tooltip";
+import SectionCard from "@/components/SectionCard";
+import PageIntro from "@/components/PageIntro";
+import SubtleCtaLink from "@/components/SubtleCtaLink";
+import SummaryGrid from "@/components/SummaryGrid";
+import SummaryCard from "@/components/SummaryCard";
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,7 +30,7 @@ export default function InvestmentGrowth() {
 
   // ——— Helpers ———
   const fmt = (n) =>
-    n.toLocaleString("en-AU", {
+    (isFinite(n) ? n : 0).toLocaleString("en-AU", {
       style: "currency",
       currency: "AUD",
       maximumFractionDigits: 0,
@@ -89,9 +96,9 @@ export default function InvestmentGrowth() {
       <div className="rounded-lg border bg-white p-3 text-xs shadow-md">
         <div className="mb-1 font-semibold">Year {label}</div>
         <div className="space-y-0.5">
-          <div>Balance: <span className="font-medium">{fmt(byKey.Balance || 0)}</span></div>
-          <div>Contributed: <span className="font-medium">{fmt(byKey.Contributed || 0)}</span></div>
-          <div>Earnings: <span className="font-medium">{fmt(byKey.Earnings || 0)}</span></div>
+          <div>Balance: <span className="font-semibold">{fmt(byKey.Balance || 0)}</span></div>
+          <div>Contributed: <span className="font-semibold">{fmt(byKey.Contributed || 0)}</span></div>
+          <div>Earnings: <span className="font-semibold">{fmt(byKey.Earnings || 0)}</span></div>
         </div>
       </div>
     );
@@ -128,7 +135,15 @@ export default function InvestmentGrowth() {
   ];
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main>
+      {/* Site-wide heading bar */}
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
+        <h1 className="text-2xl font-bold text-slate-900">
+          Investment Growth Calculator (Compound Interest)
+        </h1>
+      </header>
+
+      {/* Head / SEO */}
       <Head>
         <title>{`${pageTitle} | FinToolbox`}</title>
         <meta name="description" content={pageDescription} />
@@ -200,231 +215,249 @@ export default function InvestmentGrowth() {
         />
       </Head>
 
-      <div className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="mt-3 text-3xl font-bold text-gray-900">
-          Investment Growth Calculator (Compound Interest)
-        </h1>
-        <p className="mt-2 text-gray-600">
-          Project your balance with monthly compounding and regular contributions. Return shown net of annual fees.
-        </p>
-
-        {/* ——— Inputs (Top) ——— */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Initial amount</label>
-              <input
-                type="number"
-                min="0"
-                value={initial}
-                onChange={(e) => setInitial(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-                inputMode="decimal"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Regular contribution</label>
-              <input
-                type="number"
-                min="0"
-                value={contrib}
-                onChange={(e) => setContrib(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-                inputMode="decimal"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Contribution frequency</label>
-              <select
-                value={contribFreq}
-                onChange={(e) => setContribFreq(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-              >
-                <option value="monthly">Monthly</option>
-                <option value="fortnightly">Fortnightly</option>
-                <option value="weekly">Weekly</option>
-                <option value="annual">Annual</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Years</label>
-              <input
-                type="number"
-                min="1"
-                value={years}
-                onChange={(e) => setYears(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-                inputMode="numeric"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Return (p.a. %)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={returnPct}
-                onChange={(e) => setReturnPct(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-                inputMode="decimal"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Fees (p.a. %)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={feePct}
-                onChange={(e) => setFeePct(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2"
-                inputMode="decimal"
-              />
-            </div>
-          </div>
-
-          {/* KPI row */}
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Final balance</div>
-              <div className="mt-1 text-xl font-semibold">{fmt(sim.finalBalance)}</div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total contributions</div>
-              <div className="mt-1 text-xl font-semibold">{fmt(sim.totalContrib)}</div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total earnings</div>
-              <div className="mt-1 text-xl font-semibold">{fmt(sim.totalEarnings)}</div>
-            </div>
-          </div>
-        </section>
-
-        {/* ——— Chart (Middle) ——— */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">Projection</h2>
-          <p className="text-sm text-gray-600 mt-1">Yearly snapshot of balance, total contributed, and earnings.</p>
-
-          <div className="mt-4 h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-                <defs>
-                  {/* Blue gradients */}
-                  <linearGradient id="gBalance" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
-                  </linearGradient>
-                  <linearGradient id="gContrib" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.25} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.04} />
-                  </linearGradient>
-                  <linearGradient id="gEarnings" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="year"
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <YAxis
-                  tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
-                  tickLine={false}
-                  axisLine={{ stroke: "#e5e7eb" }}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  width={56}
-                />
-                <RTooltip content={<CustomTooltip />} />
-                <Legend wrapperStyle={{ paddingTop: 8 }} />
-
-                <Area
-                  name="Balance"
-                  type="monotone"
-                  dataKey="Balance"
-                  stroke="#1e3a8a"
-                  fill="url(#gBalance)"
-                  strokeWidth={2}
-                  isAnimationActive
-                />
-                <Area
-                  name="Contributed"
-                  type="monotone"
-                  dataKey="Contributed"
-                  stroke="#3b82f6"
-                  fill="url(#gContrib)"
-                  strokeWidth={2}
-                  strokeDasharray="5 3"
-                  isAnimationActive
-                />
-                <Area
-                  name="Earnings"
-                  type="monotone"
-                  dataKey="Earnings"
-                  stroke="#60a5fa"
-                  fill="url(#gEarnings)"
-                  strokeWidth={2}
-                  strokeDasharray="2 3"
-                  isAnimationActive
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-
-        {/* ——— Table (Bottom) ——— */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="text-sm font-medium text-gray-700 mb-2">Yearly projection</div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="text-left text-gray-500">
-                  <th className="py-1 pr-4">Year</th>
-                  <th className="py-1 pr-4">Balance</th>
-                  <th className="py-1 pr-4">Contributed</th>
-                  <th className="py-1 pr-4">Earnings</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sim.rows.map((r) => (
-                  <tr key={r.year} className="border-t">
-                    <td className="py-1 pr-4">{r.year}</td>
-                    <td className="py-1 pr-4">{fmt(r.balance)}</td>
-                    <td className="py-1 pr-4">{fmt(r.contributed)}</td>
-                    <td className="py-1 pr-4">{fmt(r.earnings)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-2 text-xs text-gray-500">
-            Assumes even contributions monthly and a constant net return (return − fees) compounded monthly.
+      <div className="max-w-5xl mx-auto px-4 mt-4">
+        {/* Intro card */}
+        <PageIntro tone="blue">
+          <p>
+            Project your balance with <strong>monthly compounding</strong> and <strong>regular contributions</strong>.
+            Returns are shown net of annual fees.
           </p>
-        </section>
+        </PageIntro>
 
-        {/* ——— Visible FAQ (matches JSON-LD) ——— */}
-        <section id="faq" className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900">FAQs</h2>
-          <div className="mt-3 divide-y">
-            {faq.map(({ q, a }, i) => (
-              <details key={i} className="py-3 group">
-                <summary className="flex cursor-pointer list-none items-center justify-between">
-                  <span className="font-medium text-gray-900">{q}</span>
-                  <span className="ml-4 text-gray-400 transition-transform group-open:rotate-180">▾</span>
-                </summary>
-                <div className="mt-2 text-sm text-gray-700">{a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+        <SubtleCtaLink className="mt-3" href="/blog/compound-interest-explained">
+          New to compounding? Read the explainer →
+        </SubtleCtaLink>
+
+        {/* INPUTS */}
+        <div className="mt-6">
+          <SectionCard title="Your assumptions">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+              <label className="flex flex-col">
+                <span className="text-slate-600">Initial amount ($)</span>
+                <input
+                  type="number"
+                  min="0"
+                  className="border rounded px-2 py-1"
+                  value={initial}
+                  onChange={(e) => setInitial(e.target.value)}
+                  inputMode="decimal"
+                />
+              </label>
+
+              <label className="flex flex-col">
+                <span className="text-slate-600 flex items-center gap-2">
+                  Regular contribution ($)
+                  <Tooltip text="Amount you add regularly at the end of each period." />
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  className="border rounded px-2 py-1"
+                  value={contrib}
+                  onChange={(e) => setContrib(e.target.value)}
+                  inputMode="decimal"
+                />
+              </label>
+
+              <label className="flex flex-col">
+                <span className="text-slate-600">Contribution frequency</span>
+                <select
+                  value={contribFreq}
+                  onChange={(e) => setContribFreq(e.target.value)}
+                  className="border rounded px-2 py-1"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="fortnightly">Fortnightly</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="annual">Annual</option>
+                </select>
+              </label>
+
+              <label className="flex flex-col">
+                <span className="text-slate-600">Years</span>
+                <input
+                  type="number"
+                  min="1"
+                  className="border rounded px-2 py-1"
+                  value={years}
+                  onChange={(e) => setYears(e.target.value)}
+                  inputMode="numeric"
+                />
+              </label>
+
+              <label className="flex flex-col">
+                <span className="text-slate-600 flex items-center gap-2">
+                  Return (% p.a.)
+                  <Tooltip text="Nominal annual return assumption before fees." />
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="border rounded px-2 py-1"
+                  value={returnPct}
+                  onChange={(e) => setReturnPct(e.target.value)}
+                  inputMode="decimal"
+                />
+              </label>
+
+              <label className="flex flex-col">
+                <span className="text-slate-600 flex items-center gap-2">
+                  Fees (% p.a.)
+                  <Tooltip text="Annual fee as a % of balance. The calculator subtracts fees from returns." />
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="border rounded px-2 py-1"
+                  value={feePct}
+                  onChange={(e) => setFeePct(e.target.value)}
+                  inputMode="decimal"
+                />
+              </label>
+            </div>
+          </SectionCard>
+        </div>
+
+        {/* KPI SUMMARY */}
+        <div className="mt-8">
+          <SectionCard>
+            <SummaryGrid>
+              <SummaryCard label="Final balance" value={fmt(sim.finalBalance)} />
+              <SummaryCard label="Total contributions" value={fmt(sim.totalContrib)} />
+              <SummaryCard label="Total earnings" value={fmt(sim.totalEarnings)} />
+            </SummaryGrid>
+          </SectionCard>
+        </div>
+
+        {/* CHART */}
+        <div className="mt-8">
+          <SectionCard title="Projection">
+            <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
+              Yearly snapshot of total balance, amount contributed, and earnings.
+            </p>
+
+            <div className="w-full h-72">
+              <ResponsiveContainer>
+                <AreaChart data={chartData} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
+                  <defs>
+                    <linearGradient id="gBalance" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.35} />
+                      <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
+                    </linearGradient>
+                    <linearGradient id="gContrib" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.25} />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.04} />
+                    </linearGradient>
+                    <linearGradient id="gEarnings" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" tick={{ fontSize: 10, fill: "#4b5563" }} />
+                  <YAxis
+                    tickFormatter={(v) =>
+                      (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                        style: "currency",
+                        currency: "AUD",
+                        maximumFractionDigits: 0,
+                      })
+                    }
+                    tick={{ fontSize: 10, fill: "#4b5563" }}
+                  />
+                  <RTooltip content={<CustomTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }} iconSize={8} />
+
+                  <Area
+                    name="Balance"
+                    type="monotone"
+                    dataKey="Balance"
+                    stroke="#1e3a8a"
+                    fill="url(#gBalance)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    name="Contributed"
+                    type="monotone"
+                    dataKey="Contributed"
+                    stroke="#3b82f6"
+                    fill="url(#gContrib)"
+                    strokeWidth={2}
+                    strokeDasharray="5 3"
+                  />
+                  <Area
+                    name="Earnings"
+                    type="monotone"
+                    dataKey="Earnings"
+                    stroke="#60a5fa"
+                    fill="url(#gEarnings)"
+                    strokeWidth={2}
+                    strokeDasharray="2 3"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </SectionCard>
+        </div>
+
+        {/* TABLE */}
+        <div className="mt-8">
+          <SectionCard title="Yearly projection">
+            <div className="overflow-x-auto">
+              <table className="min-w-[720px] text-xs text-left">
+                <thead className="text-slate-600 border-b text-[11px]">
+                  <tr className="border-b align-top">
+                    <th className="py-2 pr-4 font-medium">Year</th>
+                    <th className="py-2 pr-4 font-medium">Balance</th>
+                    <th className="py-2 pr-4 font-medium">Contributed</th>
+                    <th className="py-2 pr-4 font-medium">Earnings</th>
+                  </tr>
+                </thead>
+                <tbody className="text-slate-800">
+                  {sim.rows.map((r) => (
+                    <tr key={r.year} className="border-b last:border-0 align-top">
+                      <td className="py-2 pr-4">{r.year}</td>
+                      <td className="py-2 pr-4">{fmt(r.balance)}</td>
+                      <td className="py-2 pr-4">{fmt(r.contributed)}</td>
+                      <td className="py-2 pr-4">{fmt(r.earnings)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-2 text-[11px] text-slate-600">
+              Assumes even contributions monthly and a constant net return (return − fees) compounded monthly.
+            </p>
+          </SectionCard>
+        </div>
+
+        {/* FAQ */}
+        <div className="mt-8">
+          <SectionCard title="FAQs">
+            <div className="divide-y">
+              {faq.map(({ q, a }, i) => (
+                <details key={i} className="py-3 group">
+                  <summary className="flex cursor-pointer list-none items-center justify-between">
+                    <span className="font-medium text-slate-900">{q}</span>
+                    <span className="ml-4 text-slate-400 transition-transform group-open:rotate-180">▾</span>
+                  </summary>
+                  <div className="mt-2 text-sm text-slate-700">{a}</div>
+                </details>
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      </div>
+
+      {/* Footer disclaimer (house style) */}
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+        <p>
+          This calculator is general information only. It does not consider your personal objectives, financial situation,
+          or needs. Consider speaking with a qualified professional.
+        </p>
       </div>
     </main>
   );

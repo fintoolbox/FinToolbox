@@ -1,7 +1,14 @@
 // pages/calculators/account-based-pension.js
 import { useMemo, useState, useEffect } from "react";
 import Head from "next/head";
-import Tooltip from "../../components/Tooltip";
+import Tooltip from "@/components/Tooltip";
+import SectionCard from "@/components/SectionCard";
+import PageIntro from "@/components/PageIntro";
+import SubtleCtaLink from "@/components/SubtleCtaLink";
+import SummaryGrid from "@/components/SummaryGrid";
+import SummaryCard from "@/components/SummaryCard";
+import ChartTooltip from "@/components/ChartTooltip";
+
 import {
   ResponsiveContainer,
   AreaChart,
@@ -95,62 +102,77 @@ export default function AccountBasedPensionCalculator() {
     let totalFees = 0;
 
     for (let y = 0; y < horizon; y++) {
-      const currentAge = startAge + y;
-      const opening = bal;
+  const currentAge = startAge + y;
+  const opening = bal;
 
-      if (opening <= 0) {
-        rows.push({
-          year: y + 1,
-          age: currentAge,
-          minRate: minDrawdownRate(currentAge),
-          opening: 0,
-          minDrawdown: 0,
-          requestedIndexed: indexByInflation
-            ? Math.round(req0 * Math.pow(1 + cpi, y))
-            : Math.round(req0),
-          payment: 0,
-          earnings: 0,
-          fees: 0,
-          closing: 0,
-        });
-        chartIncome.push({ age: currentAge, Income: 0 });
-        chartBalance.push({ age: currentAge, Balance: 0 });
-        continue;
-      }
+  if (opening <= 0) {
+    rows.push({
+      year: y + 1,
+      age: currentAge,
+      minRate: minDrawdownRate(currentAge),
+      opening: 0,
+      minDrawdown: 0,
+      requestedIndexed: indexByInflation
+        ? Math.round(req0 * Math.pow(1 + cpi, y))
+        : Math.round(req0),
+      payment: 0,
+      earnings: 0,
+      fees: 0,
+      closing: 0,
+    });
 
-      const minRate = minDrawdownRate(currentAge);
-      const minDrawdown = opening * minRate;
+    chartIncome.push({ age: currentAge, Income: 0 });
+    chartBalance.push({ age: currentAge, Balance: 0 });
+    continue;
+  }
 
-      const requestedIndexed = indexByInflation ? req0 * Math.pow(1 + cpi, y) : req0;
-      const payment = Math.min(opening, Math.max(minDrawdown, requestedIndexed));
+  const minRate = minDrawdownRate(currentAge);
+  const minDrawdown = opening * minRate;
 
-      const earnings = earningsApprox(opening, payment);
-      const fees = feesApprox(opening);
-      let closing = opening + earnings - fees - payment;
-      if (closing < 0) closing = 0;
+  const requestedIndexed = indexByInflation
+    ? req0 * Math.pow(1 + cpi, y)
+    : req0;
 
-      totalIncome += payment;
-      totalEarnings += earnings;
-      totalFees += fees;
+  let payment = Math.max(minDrawdown, requestedIndexed);
+  let earnings = 0;
+  let fees = 0;
+  let closing = 0;
 
-      rows.push({
-        year: y + 1,
-        age: currentAge,
-        minRate,
-        opening: Math.round(opening),
-        minDrawdown: Math.round(minDrawdown),
-        requestedIndexed: Math.round(requestedIndexed),
-        payment: Math.round(payment),
-        earnings: Math.round(earnings),
-        fees: Math.round(fees),
-        closing: Math.round(closing),
-      });
+  // ✅ If the pension would exceed the remaining balance,
+  // pay only the remainder and no earnings/fees apply this year
+  if (payment >= opening) {
+    payment = opening;
+    closing = 0;
+  } else {
+    earnings = earningsApprox(opening, payment);
+    fees = feesApprox(opening);
+    closing = opening + earnings - fees - payment;
+    if (closing < 0) closing = 0;
+  }
 
-      chartIncome.push({ age: currentAge, Income: Math.round(payment) });
-      chartBalance.push({ age: currentAge, Balance: Math.round(closing) });
+  totalIncome += payment;
+  totalEarnings += earnings;
+  totalFees += fees;
 
-      bal = closing;
-    }
+  rows.push({
+    year: y + 1,
+    age: currentAge,
+    minRate,
+    opening: Math.round(opening),
+    minDrawdown: Math.round(minDrawdown),
+    requestedIndexed: Math.round(requestedIndexed),
+    payment: Math.round(payment),
+    earnings: Math.round(earnings),
+    fees: Math.round(fees),
+    closing: Math.round(closing),
+  });
+
+  chartIncome.push({ age: currentAge, Income: Math.round(payment) });
+  chartBalance.push({ age: currentAge, Balance: Math.round(closing) });
+
+  bal = closing;
+}
+
 
     // First-year info
     const firstRate = minDrawdownRate(startAge);
@@ -160,6 +182,15 @@ export default function AccountBasedPensionCalculator() {
       /* no-op block for readability */
     }
     const firstPaid = Math.min(startBal, Math.max(firstMin, firstRequested));
+
+    // Find first year where the closing balance hits zero
+let depletionAge = null;
+for (const r of rows) {
+  if (r.closing === 0) {
+    depletionAge = r.age; // age in the year the balance first hits $0
+    break;
+  }
+}
 
     return {
       rows,
@@ -177,6 +208,7 @@ export default function AccountBasedPensionCalculator() {
         requested: Math.round(firstRequested),
         paid: Math.round(firstPaid),
       },
+      depletionAge
     };
   }, [openingBalance, age, returnPct, feePct, years, requestedAnnual, indexByInflation, inflationPct]);
 
@@ -205,6 +237,9 @@ export default function AccountBasedPensionCalculator() {
       </div>
     );
   };
+  const depletionNote = sim.depletionAge
+  ? `Your pension is projected to last until you reach age ${sim.depletionAge}.`
+  : `Your pension is projected to last beyond the projection period.`;
 
   // ——— SEO constants ———
   const pageUrl = "https://fintoolbox.com.au/calculators/account-based-pension";
@@ -213,122 +248,173 @@ export default function AccountBasedPensionCalculator() {
     "Calculate your Account Based Pension income (with CPI indexing). See how long your super will last.";
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Head>
-        <title>{`${pageTitle} | FinToolbox`}</title>
-        <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={pageUrl} />
+  <main>
+    {/* Heading (matches Debt Recycling) */}
+    <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
+      <h1 className="text-2xl font-bold text-slate-900">
+        Account-Based Pension (ABP) Calculator
+      </h1>
+    </header>
 
-        {/* Open Graph */}
-        <meta property="og:title" content={`${pageTitle} | FinToolbox`} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={pageUrl} />
-        <meta property="og:image" content="https://fintoolbox.com.au/og-default.png" />
+    <div className="max-w-5xl mx-auto px-4 mt-4">
+      {/* Blue intro card */}
+      <PageIntro tone="blue">
+        <div className="space-y-2">
+          <p>
+            Estimate your retirement income from an account-based pension using
+            Australian minimum drawdown rules. See how CPI indexing, returns and
+            fees affect both your <em>income</em> and <em>remaining balance</em> over time.
+          </p>
+          <p className="mt-2">
+            If your chosen income is below the legislated minimum in any year,
+            the minimum is paid instead.
+          </p>
+        </div>
+      </PageIntro>
 
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${pageTitle} | FinToolbox`} />
-        <meta name="twitter:description" content={pageDescription} />
-        <meta name="twitter:image" content="https://fintoolbox.com.au/og-default.png" />
+      {/* Optional explainer link (edit or remove if you don’t have this post yet) */}
+      <SubtleCtaLink className="mt-3" href="/blog/account-based-pension-explained">
+        New to account-based pensions? Read the explainer →
+      </SubtleCtaLink>
 
-        {/* JSON-LD: WebApplication */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebApplication",
-              name: "Account-Based Pension (ABP) Calculator",
-              url: pageUrl,
-              description: pageDescription,
-              applicationCategory: "FinanceApplication",
-              operatingSystem: "All",
-              isAccessibleForFree: true,
-              inLanguage: "en-AU",
-              offers: { "@type": "Offer", price: "0", priceCurrency: "AUD" },
-              publisher: { "@type": "Organization", name: "FinToolbox", url: "https://fintoolbox.com.au" },
-            }),
-          }}
-        />
-
-        {/* JSON-LD: Breadcrumbs */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://fintoolbox.com.au" },
-                { "@type": "ListItem", position: 2, name: "Calculators", item: "https://fintoolbox.com.au/calculators" },
-                { "@type": "ListItem", position: 3, name: "Account-Based Pension" },
-              ],
-            }),
-          }}
-        />
-      </Head>
-
-      <div className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="mt-3 text-3xl font-bold text-gray-900">Account-Based Pension (ABP) Calculator</h1>
-        <p className="mt-2 text-gray-600">
-          Use this calculator to work out how long your super will last in retirement.
-          Set the balance at commencement, your starting age, rate of return, and optionally increase payments by inflation.
-        </p>
-
-        {/* Inputs */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm min-w-0">
-          <div className="grid gap-4 sm:grid-cols-2">
+      {/* INPUTS – single card, grouped, 3-col grid */}
+      <div className="mt-6">
+        <SectionCard title="Your assumptions">
+          <div className="space-y-6">
+            {/* Opening + Age + Horizon */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Opening balance ($)</label>
-              <input
-                type="number"
-                min="0"
-                value={openingBalance}
-                onChange={(e) => setOpeningBalance(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2"
-              />
+              <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+                Starting point
+                <Tooltip text="Your opening balance, current age and projection length." />
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Opening balance ($)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="border rounded px-2 py-1"
+                    value={openingBalance}
+                    onChange={(e) => setOpeningBalance(Number(e.target.value))}
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Your age (years)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="border rounded px-2 py-1"
+                    value={age}
+                    onChange={(e) => setAge(Number(e.target.value))}
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Projection length (years)</span>
+                  <input
+                    type="number"
+                    min="1"
+                    className="border rounded px-2 py-1"
+                    value={years}
+                    onChange={(e) => setYears(Number(e.target.value))}
+                  />
+                </label>
+              </div>
             </div>
 
+            {/* Returns & Fees */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Your age (years)</label>
-              <input
-                type="number"
-                min="0"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2"
-              />
+              <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+                Returns &amp; fees
+                <Tooltip text="Annual investment return (gross) and ongoing fees as a % of balance." />
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Investment return (% p.a.)</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    className="border rounded px-2 py-1"
+                    value={returnPct}
+                    onChange={(e) => setReturnPct(Number(e.target.value))}
+                  />
+                </label>
+
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Fees (% p.a.)</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    className="border rounded px-2 py-1"
+                    value={feePct}
+                    onChange={(e) => setFeePct(Number(e.target.value))}
+                  />
+                </label>
+              </div>
             </div>
 
+            {/* Income settings */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">Investment return (p.a. %)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={returnPct}
-                onChange={(e) => setReturnPct(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2"
-              />
-            </div>
+              <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+                Income settings
+                <Tooltip text="If your chosen amount is below the legal minimum in a year, the minimum will be paid instead." />
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
+                <label className="flex flex-col">
+                  <span className="text-slate-600">Requested annual income ($)</span>
+                  <input
+                    type="number"
+                    min="0"
+                    className="border rounded px-2 py-1"
+                    value={requestedAnnual}
+                    onChange={(e) => setRequestedAnnual(Number(e.target.value))}
+                  />
+                </label>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Fees (p.a. %)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                value={feePct}
-                onChange={(e) => setFeePct(e.target.value)}
-                className="mt-1 w-full rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2"
-              />
+                <label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={indexByInflation}
+                    onChange={(e) => setIndexByInflation(e.target.checked)}
+                  />
+                  Index by inflation (CPI)
+                </label>
+
+                <label className="flex items-center gap-2">
+                  <span className="text-slate-600">Inflation (% p.a.)</span>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    className="border rounded px-2 py-1 w-24"
+                    value={inflationPct}
+                    onChange={(e) => setInflationPct(Number(e.target.value))}
+                    disabled={!indexByInflation}
+                  />
+                </label>
+              </div>
+
+              {/* Current year minimum helper strip */}
+              <div className="mt-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-900">
+                <div>
+                  <span className="font-medium">This year’s minimum:&nbsp;</span>
+                  {(sim.firstYear.minRate * 100).toFixed(1)}% = {aud0(sim.firstYear.minAmount)}
+                </div>
+                <div className="text-[11px] text-blue-900/80 mt-1">
+                  Minimum is calculated on the opening balance at the start of each financial year.
+                </div>
+              </div>
             </div>
 
             {/* Legislated minimum rates table */}
-            <div className="sm:col-span-2 rounded-lg bg-gray-50 p-3">
-              <div className="text-sm font-medium text-gray-700">Legislated minimum drawdown rates</div>
-              <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-gray-700 sm:grid-cols-7">
+            <div>
+              <h3 className="font-medium text-slate-800 flex items-center gap-2 text-sm mb-2">
+                Legislated minimum drawdown rates
+              </h3>
+              <div className="grid grid-cols-3 gap-2 text-xs text-slate-700 sm:grid-cols-7">
                 {DRAW_RATES.map((r) => (
                   <div key={r.range} className="rounded border bg-white px-2 py-1 text-center">
                     <div className="font-medium">{r.label}</div>
@@ -337,247 +423,190 @@ export default function AccountBasedPensionCalculator() {
                 ))}
               </div>
             </div>
-
-            {/* Current minimum (this year) */}
-            <div className="sm:col-span-2 rounded-lg bg-gray-50 p-3">
-              <div className="text-sm text-gray-700">
-                <span className="font-medium">Current minimum (this year):</span>{" "}
-                {(sim.firstYear.minRate * 100).toFixed(1)}% &nbsp;=&nbsp; {aud0(sim.firstYear.minAmount)}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                Based on your opening balance and age. Minimums update as your age increases each year.
-              </div>
-            </div>
-
-            {/* Requested annual pension (compact) + Tooltip + CPI */}
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Annual pension amount ($)
-                <Tooltip text="If your chosen amount is below the legal minimum for a year, the minimum will be paid instead." />
-              </label>
-              <div className="mt-1 flex flex-wrap items-center gap-3">
-                <input
-                  type="number"
-                  min="0"
-                  value={requestedAnnual}
-                  onChange={(e) => setRequestedAnnual(e.target.value)}
-                  className="w-56 rounded-lg border px-3 py-1.5 text-sm outline-none focus:ring-2"
-                />
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={indexByInflation}
-                    onChange={(e) => setIndexByInflation(e.target.checked)}
-                  />
-                  Index by inflation (CPI)
-                </label>
-                <div className="flex items-center gap-2 text-sm">
-                  <span>Inflation (% p.a.)</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={inflationPct}
-                    onChange={(e) => setInflationPct(e.target.value)}
-                    className="w-24 rounded-md border px-2 py-1 text-sm outline-none focus:ring-2"
-                    disabled={!indexByInflation}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Projection length (compact) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Projection length (years)</label>
-              <input
-                type="number"
-                min="1"
-                value={years}
-                onChange={(e) => setYears(e.target.value)}
-                className="mt-1 w-28 rounded-lg border px-2 py-1.5 text-sm outline-none focus:ring-2"
-              />
-            </div>
           </div>
+        </SectionCard>
+      </div>
 
-          {/* KPIs (compact) */}
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">First-year minimum rate</div>
-              <div className="mt-1 text-lg font-semibold">
-                {(sim.firstYear.minRate * 100).toFixed(1)}%
-              </div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">First-year minimum amount</div>
-              <div className="mt-1 text-lg font-semibold">
-                {aud0(sim.firstYear.minAmount)}
-              </div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">First-year income (paid)</div>
-              <div className="mt-1 text-lg font-semibold">
-                {aud0(sim.firstYear.paid)}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Chart – Income only */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm min-w-0">
-          <h2 className="text-lg font-semibold text-gray-900">Income projection</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Your annual pension (indexed by CPI if enabled). When below the minimum, the minimum is paid.
+      {/* CHART – Income */}
+      <div className="mt-8">
+        <SectionCard title="Income projection">
+          <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
+            Annual pension paid (indexed by CPI if enabled). If requested income is below the minimum in a year,
+            the minimum is paid.
           </p>
 
-          <div className="mt-4 h-64 w-full min-w-0">
+          <div className="w-full h-64">
             {mounted && (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <AreaChart data={sim.chartIncome} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-                  <defs>
-                    <linearGradient id="gIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#1e3a8a" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#1e3a8a" stopOpacity={0.05} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="age" tickLine={false} axisLine={{ stroke: "#e5e7eb" }} tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <ResponsiveContainer>
+                <AreaChart data={sim.chartIncome}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="age" tick={{ fontSize: 10, fill: "#4b5563" }} />
                   <YAxis
-                    tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
-                    width={56}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
+                    tickFormatter={(v) =>
+                      (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                        style: "currency",
+                        currency: "AUD",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      })
+                    }
+                    tick={{ fontSize: 10, fill: "#4b5563" }}
                   />
-                  <RTooltip content={<IncomeTooltip />} />
-                  <Legend wrapperStyle={{ paddingTop: 8 }} />
+                  <RTooltip
+                    content={
+                      <ChartTooltip
+                        valueFormatter={aud0}
+                        labelFormatter={(l) => `Age ${l}`}
+                      />
+                    }
+                  />
+                  <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }} iconSize={8} />
                   <Area
-                    name="Annual income (paid)"
                     type="monotone"
                     dataKey="Income"
+                    name="Annual income (paid)"
                     stroke="#1e3a8a"
-                    fill="url(#gIncome)"
+                    fill="#bfdbfe"
+                    fillOpacity={0.35}
                     strokeWidth={2}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </div>
-        </section>
+        </SectionCard>
+      </div>
 
-        {/* NEW Chart – Balance each year */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm min-w-0">
-          <h2 className="text-lg font-semibold text-gray-900">Account balance projection</h2>
-          <p className="text-sm text-gray-600 mt-1">
+      {/* CHART – Balance */}
+      <div className="mt-8">
+        <SectionCard title="Account balance projection">
+          <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
             Estimated end-of-year balance after income, earnings and fees.
           </p>
 
-          <div className="mt-4 h-64 w-full min-w-0">
+          <div className="w-full h-64">
             {mounted && (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-                <AreaChart data={sim.chartBalance} margin={{ top: 10, right: 20, bottom: 0, left: -10 }}>
-                  <defs>
-                    <linearGradient id="gBal" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#60a5fa" stopOpacity={0.05} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="age" tickLine={false} axisLine={{ stroke: "#e5e7eb" }} tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <ResponsiveContainer>
+                <AreaChart data={sim.chartBalance}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="age" tick={{ fontSize: 10, fill: "#4b5563" }} />
                   <YAxis
-                    tickFormatter={(v) => (v >= 1000 ? `$${(v / 1000).toFixed(0)}k` : `$${v}`)}
-                    width={56}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
+                    tickFormatter={(v) =>
+                      (isFinite(v) ? v : 0).toLocaleString("en-AU", {
+                        style: "currency",
+                        currency: "AUD",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                      })
+                    }
+                    tick={{ fontSize: 10, fill: "#4b5563" }}
                   />
-                  <RTooltip content={<BalanceTooltip />} />
-                  <Legend wrapperStyle={{ paddingTop: 8 }} />
+                  <RTooltip
+                    content={
+                      <ChartTooltip
+                        valueFormatter={aud0}
+                        labelFormatter={(l) => `Age ${l}`}
+                      />
+                    }
+                  />
+                  <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "4px" }} iconSize={8} />
                   <Area
-                    name="Balance"
                     type="monotone"
                     dataKey="Balance"
+                    name="Balance"
                     stroke="#60a5fa"
-                    fill="url(#gBal)"
+                    fill="#dbeafe"
+                    fillOpacity={0.5}
                     strokeWidth={2}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </div>
-        </section>
+        </SectionCard>
+      </div>
 
-        {/* Results / totals */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total income withdrawn</div>
-              <div className="mt-1 text-xl font-semibold">{aud0(sim.totals.totalIncome)}</div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Total earnings</div>
-              <div className="mt-1 text-xl font-semibold">{aud0(sim.totals.totalEarnings)}</div>
-            </div>
-            <div className="rounded-lg bg-gray-50 p-3">
-              <div className="text-xs text-gray-500">Ending balance</div>
-              <div className="mt-1 text-xl font-semibold">{aud0(sim.totals.endingBalance)}</div>
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-gray-500">
-            Earnings/fees use an average-balance approximation. Actual outcomes depend on timing, market performance, fees and rules.
-          </p>
-        </section>
+      {/* RESULTS – summary cards */}
+      <div className="mt-8">
+        <SectionCard>
+          <SummaryGrid>
+            <SummaryCard label="Total income withdrawn" value={aud0(sim.totals.totalIncome)} />
+            <SummaryCard label="Total earnings" value={aud0(sim.totals.totalEarnings)} />
+            <SummaryCard
+              label="Ending balance"
+              value={aud0(sim.totals.endingBalance)}
+              
+            />
+          </SummaryGrid>
+          {/* Depletion message block */}
+<div className="mt-4 p-4 rounded-xl bg-gray-50 border border-gray-200">
+  <p className="text-base font-medium text-center text-slate-700">
+    {depletionNote}
+  </p>
+</div>
+        </SectionCard>
+      </div>
 
-        {/* Table */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="text-sm font-medium text-gray-700 mb-2">Year-by-year breakdown</div>
+      {/* TABLE – year by year */}
+      <div className="mt-8">
+        <SectionCard title="Year-by-year breakdown">
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="text-left text-gray-500">
-                  <th className="py-1 pr-4">Year</th>
-                  <th className="py-1 pr-4">Age</th>
-                  <th className="py-1 pr-4">Opening</th>
-                  <th className="py-1 pr-4">Min %</th>
-                  <th className="py-1 pr-4">Minimum</th>
-                  <th className="py-1 pr-4">Requested (indexed)</th>
-                  <th className="py-1 pr-4">Paid</th>
-                  <th className="py-1 pr-4">Earnings</th>
-                  <th className="py-1 pr-4">Fees</th>
-                  <th className="py-1 pr-4">Closing</th>
+            <table className="min-w-[900px] text-xs text-left">
+              <thead className="text-slate-600 border-b text-[11px]">
+                <tr className="border-b align-top">
+                  <th className="py-2 pr-4 font-medium">Year</th>
+                  <th className="py-2 pr-4 font-medium">Age</th>
+                  <th className="py-2 pr-4 font-medium">Opening</th>
+                  <th className="py-2 pr-4 font-medium">Min %</th>
+                  <th className="py-2 pr-4 font-medium">Minimum pmt</th>
+                  <th className="py-2 pr-4 font-medium">Requested pmt</th>
+                  <th className="py-2 pr-4 font-medium">Paid</th>
+                  <th className="py-2 pr-4 font-medium">Earnings</th>
+                  <th className="py-2 pr-4 font-medium">Fees</th>
+                  <th className="py-2 pr-4 font-medium">Closing</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-slate-800">
                 {sim.rows.map((r) => (
-                  <tr key={r.year} className="border-t">
-                    <td className="py-1 pr-4">{r.year}</td>
-                    <td className="py-1 pr-4">{r.age}</td>
-                    <td className="py-1 pr-4">{aud0(r.opening)}</td>
-                    <td className="py-1 pr-4">{(r.minRate * 100).toFixed(1)}%</td>
-                    <td className="py-1 pr-4">{aud0(r.minDrawdown)}</td>
-                    <td className="py-1 pr-4">{aud0(r.requestedIndexed)}</td>
-                    <td className="py-1 pr-4">{aud0(r.payment)}</td>
-                    <td className="py-1 pr-4">{aud0(r.earnings)}</td>
-                    <td className="py-1 pr-4">{aud0(r.fees)}</td>
-                    <td className="py-1 pr-4">{aud0(r.closing)}</td>
+                  <tr key={r.year} className="border-b last:border-0 align-top">
+                    <td className="py-2 pr-4 font-medium text-slate-900 whitespace-nowrap">{r.year}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{r.age}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.opening)}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{(r.minRate * 100).toFixed(1)}%</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.minDrawdown)}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.requestedIndexed)}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.payment)}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.earnings)}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.fees)}</td>
+                    <td className="py-2 pr-4 whitespace-nowrap">{aud0(r.closing)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </section>
-
-        {/* Notes */}
-        <section className="mt-6 rounded-2xl border bg-white p-5 text-sm text-gray-600 shadow-sm space-y-2">
-          <p className="font-medium">Assumptions & notes</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>This chart shows your annual pension only (with optional CPI indexing).</li>
-            <li>If your chosen amount is below the minimum for a year, the minimum is paid.</li>
-            <li>Minimums are calculated on the opening balance at the start of each financial year, using standard rates.</li>
-            <li>Earnings and fees are approximated using average balances; actual results vary.</li>
-            <li>General information only; not financial advice.</li>
-          </ul>
-        </section>
+        </SectionCard>
       </div>
-    </main>
-  );
+
+      {/* ASSUMPTIONS */}
+      <div className="mt-8">
+        <SectionCard title="Assumptions & references">
+          <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
+            <li>If the requested amount is below the legislated minimum in any year, the minimum is paid instead.</li>
+            <li>Minimums are calculated on the opening balance each financial year using standard rates by age.</li>
+            <li>Earnings & fees use an average-balance approximation.</li>
+          </ul>
+        </SectionCard>
+      </div>
+    </div>
+
+    {/* Footer disclaimer (house style) */}
+    <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <p>
+        This calculator is general information only. It does not consider your personal objectives, financial situation,
+        or needs. Consider speaking with a qualified professional.
+      </p>
+    </div>
+  </main>
+);
+
 }

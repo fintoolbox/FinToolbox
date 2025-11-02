@@ -10,7 +10,7 @@ export default function Tooltip({ text }) {
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
     >
-      <span className="ml-1 text-blue-500 hover:text-blue-700 cursor-help">
+      <span className="ml-1 text-blue-500 hover:text-blue-700">
         ⓘ
       </span>
 

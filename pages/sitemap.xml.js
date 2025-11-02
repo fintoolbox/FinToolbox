@@ -1,54 +1,87 @@
 // pages/sitemap.xml.js
-import { calculators } from "../lib/pages"; // <-- shared list of calculator URLs
+import { calculators } from "../lib/pages"; // shared list of calculator paths (e.g. "/calculators/mortgage")
 
 export async function getServerSideProps({ res }) {
-  const siteUrl = "https://fintoolbox.com.au";
+  const siteUrl = "https://fintoolbox.com.au"; // no trailing slash
 
-  // Dynamically load posts from your MDX library (server-side only)
+  // Server-only: load MDX posts
   const { getAllPosts } = await import("../lib/mdx");
-  const posts = getAllPosts(); // returns array of { slug, frontmatter, ... }
+  const posts = getAllPosts(); // [{ slug, frontmatter: { date, updatedAt? }, ... }]
 
-  // Static core pages
+  // ---- helpers ----
+  const normalise = (p) => {
+    // ensure leading slash, remove trailing slash except root
+    let s = p.startsWith("/") ? p : `/${p}`;
+    if (s !== "/" && s.endsWith("/")) s = s.slice(0, -1);
+    return s;
+  };
+  const iso = (d) => {
+    const t = new Date(d);
+    return isNaN(t.getTime()) ? new Date().toISOString() : t.toISOString();
+  };
+
+  // Core pages (paths only)
   const staticPaths = [
-    "",
+    "/",
     "/calculators",
     "/blog",
-    ...calculators, // reuse the shared list
-  ];
+    ...calculators, // reuse your shared list of calculator paths
+  ].map(normalise);
 
-  // Combine all URLs
-  const urls = [
-    ...staticPaths.map((p) => `${siteUrl}${p}`),
-    ...posts.map((p) => `${siteUrl}/blog/${p.slug}`),
-  ];
+  // Build URL objects
+  const urls = [];
 
-  const lastmod = new Date().toISOString();
+  // Static/core pages
+  for (const p of staticPaths) {
+    urls.push({
+      loc: `${siteUrl}${p === "/" ? "" : p}`,
+      lastmod: new Date().toISOString(),
+      changefreq: p === "/" ? "daily" : p.startsWith("/calculators") ? "weekly" : "weekly",
+      priority: p === "/" ? 1.0 : p === "/calculators" || p === "/blog" ? 0.8 : 0.7,
+    });
+  }
 
-  // Build XML sitemap string
+  // Blog posts
+  for (const post of posts) {
+    const p = normalise(`/blog/${post.slug}`);
+    const lm = post.frontmatter?.updatedAt || post.frontmatter?.date || new Date().toISOString();
+    urls.push({
+      loc: `${siteUrl}${p}`,
+      lastmod: iso(lm),
+      changefreq: "monthly",
+      priority: 0.6,
+    });
+  }
+
+  // De-dupe by loc (in case of overlaps)
+  const unique = Array.from(
+    new Map(urls.map((u) => [u.loc, u])).values()
+  );
+
+  // XML
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-  <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
-    ${urls
-      .map(
-        (url) => `
-      <url>
-        <loc>${url}</loc>
-        <lastmod>${lastmod}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.7</priority>
-      </url>`
-      )
-      .join("")}
-  </urlset>`;
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${unique
+  .map(
+    (u) => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`
+  )
+  .join("\n")}
+</urlset>`;
 
-  // Return the XML response
   res.setHeader("Content-Type", "application/xml");
+  // Cache for a day (feel free to tune)
+  res.setHeader("Cache-Control", "public, max-age=86400, s-maxage=86400");
   res.write(xml);
   res.end();
 
   return { props: {} };
 }
 
-// This page itself doesn't render anything visible — it only serves XML
 export default function SiteMap() {
   return null;
 }
