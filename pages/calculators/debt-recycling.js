@@ -31,6 +31,46 @@ import {
 // Helper functions
 // -----------------
 
+// Add this helper near the component top-level
+function yearsToCsv(years) {
+  if (!years?.length) return "";
+  const headers = [
+    "Year",
+    "HomeLoanA",
+    "NetWealthA",
+    "HomeLoanB",
+    "InvestLoanB",
+    "PortfolioB",
+    "NetWealthB",
+    "DebtFreePositionB"
+  ];
+  const rows = years.map(r => [
+    r.year,
+    r.homeLoanA,
+    r.netWealthA,
+    r.homeLoanB,
+    r.investLoanB,
+    r.portfolioB,
+    r.netWealthB,
+    r.surplusIfLiquidated
+  ]);
+  const escape = (v) => (typeof v === "string" && v.includes(",") ? `"${v}"` : v);
+  return [headers, ...rows].map(row => row.map(escape).join(",")).join("\n");
+}
+
+function downloadCsv(filename, csv) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+
 function aud0(n) {
   if (!isFinite(n)) return "$0";
   return n.toLocaleString("en-AU", {
@@ -537,19 +577,17 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
   <div className="space-y-2">
     <p>
       <span className="font-semibold">Debt recycling</span>{" "}
-      is a financial strategy where you make additional payments into your home loan,
+      is a strategy to convert your home loan into investment debt. Put simply, you make additional payments into your home loan,
       then redraw those repayments as a separate <em>tax-deductible</em> investment loan and
-      invest it. Over time, investment income (and the tax benefits of 
+      invest. Over time, investment income (and the tax benefits of 
       negative gearing) help accelerate your home loan repayments while you build a portfolio. 
-      Additional lump sum payments to your home loan and the redrawn annually and invested. 
+      These additional lump sum payments to your home loan are redrawn (usually annually) and invested. 
       &lsquo;Bad&rsquo; debt is recycled into &lsquo;good&rsquo; debt over time.
     </p>
 
   <p>
-    This debt recycling calculator reflects Australian tax rules, including franking credits and
-    the potential benefit of negative gearing. Use the calculator to compare the benefits of debt recycling versus
-    keeping cash in an offset account. Use the calculator to compare net wealth projections, loan balances,
-    investment growth, and time to be debt free.
+    Use this debt recycling calculator to understand how debt recycling works and to calculate the long term benefits of
+    employing this strategy. Model how long before you will be debt free, and compare the benefits of this strategy with simply paying down your home loan.
   </p>
 
       </div>
@@ -801,6 +839,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
         </div>
         </div>
       </SectionCard>
+      
     </div>
 
             {/* CHART CARD */}
@@ -895,9 +934,9 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
       {/* Debt-free year */}
       <SummaryCard
-        label="Year you could clear all debt*"
+        label="Year you could clear all debt"
         value={wipeoutYear ? `Year ${wipeoutYear}` : "Not within projection"}
-        note="*If you sold investments, paid CGT, and cleared all loans."
+    
       />
     </SummaryGrid>
   </SectionCard>
@@ -980,7 +1019,15 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
             {/* COMPARISON TABLE */}
       <div className="mt-8">
-        <SectionCard title="Year-by-Year Comparison">
+  <SectionCard
+  title={
+    <div className="flex-1 min-w-0 flex items-center gap-2">
+      <span className="truncate">Year-by-Year Comparison</span>
+
+      
+    </div>
+  }
+>
           <div className="overflow-x-auto">
             <table className="min-w-[900px] text-xs text-left">
               <thead className="text-slate-600 border-b text-[11px]">
@@ -1079,7 +1126,22 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                 ))}
               </tbody>
             </table>
+            
           </div>
+          <div className="flex justify-end mt-4">
+  <button
+    type="button"
+    onClick={() =>
+      downloadCsv(
+        "debt-recycling-results.csv",
+        yearsToCsv(results.yearsArr)
+      )
+    }
+    className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+  >
+    Export CSV
+  </button>
+</div>
         </SectionCard>
       </div>
 
@@ -1166,9 +1228,13 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                 <li>
                   Final cash applied to the home loan = distributions +/- any tax refund / payable.
                 </li>
-              </ul>
-              We assume that you direct 100% of that after-tax investment income
+                <li>
+                  We assume that you direct 100% of that after-tax investment income
               as additional repayments to your non-deductible home loan split over the following 12 months.
+              </li>
+                
+              </ul>
+              
             </li>
 
             <li>

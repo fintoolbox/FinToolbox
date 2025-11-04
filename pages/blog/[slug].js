@@ -123,7 +123,6 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
           )}
           <ReadingTime
             minutes={frontmatter?.readingTime}
-            words={frontmatter?.wordCount}
           />
           {frontmatter?.author && <span>by {frontmatter.author}</span>}
         </div>

@@ -120,7 +120,7 @@ export default function BlogIndex({ posts }) {
                           })}
                         </time>
                       )}
-                      <ReadingTime minutes={readingTime} words={wordCount} />
+                      <ReadingTime minutes={readingTime} />
                     </div>
 
                     {excerpt && <p className="mt-2 text-gray-700">{excerpt}</p>}

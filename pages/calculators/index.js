@@ -29,26 +29,30 @@ export default function CalculatorsIndex() {
         <div className="mx-auto max-w-4xl px-6">
           <h1 className="text-3xl font-bold mb-6">Calculators</h1>
 
-          <CardSection cols={2}>
-            <CardLink href="/calculators/debt-recycling" title="Debt Recycling">
-              Model paying off your home loan vs recycling into investments.
-            </CardLink>
-            <CardLink href="/calculators/tax-calculator" title="Income Tax (AU)">
-              Estimate tax payable and take-home pay.
-            </CardLink>
-            <CardLink href="/calculators/investment-growth" title="Compound Interest">
-              Project balance with regular contributions.
-            </CardLink>
-            <CardLink href="/calculators/mortgage" title="Mortgage Repayments">
-              See repayments and total interest.
-            </CardLink>
-            <CardLink href="/calculators/age-pension" title="Age Pension (Centrelink)">
-              Rough guide based on assets &amp; income.
-            </CardLink>
-            <CardLink href="/calculators/account-based-pension" title="Account Based Pension">
-              How long your super will last in retirement.
-            </CardLink>
-          </CardSection>
+          <CardSection cols={3}>
+                      <CardLink href="/calculators/debt-recycling" title="Debt Recycling">
+                                    Convert your home loan to investment debt
+                                  </CardLink>
+                      <CardLink href="/calculators/tax-calculator" title="Income Tax">
+                        Calculate your take home pay
+                      </CardLink>
+                      <CardLink
+                        href="/calculators/investment-growth"
+                        title="Compound Interest"
+                      >Investment growth over time
+                      </CardLink>
+                      <CardLink href="/calculators/mortgage" title="Mortgage Repayments">
+                        Payoff your home loan faster
+                      </CardLink>
+                      <CardLink
+                        href="/calculators/age-pension"
+                        title="Centrelink Age Pension"
+                      >How much Age Pension you can receive
+                      </CardLink>
+                      <CardLink href="/calculators/account-based-pension" title="Account Based Pension">
+                                    How long your super will last in retirement
+                                  </CardLink>
+                    </CardSection>
         </div>
       </section>
     </main>

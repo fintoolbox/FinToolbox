@@ -80,30 +80,28 @@ export default function Home({ latestPosts = [] }) {
 
       <div className="mx-auto max-w-4xl px-6">
         {/* Calculators */}
-        <CardSection title="Calculators">
+        <CardSection title="Calculators" cols={3}>
           <CardLink href="/calculators/debt-recycling" title="Debt Recycling">
-                        Model paying off your home loan vs recycling into investments.
+                        Convert your home loan to investment debt
                       </CardLink>
-          <CardLink href="/calculators/tax-calculator" title="Income Tax (AU)">
-            Estimate tax payable and take-home pay.
+          <CardLink href="/calculators/tax-calculator" title="Income Tax">
+            Calculate your take home pay
           </CardLink>
           <CardLink
             href="/calculators/investment-growth"
             title="Compound Interest"
-          >
-            Models growth of investments.
+          >Investment growth over time
           </CardLink>
           <CardLink href="/calculators/mortgage" title="Mortgage Repayments">
-            See repayments and total interest.
+            Payoff your home loan faster
           </CardLink>
           <CardLink
             href="/calculators/age-pension"
-            title="Age Pension (Centrelink)"
-          >
-            Guide based on assets &amp; income.
+            title="Centrelink Age Pension"
+          >How much Age Pension you can receive
           </CardLink>
           <CardLink href="/calculators/account-based-pension" title="Account Based Pension">
-                        How long your super will last in retirement.
+                        How long your super will last in retirement
                       </CardLink>
         </CardSection>
 
@@ -198,7 +196,6 @@ export async function getStaticProps() {
         frontmatter: {
           ...p.frontmatter,
           readingTime: minutes,
-          wordCount: words,
           excerpt: p.frontmatter.excerpt || p.frontmatter.description || "",
         },
       };
