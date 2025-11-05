@@ -273,7 +273,7 @@ for (const r of rows) {
       </PageIntro>
 
       {/* Optional explainer link (edit or remove if you don’t have this post yet) */}
-      <SubtleCtaLink className="mt-3" href="/blog/account-based-pension-explained">
+      <SubtleCtaLink className="mt-3" href="/blog/how-to-use-an-account-based-pension-calculator">
         New to account-based pensions? Read the explainer →
       </SubtleCtaLink>
 

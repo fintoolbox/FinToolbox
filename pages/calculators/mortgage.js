@@ -291,8 +291,8 @@ export default function MortgageCalculator() {
           </p>
         </PageIntro>
 
-        <SubtleCtaLink className="mt-3" href="/blog/mortgage-extra-repayments-explained">
-          New to extra repayments? Read the explainer →
+        <SubtleCtaLink className="mt-3" href="/blog/mortgage-repayment-calculator-australia">
+          Need help with calculating mortgage payments? Read the explainer →
         </SubtleCtaLink>
 
         {/* INPUTS – grouped like the house style */}
