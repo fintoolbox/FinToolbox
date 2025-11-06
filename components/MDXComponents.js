@@ -1,7 +1,7 @@
 // components/MDXComponents.js
 import Link from "next/link";
-import Tooltip from "@/components/Tooltip"; // ← add this line
-
+import Tooltip from "@/components/Tooltip";
+import SavingsGoalChart from "@/components/SavingsGoalChart";
 
 // Tailwind-styled elements + custom components available in MDX
 export default {
@@ -27,9 +27,10 @@ export default {
     </div>
   ),
 
-  // Re-export Next Link if you want it available as <Link> in MDX
+  // Next Link if you want it available as <Link> in MDX
   Link,
 
-  // 👇 Make Tooltip available to all MDX files
+  // Custom components available to MDX
   Tooltip,
+  SavingsGoalChart,   // 👈 expose the chart component to MDX
 };

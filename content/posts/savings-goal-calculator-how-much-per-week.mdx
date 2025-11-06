@@ -1,38 +1,119 @@
 ---
 title: "Savings Goal Calculator: How Much Should I Save Each Week?"
-description: "Work backwards from your target and deadline to find the weekly or fortnightly deposit you actually need."
-excerpt: "Work out exactly how much you should save each week or fortnight to reach your target on time. Use our simple calculator and take control of your savings goals."
+description: "Work backwards from your target and deadline to find the weekly or fortnightly amount you need to reach your savings goal on time."
+excerpt: "Work out exactly how much you need to save each week or fortnight to reach your goal — whether it's a holiday, new car, or emergency fund — with our simple savings goal calculator."
 date: "2025-10-16"
 tags: ["savings", "budgeting", "goals"]
-keywords: ["savings goal calculator", "how much to save per week", "goal tracker"]
+keywords: ["savings goal calculator", "how much to save per week", "goal tracker", "saving plan", "budget goals"]
 coverImage: "/images/blog/savings-goal-cover.jpg"
 ---
 
-Have a goal—holiday, car deposit, emergency fund? A **savings goal calculator** tells you the **weekly or fortnightly** amount to hit it on time.
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip as RTooltip,
+  Legend,
+} from "recharts";
+import ClientOnly from "@/components/ClientOnly";
+
+export const savingsChartData = [
+  { month: "Start", balance: 1200, target: 8000 },
+  { month: "Mar",   balance: 2600, target: 8000 },
+  { month: "Jun",   balance: 4300, target: 8000 },
+  { month: "Sep",   balance: 6100, target: 8000 },
+  { month: "Dec",   balance: 8000, target: 8000 },
+];
+
+> **Want to hit your savings target faster? Try the [Investment Growth Calculator](/calculators/investment-growth)** and find out exactly how much to save each week or fortnight.
+
+---
+
+## Why you need a savings goal
+
+Having a clear savings goal turns a vague idea into a plan.  
+Whether you’re building an emergency fund, planning a holiday, or saving for a home deposit, knowing your **target and timeline** gives you focus and motivation.
+
+---
+
+## Table of contents
+1. [What to enter](#what-to-enter)
+2. [How it works](#how-it-works)
+3. [Example: hitting an $8,000 goal](#example-hitting-an-8000-goal)
+6. [Tips to stay on track](#tips-to-stay-on-track)
+7. [FAQ](#faq)
+8. [Disclaimer](#disclaimer)
+
+---
 
 ## What to enter
 
-- Target amount (e.g. \$8,000)  
-- Current savings  
-- Deadline (e.g. 12 months)  
-- Expected interest (optional)
+The calculator only needs a few details:
+
+- **Target amount** — the total you want to reach (for example, $8,000)  
+- **Current savings** — what you’ve already set aside  
+- **Deadline** — in months or years (for example, 12 months)  
+- **Expected interest** — optional, if you’re earning interest in a savings account
+
+It then works out **how much to save each week or fortnight** to reach your goal on time.
+
+---
 
 ## How it works
 
-We reverse-engineer the **required deposit** using the future value of a series. If you’re getting some interest, we include that too.
+Behind the scenes, the calculator uses the **future value of a series** formula.  
+In simple terms, it calculates the deposit required (weekly or fortnightly) to grow your balance — including any interest — to the target by your deadline.
 
-## Example
+---
 
-- Target: \$8,000 in 12 months  
-- Current: \$1,200  
-- Interest: 3% p.a. (monthly)
+## Example: hitting an $8,000 goal
 
-**Result:** save roughly **\$133/week**. Switch to fortnightly if that lines up with your pay cycle.
+| Detail | Amount |
+|--------|--------:|
+| Target | $8,000 |
+| Current savings | $1,200 |
+| Interest rate | 3% p.a. (monthly compounding) |
+| Timeframe | 12 months |
 
-## Stick with it
+Required savings: **~$133 per week** (or **~$266 per fortnight**).
 
-- Automate transfers the day you get paid  
-- Park savings in a separate high-interest account  
-- Track progress monthly inside the calculator
+> Adjust the interest rate or deadline in the calculator to see how the weekly number moves.
 
-👉 Start here: **[Investment Growth Calculator](/calculators/investment-growth)**
+---
+
+## Tips to stay on track
+
+- **Automate transfers** on payday  
+- **Keep savings separate** from everyday spending  
+- **Track progress** monthly with the calculator  
+- **Increase savings** after pay rises, refunds, or bonuses
+
+---
+
+> **Ready to plan your goal?** Use the [Investment Growth](/calculators/investment-growth) calculator to set a clear target, pick your timeframe, and start building momentum.
+
+---
+
+## FAQ
+
+**How accurate is the result?**  
+It’s a projection based on your interest rate and cadence. Actual results vary with your bank’s compounding rules.
+
+**Can I include irregular deposits?**  
+This tool assumes consistent contributions. You can periodically bump “current savings” to reflect lump sums.
+
+**What interest rate should I use?**  
+Use your account rate, or a conservative 3–4% p.a. If unsure, try 0% to see the pure deposit required.
+
+**What if I’m paid fortnightly?**  
+Choose fortnightly so it lines up with your pay — it keeps automation simple.
+
+---
+
+## Disclaimer
+
+General information only. Examples are illustrative and assume steady savings and interest.  
+Seek personal advice for your circumstances.
