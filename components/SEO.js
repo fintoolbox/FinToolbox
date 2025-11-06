@@ -1,32 +1,43 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
+
+const SITE = "https://fintoolbox.com.au";
 
 export default function SEO({
   title = "FinToolbox",
   description = "Financial Calculators & Tools for Australians.",
-  url = "https://fintoolbox.com.au",
+  url,                 // optional: pass a full absolute URL if you want to override
   image = "/og-default.png",
-  noindex = false, // optional
+  noindex = false,     // optional: force noindex for a page
   siteName = "FinToolbox",
   locale = "en_AU",
 }) {
-  // Ensure canonical is clean (no query/hash)
-  let canonical;
+  const { asPath = "/" } = useRouter();
+
+  // Build a canonical from the current route if none was provided
+  const routePath = asPath.split("#")[0];              // strip hash
+  const routeNoQuery = routePath.split("?")[0];        // strip query
+  const fallbackCanonical = new URL(routeNoQuery || "/", SITE).toString();
+
+  let canonical = url || fallbackCanonical;
   try {
-    const u = new URL(url);
-    u.search = "";
+    const u = new URL(canonical);
+    u.search = "";                                     // ensure clean canonical
     u.hash = "";
     canonical = u.toString();
   } catch {
-    canonical = url; // fallback if a relative URL ever sneaks in
+    // leave as-is if someone passes a non-absolute string
   }
 
-  // Ensure og:image is absolute (handle relative like "/og-default.png")
+  // Ensure og:image is absolute
   let ogImage = image;
   try {
     ogImage = new URL(image, canonical).toString();
-  } catch {
-    // leave as-is if URL() fails (shouldn't in normal use)
-  }
+  } catch {}
+
+  // Auto noindex for /search (in addition to explicit noindex prop)
+  const isSearch = routeNoQuery.startsWith("/search");
+  const robots = (noindex || isSearch) ? "noindex, nofollow" : "index, follow";
 
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
 
@@ -34,7 +45,9 @@ export default function SEO({
     <Head>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
-      {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+      {/* Robots */}
+      <meta name="robots" content={robots} />
 
       {/* Canonical */}
       <link rel="canonical" href={canonical} />
@@ -56,5 +69,4 @@ export default function SEO({
     </Head>
   );
 }
-
 
