@@ -31,27 +31,24 @@ export default function Home({ latestPosts = [] }) {
           }}
         />
 
-        {/* ✅ Structured Data: WebSite (safe SearchAction) */}
-<script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "@id": "https://fintoolbox.com.au/#website",
-      url: "https://fintoolbox.com.au/",
-      name: "FinToolbox",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: "https://fintoolbox.com.au/search?q={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
-    }),
-  }}
-/>
+        {/* ✅ Structured Data: WebSite */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "FinToolbox",
+              url: "https://fintoolbox.com.au",
+              potentialAction: {
+                "@type": "SearchAction",
+                target:
+                  "https://fintoolbox.com.au/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
       </Head>
 
       {/* ===== HERO (optimized spacing) ===== */}

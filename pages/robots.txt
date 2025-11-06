@@ -7,7 +7,6 @@ export default function handler(req, res) {
   const host = "https://fintoolbox.com.au";
   res.send(`User-agent: *
 Allow: /
-Disallow: /search
 
 Sitemap: ${host}/sitemap.xml
 `);
