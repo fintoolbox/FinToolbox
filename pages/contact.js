@@ -1,7 +1,6 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SEO from "@/components/SEO";
-import Link from "next/link";
 
 export default function ContactPage() {
   const siteUrl = "https://fintoolbox.com.au";
@@ -10,45 +9,51 @@ export default function ContactPage() {
   const pageDescription =
     "Got a question, bug report, or feature request? Contact FinToolbox — we read every message.";
 
-  const [status, setStatus] = useState({ state: "idle", msg: "" });
+  // NOTE: keep the real email pieces here, but split so the full address
+  // isn't present in the compiled HTML as a single string.
+  // Adjust these parts if you want to change the email later.
+  const emailUser = "hello.fintoolbox";
+  const emailDomain = "gmail.com";
+  const emailSubject = "FinToolbox Contact";
 
-  async function onSubmit(e) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+  const [emailVisible, setEmailVisible] = useState("");
+  const [mailtoHref, setMailtoHref] = useState("");
+  const [copyStatus, setCopyStatus] = useState("idle"); // idle | copied | error
 
-    // Honeypot anti-spam field
-    if (formData.get("company")) {
-      setStatus({ state: "error", msg: "Submission blocked." });
-      return;
-    }
+  useEffect(() => {
+    // Reconstruct in browser only
+    const email = `${emailUser}@${emailDomain}`;
+    setEmailVisible(email);
+    setMailtoHref(`mailto:${email}?subject=${encodeURIComponent(emailSubject)}`);
+  }, []);
 
-    setStatus({ state: "loading", msg: "Sending…" });
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          subject: formData.get("subject"),
-          message: formData.get("message"),
-          consent: formData.get("consent") === "on",
-        }),
+  function copyEmail() {
+    if (!emailVisible) return;
+    navigator.clipboard
+      .writeText(emailVisible)
+      .then(() => {
+        setCopyStatus("copied");
+        setTimeout(() => setCopyStatus("idle"), 2500);
+      })
+      .catch(() => {
+        // fallback: create temporary input
+        try {
+          const input = document.createElement("input");
+          input.value = emailVisible;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand("copy");
+          document.body.removeChild(input);
+          setCopyStatus("copied");
+          setTimeout(() => setCopyStatus("idle"), 2500);
+        } catch {
+          setCopyStatus("error");
+          setTimeout(() => setCopyStatus("idle"), 2500);
+        }
       });
-
-      if (!res.ok) throw new Error("Request failed");
-
-      setStatus({ state: "success", msg: "Thanks! We’ll get back to you soon." });
-      form.reset();
-    } catch {
-      setStatus({
-        state: "error",
-        msg: "Couldn’t send right now. You can also email us directly: hello@fintoolbox.com.au",
-      });
-    }
   }
 
+  // JSON-LD WITHOUT email to avoid exposing it in the page source
   const contactJsonLd = {
     "@context": "https://schema.org",
     "@type": "ContactPage",
@@ -63,11 +68,11 @@ export default function ContactPage() {
     "@type": "Organization",
     name: "FinToolbox",
     url: siteUrl,
+    // intentionally omitted contactPoint.email to reduce scraping surface
     contactPoint: [
       {
         "@type": "ContactPoint",
         contactType: "customer support",
-        email: "hello@fintoolbox.com.au",
         availableLanguage: ["English"],
       },
     ],
@@ -96,129 +101,70 @@ export default function ContactPage() {
         <div className="mx-auto max-w-3xl px-6">
           <h1 className="text-3xl font-bold text-gray-900">Contact</h1>
           <p className="mt-2 text-gray-700">
-            Questions, bugs, or feature ideas? Send a message below. We aim to reply within a couple of business days.
+            We love to hear about feature requests, parnterships and guest posts.
+            Email us and we’ll get back to you within a couple of days. And we definitely hate spam as much as you do!
           </p>
 
           <div className="mt-6 rounded-2xl border p-5">
-            <form onSubmit={onSubmit} className="grid gap-4" noValidate>
-              {/* Honeypot field */}
-              <input
-                type="text"
-                name="company"
-                tabIndex={-1}
-                autoComplete="off"
-                className="hidden"
-                aria-hidden="true"
-              />
-
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <label className="block text-sm font-medium text-gray-700" htmlFor="name">
-                  Your name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  className="mt-1 w-full rounded-lg border px-3 py-2"
-                  placeholder="e.g. Jane Citizen"
-                />
+                <p className="text-sm text-gray-600">Email</p>
+
+                {/* The visible email is only rendered client-side via useEffect */}
+                <div className="mt-1 flex items-center gap-3">
+                  {emailVisible ? (
+                    <a
+                      href={mailtoHref}
+                      className="text-lg font-medium text-blue-700 hover:underline break-all"
+                    >
+                      {emailVisible}
+                    </a>
+                  ) : (
+                    <span className="text-lg font-medium text-gray-700">[email hidden — enable JavaScript]</span>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="mt-1 w-full rounded-lg border px-3 py-2"
-                  placeholder="you@example.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700" htmlFor="subject">
-                  Subject
-                </label>
-                <input
-                  id="subject"
-                  name="subject"
-                  type="text"
-                  required
-                  className="mt-1 w-full rounded-lg border px-3 py-2"
-                  placeholder="Feature request, bug report, question…"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700" htmlFor="message">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={6}
-                  required
-                  className="mt-1 w-full rounded-lg border px-3 py-2"
-                  placeholder="Tell us the details…"
-                />
-              </div>
-
-              <label className="flex items-start gap-2 text-sm">
-                <input id="consent" name="consent" type="checkbox" required className="mt-1" />
-                <span>
-                  I understand FinToolbox provides general information only and that my message may be stored to help respond.
-                </span>
-              </label>
-
-              <div className="flex items-center gap-3">
-                <button
-                  type="submit"
-                  className="rounded-lg bg-blue-700 px-4 py-2 text-white hover:bg-blue-800 disabled:opacity-60"
-                  disabled={status.state === "loading"}
-                >
-                  {status.state === "loading" ? "Sending…" : "Send message"}
-                </button>
-
-                {/* Mail fallback */}
+              <div className="flex gap-3">
                 <a
-                  href="mailto:hello@fintoolbox.com.au?subject=FinToolbox%20Contact"
-                  className="text-sm text-blue-700 hover:underline"
+                  // mailtoHref is empty until client-side runs; that's OK — the link will be hydrated
+                  href={mailtoHref || "#"}
+                  onClick={(e) => {
+                    if (!mailtoHref) {
+                      e.preventDefault();
+                      // If JS not yet ready, do nothing
+                    }
+                  }}
+                  className="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
                 >
-                  or email hello@fintoolbox.com.au
+                  Open email app
                 </a>
-              </div>
 
-              {status.state !== "idle" && (
-                <p
-                  className={
-                    status.state === "success"
-                      ? "text-sm text-green-700"
-                      : status.state === "error"
-                      ? "text-sm text-red-700"
-                      : "text-sm text-gray-600"
-                  }
-                  role={status.state === "error" ? "alert" : undefined}
+                <button
+                  type="button"
+                  onClick={copyEmail}
+                  className="inline-flex items-center rounded-lg border px-4 py-2 text-gray-800 hover:bg-gray-50"
+                  aria-live="polite"
+                  aria-pressed={copyStatus === "copied"}
                 >
-                  {status.msg}
-                </p>
-              )}
-            </form>
+                  {copyStatus === "copied" ? "Copied!" : "Copy email"}
+                </button>
+              </div>
+            </div>
 
-            <p className="mt-4 text-xs text-gray-500">
-              No Facebook or LinkedIn yet. For media or partnership queries, please use the subject line “Media”.
-            </p>
+            
+            <noscript className="mt-4 block text-sm text-gray-600">
+              JavaScript is required to view the email address. If JavaScript is disabled for your browser,
+              please try emailing <strong>hello [dot] fintoolbox [at] gmail [dot] com</strong> (replace brackets).
+            </noscript>
           </div>
 
           <div className="mt-8 rounded-2xl border p-5">
-            <h2 className="text-lg font-semibold text-gray-900">Before you write</h2>
+            <h2 className="text-lg font-semibold text-gray-900">What makes us happy</h2>
             <ul className="mt-1 list-disc pl-5 text-gray-700 space-y-1">
-              <li>We can’t provide personal financial advice.</li>
-              <li>Bug reports: include device, browser, and steps to reproduce.</li>
-              <li>Feature ideas: links or screenshots help a lot.</li>
+              <li>Building a community of like minded finance enthusiasts</li>
+              <li>Hearing ideas on features or new calculators that you'd find useful</li>
+              <li>Letting others know about our calculators and tools!</li>
             </ul>
           </div>
         </div>
@@ -226,4 +172,3 @@ export default function ContactPage() {
     </main>
   );
 }
-
