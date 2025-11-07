@@ -102,7 +102,7 @@ export default function ContactPage() {
           <h1 className="text-3xl font-bold text-gray-900">Contact</h1>
           <p className="mt-2 text-gray-700">
             We love to hear about feature requests, parnterships and guest posts.
-            Email us and we’ll get back to you within a couple of days. And we definitely hate spam as much as you do!
+            Email us and we&lsquo;ll get back to you within a couple of days. And we definitely hate spam as much as you do!
           </p>
 
           <div className="mt-6 rounded-2xl border p-5">
@@ -163,7 +163,7 @@ export default function ContactPage() {
             <h2 className="text-lg font-semibold text-gray-900">What makes us happy</h2>
             <ul className="mt-1 list-disc pl-5 text-gray-700 space-y-1">
               <li>Building a community of like minded finance enthusiasts</li>
-              <li>Hearing ideas on features or new calculators that you'd find useful</li>
+              <li>Hearing ideas on features or new calculators that you&lsquo;d find useful</li>
               <li>Letting others know about our calculators and tools!</li>
             </ul>
           </div>
