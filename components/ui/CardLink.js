@@ -1,16 +1,25 @@
+// components/ui/CardLink.js
 import Link from "next/link";
 
-export default function CardLink({ href, title, children }) {
+export default function CardLink({ href, title, icon: Icon, children }) {
   return (
     <Link
       href={href}
-      className="block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm
-                 transition hover:shadow-md hover:border-brand-300
-                 hover:border-l-4 hover:border-l-brand-500"
+      className="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm
+                 transition hover:shadow-md hover:border-blue-300"
     >
-      <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-      <p className="mt-2 text-gray-600 leading-relaxed">{children}</p>
+      <div className="flex flex-col items-start text-left">
+  {Icon && (
+    <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-xl
+                    bg-blue-50 text-blue-700 transition
+                    group-hover:bg-blue-600 group-hover:text-white">
+      <Icon size={36} strokeWidth={1.8} />
+    </div>
+  )}
+  <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+  <p className="mt-1 text-gray-600 leading-relaxed">{children}</p>
+</div>
+
     </Link>
   );
 }
-

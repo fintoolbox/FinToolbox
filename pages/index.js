@@ -1,6 +1,7 @@
 // pages/index.js
 import Head from "next/head";
 import Link from "next/link";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 import ReadingTime from "@/components/ReadingTime";
@@ -81,29 +82,54 @@ export default function Home({ latestPosts = [] }) {
       <div className="mx-auto max-w-4xl px-6">
         {/* Calculators */}
         <CardSection title="Calculators" cols={3}>
-          <CardLink href="/calculators/debt-recycling" title="Debt Recycling">
-                        Convert your home loan to investment debt
-                      </CardLink>
-          <CardLink href="/calculators/tax-calculator" title="Income Tax">
-            Calculate your take home pay
-          </CardLink>
-          <CardLink
-            href="/calculators/investment-growth"
-            title="Compound Interest"
-          >Investment growth over time
-          </CardLink>
-          <CardLink href="/calculators/mortgage" title="Mortgage Repayments">
-            Payoff your home loan faster
-          </CardLink>
-          <CardLink
-            href="/calculators/age-pension"
-            title="Centrelink Age Pension"
-          >How much Age Pension you can receive
-          </CardLink>
-          <CardLink href="/calculators/account-based-pension" title="Account Based Pension">
-                        How long your super will last in retirement
-                      </CardLink>
-        </CardSection>
+  <CardLink
+    href="/calculators/debt-recycling"
+    title="Debt Recycling"
+    icon={Repeat}
+  >
+    Convert your home loan to investment debt
+  </CardLink>
+
+  <CardLink
+    href="/calculators/tax-calculator"
+    title="Income Tax"
+    icon={Calculator}
+  >
+    Calculate your take home pay
+  </CardLink>
+
+  <CardLink
+    href="/calculators/investment-growth"
+    title="Compound Interest"
+    icon={PiggyBank}
+  >
+    Investment growth over time
+  </CardLink>
+
+  <CardLink
+    href="/calculators/mortgage"
+    title="Mortgage Repayments"
+    icon={HomeIcon}
+  >
+    Payoff your home loan faster
+  </CardLink>
+
+  <CardLink
+    href="/calculators/age-pension"
+    title="Centrelink Age Pension"
+    icon={HandCoins}
+  >
+    How much Age Pension you can receive
+  </CardLink>
+
+  <CardLink
+    href="/calculators/account-based-pension"
+    title="Account Based Pension"
+    icon={ChartColumn}
+  >
+    How long your super will last in retirement
+  </CardLink>
+</CardSection>
 
         {/* Latest from the Blog */}
         <CardSection title="Latest post" cols={1}>
