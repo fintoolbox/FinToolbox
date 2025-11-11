@@ -7,33 +7,28 @@ import SEO from "@/components/SEO";
 import Tooltip from "@/components/Tooltip";
 import MDXComponents from "@/components/MDXComponents";
 import ReadingTime from "@/components/ReadingTime";
+import { SITE_URL } from "@/lib/site";
 
 export default function BlogPostPage({ source, frontmatter, slug }) {
-  const siteUrl = "https://fintoolbox.com.au";
+  const siteUrl = SITE_URL;
 
-  // 1. Build the "self URL" for this blog post
-  const blogUrl = `${siteUrl}/blog/${slug}`;
+  // Self URL for this post
+  const blogUrl = new URL(`/blog/${slug}`, siteUrl).toString();
 
-  // 2. If this blog post is intentionally targeting the same intent/keyword
-  //    as a calculator page, nominate the calculator as canonical instead.
-  //
-  //    Add more cases here as you publish more “calculator explainer” posts.
-  //
-  //    Example: mortgage calculator explainer blog post
+  // Canonical override map (when a post intentionally targets a calculator keyword)
   const canonicalOverrideMap = {
-    "mortgage-repayment-calculator-australia": `${siteUrl}/calculators/mortgage`,
-    // "some-other-post-slug": `${siteUrl}/calculators/some-other-calculator`,
+    "mortgage-repayment-calculator-australia": new URL("/calculators/mortgage", siteUrl).toString(),
+    // "some-other-post-slug": new URL("/calculators/some-other-calculator", siteUrl).toString(),
   };
 
-  // pick canonical URL
   const canonicalUrl = canonicalOverrideMap[slug] || blogUrl;
 
   const title = frontmatter?.title || slug;
   const description = frontmatter?.excerpt || frontmatter?.description || "";
-  const image = frontmatter?.coverImage || `${siteUrl}/og-default.png`;
+  const image = frontmatter?.coverImage || new URL("/og-default.png", siteUrl).toString();
 
   const published = frontmatter?.date || null;
-  const modified = frontmatter?.updated || frontmatter?.date || null;
+  const modified = frontmatter?.updatedAt || frontmatter?.updated || frontmatter?.date || null;
 
   // JSON-LD: Breadcrumbs
   const breadcrumbJsonLd = {
@@ -41,7 +36,7 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
-      { "@type": "ListItem", position: 2, name: "Blog", item: `${siteUrl}/blog` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: new URL("/blog", siteUrl).toString() },
       { "@type": "ListItem", position: 3, name: title, item: blogUrl },
     ],
   };
@@ -53,59 +48,44 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
     mainEntityOfPage: { "@type": "WebPage", "@id": blogUrl },
     headline: title,
     description,
-    image,
+    image: new URL(image, siteUrl).toString(),
     author: frontmatter?.author
       ? { "@type": "Person", name: frontmatter.author }
       : { "@type": "Organization", name: "FinToolbox" },
     publisher: {
       "@type": "Organization",
       name: "FinToolbox",
-      logo: { "@type": "ImageObject", url: `${siteUrl}/og-default.png` },
+      logo: { "@type": "ImageObject", url: new URL("/og-default.png", siteUrl).toString() },
     },
     datePublished: published || undefined,
     dateModified: modified || undefined,
     inLanguage: "en-AU",
-    keywords: Array.isArray(frontmatter?.tags)
-      ? frontmatter.tags.join(", ")
-      : undefined,
+    keywords: Array.isArray(frontmatter?.tags) ? frontmatter.tags.join(", ") : undefined,
   };
 
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-3xl px-6 py-10">
-        {/* Canonical + base meta via SEO component */}
-        <SEO
-          title={title}
-          description={description}
-          url={canonicalUrl}         // <-- this is the key change
-          image={image}
-        />
+        {/* Canonical + base meta */}
+        <SEO title={title} description={description} url={canonicalUrl} image={image} />
 
-        {/* Article-specific meta + JSON-LD */}
+        {/* Article meta + JSON-LD */}
         <Head>
-          {/* Open Graph: article */}
           <meta property="og:type" content="article" />
           <meta property="article:published_time" content={published || ""} />
           <meta property="article:modified_time" content={modified || ""} />
           {Array.isArray(frontmatter?.tags) &&
-            frontmatter.tags.map((t) => (
-              <meta key={t} property="article:tag" content={t} />
-            ))}
+            frontmatter.tags.map((t) => <meta key={t} property="article:tag" content={t} />)}
           <meta name="author" content={frontmatter?.author || "FinToolbox"} />
           <meta property="og:image:alt" content={title} />
 
-          {/* JSON-LD */}
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(breadcrumbJsonLd),
-            }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
           />
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(blogPostingJsonLd),
-            }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
           />
         </Head>
 
@@ -121,9 +101,7 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
               })}
             </time>
           )}
-          <ReadingTime
-            minutes={frontmatter?.readingTime}
-          />
+          <ReadingTime minutes={frontmatter?.readingTime} />
           {frontmatter?.author && <span>by {frontmatter.author}</span>}
         </div>
 
@@ -152,7 +130,6 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
           />
         </article>
 
-        {/* Simple back link */}
         <div className="mt-8">
           <Link href="/blog" className="text-blue-700 hover:underline">
             ← Back to blog
@@ -163,13 +140,12 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
   );
 }
 
-// --- Build-time: load a single post and serialize MDX ---
+// Build-time: load a single post and serialize MDX
 export async function getStaticProps({ params }) {
   const { getPostBySlug } = await import("@/lib/mdx");
   const { readingStats } = await import("@/lib/readingTime");
   const { content, frontmatter } = getPostBySlug(params.slug);
 
-  // compute reading time
   const { words, minutes } = readingStats(content);
   frontmatter.readingTime = minutes;
   frontmatter.wordCount = words;
@@ -190,7 +166,7 @@ export async function getStaticProps({ params }) {
   return { props: { source: mdxSource, frontmatter, slug: params.slug } };
 }
 
-// --- Build-time: generate paths for all posts ---
+// Build-time: generate paths for all posts
 export async function getStaticPaths() {
   const { getPostSlugs } = await import("@/lib/mdx");
   const files = getPostSlugs();

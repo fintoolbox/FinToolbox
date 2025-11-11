@@ -1,8 +1,10 @@
 // pages/sitemap.xml.js
+import { SITE_URL } from "@/lib/site"; // central base URL (see Step 0 below)
 import { calculators } from "../lib/pages"; // shared list of calculator paths (e.g. "/calculators/mortgage")
 
 export async function getServerSideProps({ res }) {
-  const siteUrl = "https://fintoolbox.com.au"; // no trailing slash
+  const siteUrl = SITE_URL; // no trailing slash
+  const nowIso = new Date().toISOString();
 
   // Server-only: load MDX posts
   const { getAllPosts } = await import("../lib/mdx");
@@ -17,8 +19,9 @@ export async function getServerSideProps({ res }) {
   };
   const iso = (d) => {
     const t = new Date(d);
-    return isNaN(t.getTime()) ? new Date().toISOString() : t.toISOString();
+    return isNaN(t.getTime()) ? nowIso : t.toISOString();
   };
+  const loc = (path) => `${siteUrl}${path === "/" ? "" : path}`;
 
   // Core pages (paths only)
   const staticPaths = [
@@ -34,8 +37,8 @@ export async function getServerSideProps({ res }) {
   // Static/core pages
   for (const p of staticPaths) {
     urls.push({
-      loc: `${siteUrl}${p === "/" ? "" : p}`,
-      lastmod: new Date().toISOString(),
+      loc: loc(p),
+      lastmod: nowIso,
       changefreq: p === "/" ? "daily" : p.startsWith("/calculators") ? "weekly" : "weekly",
       priority: p === "/" ? 1.0 : p === "/calculators" || p === "/blog" ? 0.8 : 0.7,
     });
@@ -44,44 +47,47 @@ export async function getServerSideProps({ res }) {
   // Blog posts
   for (const post of posts) {
     const p = normalise(`/blog/${post.slug}`);
-    const lm = post.frontmatter?.updatedAt || post.frontmatter?.date || new Date().toISOString();
+    const lm = post.frontmatter?.updatedAt || post.frontmatter?.date || nowIso;
     urls.push({
-      loc: `${siteUrl}${p}`,
+      loc: loc(p),
       lastmod: iso(lm),
       changefreq: "monthly",
       priority: 0.6,
     });
   }
 
-  // De-dupe by loc (in case of overlaps)
-  const unique = Array.from(
-    new Map(urls.map((u) => [u.loc, u])).values()
+  // De-dupe by loc (in case of overlaps) & make output stable
+  const unique = Array.from(new Map(urls.map((u) => [u.loc, u])).values()).sort((a, b) =>
+    a.loc.localeCompare(b.loc)
   );
 
   // XML
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${unique
-  .map(
-    (u) => `  <url>
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    unique
+      .map(
+        (u) => `  <url>
     <loc>${u.loc}</loc>
     <lastmod>${u.lastmod}</lastmod>
     <changefreq>${u.changefreq}</changefreq>
     <priority>${u.priority}</priority>
   </url>`
-  )
-  .join("\n")}
-</urlset>`;
+      )
+      .join("\n") +
+    `\n</urlset>`;
 
+  // Headers + send
   res.setHeader("Content-Type", "application/xml");
-  // Cache for a day (feel free to tune)
-  res.setHeader("Cache-Control", "public, max-age=86400, s-maxage=86400");
+  // cache at the edge for 1h; allow serving stale for a day while revalidating
+  res.setHeader("Cache-Control", "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400");
   res.write(xml);
   res.end();
 
   return { props: {} };
 }
 
+// No page component render
 export default function SiteMap() {
   return null;
 }

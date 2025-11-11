@@ -81,7 +81,7 @@ export default function Home({ latestPosts = [] }) {
 </section>
 
 
-      <div className="mx-auto max-w-4xl px-6 px-6 pb-6 md:pb-8">
+      <div className="mx-auto max-w-4xl px-6 pb-6 md:pb-8">
         {/* Calculators */}
         <CardSection title="Calculators" cols={3}>
   <CardLink

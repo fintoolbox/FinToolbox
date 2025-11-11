@@ -5,10 +5,11 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SITE_URL } from "@/lib/site";
 
 const links = [
   { href: "/", label: "Home" },
-  { href: "/calculators", label: "Calculators"}, 
+  { href: "/calculators", label: "Calculators" },
   { href: "/calculators/debt-recycling", label: "Debt Recycling" },
   { href: "/blog", label: "Blog" },
 ];
@@ -25,16 +26,15 @@ export default function Layout({ children }) {
   const isActive = (href) =>
     pathname === href || (href !== "/" && pathname.startsWith(href));
 
-  const siteUrl = "https://fintoolbox.com.au";
+  const siteUrl = SITE_URL;
 
-  // Site-wide JSON-LD (these describe the business / site as a whole,
-  // not individual pages, so it's safe to include globally)
+  // Site-wide JSON-LD (global)
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "FinToolbox",
     url: siteUrl,
-    logo: `${siteUrl}/logo.png`,
+    logo: new URL("/logo.png", siteUrl).toString(),
   };
   const websiteJsonLd = {
     "@context": "https://schema.org",
@@ -48,42 +48,17 @@ export default function Layout({ children }) {
       <Head>
         {/* Favicons & App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#ffffff" />
 
-        {/* IMPORTANT:
-           We intentionally do NOT set:
-           - <title>
-           - <meta name="description">
-           - <meta property="og:*">
-           - <meta name="twitter:*">
-           - <link rel="canonical">
-           Those must now be provided per page via <SEO /> or local <Head>.
-           This prevents every page from claiming the homepage as canonical.
-        */}
+        {/* IMPORTANT: page-specific SEO is handled by <SEO /> or local <Head> in each page */}
 
         {/* Global structured data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </Head>
 
       {/* Skip link for accessibility */}
@@ -103,26 +78,18 @@ export default function Layout({ children }) {
             aria-label="FinToolbox — Financial Calculators & Tools for Australians"
           >
             FinToolbox
-            <span className="sr-only">
-              {" "}
-              — Financial Calculators &amp; Tools for Australians
-            </span>
+            <span className="sr-only"> — Financial Calculators &amp; Tools for Australians</span>
           </Link>
 
           {/* Desktop nav */}
-          <nav
-            className="hidden items-center gap-5 text-sm sm:flex"
-            aria-label="Primary"
-          >
+          <nav className="hidden items-center gap-5 text-sm sm:flex" aria-label="Primary">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 className={[
                   "rounded-md px-2 py-1 transition-colors",
-                  isActive(l.href)
-                    ? "text-blue-700 font-semibold bg-blue-50"
-                    : "text-gray-700 hover:text-blue-800",
+                  isActive(l.href) ? "text-blue-700 font-semibold bg-blue-50" : "text-gray-700 hover:text-blue-800",
                 ].join(" ")}
               >
                 {l.label}
@@ -145,18 +112,10 @@ export default function Layout({ children }) {
         {/* Mobile dropdown */}
         {open && (
           <div className="sm:hidden border-t bg-white" id="mobile-nav">
-            <nav
-              className="mx-auto max-w-6xl px-6 py-3 text-sm"
-              aria-label="Primary mobile"
-            >
+            <nav className="mx-auto max-w-6xl px-6 py-3 text-sm" aria-label="Primary mobile">
               <div className="grid gap-2">
                 {links.map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-md px-2 py-2 hover:bg-gray-100"
-                  >
+                  <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-md px-2 py-2 hover:bg-gray-100">
                     {l.label}
                   </Link>
                 ))}
@@ -169,29 +128,18 @@ export default function Layout({ children }) {
       {/* Main content */}
       <main id="main" className="mx-auto max-w-5xl px-6 py-10">
         <Breadcrumbs />
-
         {children}
 
         {/* Footer */}
         <footer className="mt-10 border-t bg-white">
           <div className="px-6 py-6 text-sm text-gray-600">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <p>
-                © <Year /> FinToolbox. General information only.
-              </p>
+              <p>© <Year /> FinToolbox. General information only.</p>
               <div className="flex gap-4">
-                <Link href="/about" className="hover:text-blue-700">
-                  About
-                </Link>
-                <Link href="/disclaimer" className="hover:text-blue-700">
-                  Disclaimer
-                </Link>
-                <Link href="/contact" className="hover:text-blue-700">
-                  Contact
-                </Link>
-                <Link href="/blog" className="hover:text-blue-700">
-                  Blog
-                </Link>
+                <Link href="/about" className="hover:text-blue-700">About</Link>
+                <Link href="/disclaimer" className="hover:text-blue-700">Disclaimer</Link>
+                <Link href="/contact" className="hover:text-blue-700">Contact</Link>
+                <Link href="/blog" className="hover:text-blue-700">Blog</Link>
               </div>
             </div>
           </div>

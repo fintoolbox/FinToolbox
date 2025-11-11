@@ -560,7 +560,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
         />
         <link
           rel="canonical"
-          href="https://www.fintoolbox.com.au/calculators/debt-recycling"
+          href="https://fintoolbox.com.au/calculators/debt-recycling"
         />
       </Head>
 
