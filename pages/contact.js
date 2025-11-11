@@ -165,7 +165,7 @@ export default function ContactPage() {
               <li>To build a community of like minded finance enthusiasts</li>
               <li>Hear your ideas for features or new calculators that you&lsquo;d find useful</li>
               <li>Tell us about other sites we can link to and build our community</li>
-              <li>Advertising products and services on our site that our community will find useful.</li>
+              <li>Advertising products and services on our site that our community will find useful</li>
             </ul>
           </div>
         </div>

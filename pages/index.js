@@ -1,10 +1,12 @@
 // pages/index.js
 import Head from "next/head";
 import Link from "next/link";
+import Image from "next/image"
 import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 import ReadingTime from "@/components/ReadingTime";
+
 
 export default function Home({ latestPosts = [] }) {
   return (
@@ -79,7 +81,7 @@ export default function Home({ latestPosts = [] }) {
 </section>
 
 
-      <div className="mx-auto max-w-4xl px-6">
+      <div className="mx-auto max-w-4xl px-6 px-6 pb-6 md:pb-8">
         {/* Calculators */}
         <CardSection title="Calculators" cols={3}>
   <CardLink
@@ -132,68 +134,85 @@ export default function Home({ latestPosts = [] }) {
 </CardSection>
 
         {/* Latest from the Blog */}
-        <CardSection title="Latest post" cols={1}>
-          <ul className="space-y-6">
-            {latestPosts.length > 0 ? (
-              latestPosts.map((p) => (
-                <li
-                  key={p.slug}
-                  className="border-b border-gray-200 pb-6 last:border-0 last:pb-0"
-                >
-                  <Link
-                    href={`/blog/${p.slug}`}
-                    className="text-xl font-semibold text-gray-900 hover:text-blue-700"
-                  >
-                    {p.frontmatter.title}
-                  </Link>
+<CardSection title="Latest post" cols={1}>
+  <ul className="space-y-8">
+    {latestPosts.length > 0 ? (
+      latestPosts.map((post) => {
+        const { slug } = post;
+        const {
+          title,
+          date,
+          readingTime,
+          wordCount,
+          excerpt,
+          coverImage,
+        } = post.frontmatter;
 
-                  <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                    {p.frontmatter.date && (
-                      <time
-                        dateTime={p.frontmatter.date}
-                        suppressHydrationWarning
-                      >
-                        {new Date(p.frontmatter.date).toLocaleDateString(
-                          "en-AU",
-                          {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )}
-                      </time>
-                    )}
-                    <ReadingTime
-                      minutes={p.frontmatter.readingTime}
-                      words={p.frontmatter.wordCount}
-                    />
-                  </div>
+        return (
+          <li key={slug} className="border-b border-gray-200 pb-6 last:border-0">
+            <Link
+              href={`/blog/${slug}`}
+              className="group grid grid-cols-[112px_1fr] gap-4 sm:grid-cols-[192px_1fr] items-start"
+            >
+              {/* Thumbnail (16:9) */}
+              {coverImage ? (
+                <div className="relative h-[70px] w-[112px] sm:h-[108px] sm:w-[192px] overflow-hidden rounded-lg bg-gray-200">
+                  <Image
+                    src={coverImage}
+                    alt={title || "Blog post thumbnail"}
+                    fill
+                    sizes="(min-width: 640px) 192px, 112px"
+                    className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="h-[70px] w-[112px] sm:h-[108px] sm:w-[192px] rounded-lg bg-gray-200"
+                  aria-hidden="true"
+                />
+              )}
 
-                  {p.frontmatter.excerpt && (
-                    <p className="mt-2 text-gray-700">
-                      {p.frontmatter.excerpt}
-                    </p>
+              {/* Text block */}
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 group-hover:text-blue-700">
+                  {title}
+                </h2>
+
+                {/* meta row */}
+                <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                  {date && (
+                    <time dateTime={date} suppressHydrationWarning>
+                      {new Date(date).toLocaleDateString("en-AU", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </time>
                   )}
+                  {/* Reading time – keep signature parity */}
+                  <ReadingTime minutes={readingTime} words={wordCount} />
+                </div>
 
-                  <div className="mt-3">
-                    <Link
-                      href={`/blog/${p.slug}`}
-                      className="text-blue-700 hover:underline font-medium"
-                    >
-                      Read more →
-                    </Link>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <li className="text-gray-600">
-                No posts yet — check back soon.
-              </li>
-            )}
-          </ul>
-        </CardSection>
+                {excerpt && <p className="mt-2 text-gray-700">{excerpt}</p>}
+
+                <div className="mt-3">
+                  <span className="text-blue-700 hover:underline font-medium">
+                    Read more →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </li>
+        );
+      })
+    ) : (
+      <li className="text-gray-600">No posts yet — check back soon.</li>
+    )}
+  </ul>
+</CardSection>
 
         {/* Why these calculators */}
+        {/*
         <CardSection title="Why these calculators?" cols={1}>
           <div className="leading-relaxed text-gray-700">
             We built these tools to make Australian money questions simple — no
@@ -201,7 +220,7 @@ export default function Home({ latestPosts = [] }) {
             accurate answers on tax, investing, and retirement. General
             information only.
           </div>
-        </CardSection>
+        </CardSection> */}
       </div>
     </main>
   );
