@@ -2,7 +2,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image"
-import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn } from "lucide-react";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 import ReadingTime from "@/components/ReadingTime";
@@ -68,13 +68,13 @@ export default function Home({ latestPosts = [] }) {
         href="/calculators/"
         className="inline-block rounded-md bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
       >
-        Explore Calculators
+        Explore all calculators
       </Link>
       <Link
         href="/blog"
         className="inline-block rounded-md border border-blue-700 px-6 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
       >
-        Read the Blog
+        Latest from the blog
       </Link>
     </div>
   </div>
@@ -83,13 +83,21 @@ export default function Home({ latestPosts = [] }) {
 
       <div className="mx-auto max-w-4xl px-6 pb-6 md:pb-8">
         {/* Calculators */}
-        <CardSection title="Calculators" cols={3}>
+        <CardSection title="Featured Calculators" cols={3}>
   <CardLink
     href="/calculators/debt-recycling"
     title="Debt Recycling"
     icon={Repeat}
   >
     Convert your home loan to investment debt
+  </CardLink>
+
+<CardLink
+    href="/calculators/salary-sacrifice"
+    title="Salary Sacrifice"
+    icon={ChartNoAxesColumnIncreasing}
+  >
+    Understand the benefits of salary sacrificing
   </CardLink>
 
   <CardLink
@@ -109,14 +117,6 @@ export default function Home({ latestPosts = [] }) {
   </CardLink>
 
   <CardLink
-    href="/calculators/mortgage"
-    title="Mortgage Repayments"
-    icon={HomeIcon}
-  >
-    Payoff your home loan faster
-  </CardLink>
-
-  <CardLink
     href="/calculators/age-pension"
     title="Centrelink Age Pension"
     icon={HandCoins}
@@ -131,6 +131,15 @@ export default function Home({ latestPosts = [] }) {
   >
     How long your super will last in retirement
   </CardLink>
+  <div className="mt-3 mb-3 text-center">
+  <Link
+    href="/calculators"
+    className="text-blue-700 font-medium hover:underline"
+  >
+    View all calculators →
+  </Link>
+</div>
+
 </CardSection>
 
         {/* Latest from the Blog */}

@@ -10,8 +10,8 @@ import { SITE_URL } from "@/lib/site";
 const links = [
   { href: "/", label: "Home" },
   { href: "/calculators", label: "Calculators" },
-  { href: "/calculators/debt-recycling", label: "Debt Recycling" },
   { href: "/blog", label: "Blog" },
+  { href: "/contact", label: "Contact" },
 ];
 
 function Year() {

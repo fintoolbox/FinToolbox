@@ -1,9 +1,9 @@
 import Head from "next/head";
 import SEO from "@/components/SEO";
-import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn } from "lucide-react";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
-
+<ChartNoAxesColumnIncreasing />
 export default function CalculatorsIndex() {
   const pageUrl = "https://fintoolbox.com.au/calculators";
   const pageTitle = "All Financial Calculators (Australia) | FinToolbox";
@@ -28,10 +28,9 @@ export default function CalculatorsIndex() {
 
       <section className="py-10">
         <div className="mx-auto max-w-4xl px-6">
-          <h1 className="text-3xl font-bold mb-6">Calculators</h1>
-
-         
-        {/* Calculators */}
+                   
+        {/* Tax Calculators */}
+        <h1 className="text-3xl font-bold mb-6">Tax Calculators</h1>
         <CardSection cols={3}>
   <CardLink
     href="/calculators/debt-recycling"
@@ -42,12 +41,27 @@ export default function CalculatorsIndex() {
   </CardLink>
 
   <CardLink
+    href="/calculators/salary-sacrifice"
+    title="Salary Sacrifice"
+    icon={ChartNoAxesColumnIncreasing}
+  >
+    Understand the benefits of salary sacrificing
+  </CardLink>
+
+  <CardLink
     href="/calculators/tax-calculator"
     title="Income Tax"
     icon={Calculator}
   >
     Calculate your take home pay
   </CardLink>
+
+  </CardSection>
+
+{/* Investment Calculators */}
+<h1 className="text-3xl font-bold mb-6">Investment Calculators</h1>
+        <CardSection cols={3}>
+  
 
   <CardLink
     href="/calculators/investment-growth"
@@ -57,23 +71,7 @@ export default function CalculatorsIndex() {
     Investment growth over time
   </CardLink>
 
-  <CardLink
-    href="/calculators/mortgage"
-    title="Mortgage Repayments"
-    icon={HomeIcon}
-  >
-    Payoff your home loan faster
-  </CardLink>
-
-  <CardLink
-    href="/calculators/age-pension"
-    title="Centrelink Age Pension"
-    icon={HandCoins}
-  >
-    How much Age Pension you can receive
-  </CardLink>
-
-  <CardLink
+    <CardLink
     href="/calculators/account-based-pension"
     title="Account Based Pension"
     icon={ChartColumn}
@@ -81,6 +79,44 @@ export default function CalculatorsIndex() {
     How long your super will last in retirement
   </CardLink>
 </CardSection>
+
+{/* Debt Calculators */}
+<h1 className="text-3xl font-bold mb-6">Debt Calculators</h1>
+        <CardSection cols={3}>
+  <CardLink
+    href="/calculators/debt-recycling"
+    title="Debt Recycling"
+    icon={Repeat}
+  >
+    Convert your home loan to investment debt
+  </CardLink>
+
+    <CardLink
+    href="/calculators/mortgage"
+    title="Mortgage Repayments"
+    icon={HomeIcon}
+  >
+    Payoff your home loan faster
+  </CardLink>
+
+  </CardSection>
+
+{/* Centrelink Calculators */}
+<h1 className="text-3xl font-bold mb-6">Centrelink Calculators</h1>
+        <CardSection cols={3}>
+  
+    <CardLink
+    href="/calculators/age-pension"
+    title="Centrelink Age Pension"
+    icon={HandCoins}
+  >
+    How much Age Pension you can receive
+  </CardLink>
+
+  
+</CardSection>
+
+
         </div>
       </section>
     </main>
