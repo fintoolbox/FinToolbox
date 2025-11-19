@@ -1,6 +1,6 @@
 import Head from "next/head";
 import SEO from "@/components/SEO";
-import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing } from "lucide-react";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing, HousePlus } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 <ChartNoAxesColumnIncreasing />
@@ -69,6 +69,14 @@ export default function CalculatorsIndex() {
     icon={PiggyBank}
   >
     Investment growth over time
+  </CardLink>
+
+  <CardLink
+    href="/calculators/investment-property"
+    title="Investment Property"
+    icon={HousePlus}
+  >
+    Cashflow and equity growth
   </CardLink>
 
     <CardLink

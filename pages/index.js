@@ -2,7 +2,7 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image"
-import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing } from "lucide-react";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing, HousePlus } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 import ReadingTime from "@/components/ReadingTime";
@@ -93,6 +93,14 @@ export default function Home({ latestPosts = [] }) {
   </CardLink>
 
 <CardLink
+    href="/calculators/investment-property"
+    title="Investment Property"
+    icon={HousePlus}
+  >
+    Cashflow and equity growth
+  </CardLink>
+  
+<CardLink
     href="/calculators/salary-sacrifice"
     title="Salary Sacrifice"
     icon={ChartNoAxesColumnIncreasing}
@@ -100,37 +108,6 @@ export default function Home({ latestPosts = [] }) {
     Understand the benefits of salary sacrificing
   </CardLink>
 
-  <CardLink
-    href="/calculators/tax-calculator"
-    title="Income Tax"
-    icon={Calculator}
-  >
-    Calculate your take home pay
-  </CardLink>
-
-  <CardLink
-    href="/calculators/investment-growth"
-    title="Compound Interest"
-    icon={PiggyBank}
-  >
-    Investment growth over time
-  </CardLink>
-
-  <CardLink
-    href="/calculators/age-pension"
-    title="Centrelink Age Pension"
-    icon={HandCoins}
-  >
-    How much Age Pension you can receive
-  </CardLink>
-
-  <CardLink
-    href="/calculators/account-based-pension"
-    title="Account Based Pension"
-    icon={ChartColumn}
-  >
-    How long your super will last in retirement
-  </CardLink>
   <div className="mt-3 mb-3 text-center">
   <Link
     href="/calculators"
