@@ -41,6 +41,7 @@ export default function Home({ latestPosts = [] }) {
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/calculators/"
+              prefetch={false}
               className="inline-block rounded-md bg-blue-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
             >
               Explore all calculators
@@ -59,28 +60,32 @@ export default function Home({ latestPosts = [] }) {
         {/* ===== FEATURED CALCULATORS ===== */}
         <CardSection title="Featured Calculators" cols={3}>
           <CardLink
-            href="/calculators/debt-recycling"
-            title="Debt Recycling"
-            icon={Repeat}
-          >
-            Convert your home loan to investment debt
-          </CardLink>
+  href="/calculators/debt-recycling"
+  title="Debt Recycling"
+  icon={Repeat}
+  prefetch={false}
+>
+  Convert your home loan to investment debt
+</CardLink>
 
-          <CardLink
-            href="/calculators/investment-property"
-            title="Investment Property"
-            icon={HousePlus}
-          >
-            Cashflow and equity growth
-          </CardLink>
+<CardLink
+  href="/calculators/investment-property"
+  title="Investment Property"
+  icon={HousePlus}
+  prefetch={false}
+>
+  Cashflow and equity growth
+</CardLink>
 
-          <CardLink
-            href="/calculators/salary-sacrifice"
-            title="Salary Sacrifice"
-            icon={ChartNoAxesColumnIncreasing}
-          >
-            Understand the benefits of salary sacrificing
-          </CardLink>
+<CardLink
+  href="/calculators/salary-sacrifice"
+  title="Salary Sacrifice"
+  icon={ChartNoAxesColumnIncreasing}
+  prefetch={false}
+>
+  Understand the benefits of salary sacrificing
+</CardLink>
+
 
           <div className="mt-3 mb-3 text-center">
             <Link
