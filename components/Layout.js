@@ -2,10 +2,11 @@
 import Link from "next/link";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/site";
+import { inter } from "@/lib/fonts";
 
 const links = [
   { href: "/", label: "Home" },
@@ -14,11 +15,7 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
-function Year() {
-  const [y, setY] = useState("");
-  useEffect(() => setY(String(new Date().getFullYear())), []);
-  return <span suppressHydrationWarning>{y}</span>;
-}
+const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Layout({ children }) {
   const [open, setOpen] = useState(false);
@@ -44,7 +41,7 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className={`${inter.className} min-h-screen bg-gray-50 text-gray-900`}>
       <Head>
         {/* Favicons & App Icons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -134,7 +131,7 @@ export default function Layout({ children }) {
         <footer className="mt-10 border-t bg-white">
           <div className="px-6 py-6 text-sm text-gray-600">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <p>© <Year /> FinToolbox. General information only.</p>
+              <p>© {CURRENT_YEAR} FinToolbox. General information only.</p>
               <div className="flex gap-4">
                 <Link href="/about" className="hover:text-blue-700">About</Link>
                 <Link href="/disclaimer" className="hover:text-blue-700">Disclaimer</Link>
