@@ -1,8 +1,8 @@
+// pages/_app.js
 import "@/styles/globals.css";
 import Layout from "../components/Layout";
-import { Analytics } from "@vercel/analytics/react"; 
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import Script from "next/script"; // 👈 Add this import
+import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -25,18 +25,19 @@ export default function App({ Component, pageProps }) {
     return () => {
       router.events.off("routeChangeComplete", handleRouteChange);
     };
-  }, [router.events]);
+  }, [router.events]); // GA_MEASUREMENT_ID is static at runtime
 
   return (
     <>
       {/* 🧠 Load Google tag only if MEASUREMENT ID exists */}
       {GA_MEASUREMENT_ID && (
         <>
+          {/* ⏱ GA script now loads AFTER the main page has loaded */}
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
-          <Script id="ga4-init" strategy="afterInteractive">
+          <Script id="ga4-init" strategy="lazyOnload">
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
@@ -50,10 +51,9 @@ export default function App({ Component, pageProps }) {
         </>
       )}
 
-      {/* 🌐 Your existing layout and Vercel tracking */}
+      {/* 🌐 Layout + Vercel analytics */}
       <Layout>
         <Component {...pageProps} />
-        <SpeedInsights />
         <Analytics />
       </Layout>
     </>
