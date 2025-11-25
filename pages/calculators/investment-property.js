@@ -690,7 +690,7 @@ export default function InvestmentPropertyCalculator() {
 
         <SubtleCtaLink
           className="mt-3"
-          href="/blog/"
+          href="/blog/buying-investment-property-australia"
         >
           Want to learn more? Read the investment property guide →
         </SubtleCtaLink>

@@ -60,32 +60,31 @@ export default function Home({ latestPosts = [] }) {
         {/* ===== FEATURED CALCULATORS ===== */}
         <CardSection title="Featured Calculators" cols={3}>
           <CardLink
-  href="/calculators/debt-recycling"
-  title="Debt Recycling"
-  icon={Repeat}
-  prefetch={false}
->
-  Convert your home loan to investment debt
-</CardLink>
+            href="/calculators/debt-recycling"
+            title="Debt Recycling"
+            icon={Repeat}
+            prefetch={false}
+          >
+            Convert your home loan to investment debt
+          </CardLink>
 
-<CardLink
-  href="/calculators/investment-property"
-  title="Investment Property"
-  icon={HousePlus}
-  prefetch={false}
->
-  Cashflow and equity growth
-</CardLink>
+          <CardLink
+            href="/calculators/investment-property"
+            title="Investment Property"
+            icon={HousePlus}
+            prefetch={false}
+          >
+            Cashflow and equity growth
+          </CardLink>
 
-<CardLink
-  href="/calculators/salary-sacrifice"
-  title="Salary Sacrifice"
-  icon={ChartNoAxesColumnIncreasing}
-  prefetch={false}
->
-  Understand the benefits of salary sacrificing
-</CardLink>
-
+          <CardLink
+            href="/calculators/salary-sacrifice"
+            title="Salary Sacrifice"
+            icon={ChartNoAxesColumnIncreasing}
+            prefetch={false}
+          >
+            Understand the benefits of salary sacrificing
+          </CardLink>
 
           <div className="mt-3 mb-3 text-center">
             <Link
@@ -97,8 +96,8 @@ export default function Home({ latestPosts = [] }) {
           </div>
         </CardSection>
 
-        {/* ===== LATEST POST ===== */}
-        <CardSection title="Latest post" cols={1}>
+        {/* ===== LATEST POSTS ===== */}
+        <CardSection title="Latest posts" cols={1}>
           <ul className="space-y-8">
             {latestPosts.length > 0 ? (
               latestPosts.map((post) => {
@@ -148,10 +147,7 @@ export default function Home({ latestPosts = [] }) {
                         {/* meta row */}
                         <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-600">
                           {date && (
-                            <time
-                              dateTime={date}
-                              suppressHydrationWarning
-                            >
+                            <time dateTime={date} suppressHydrationWarning>
                               {new Date(date).toLocaleDateString("en-AU", {
                                 year: "numeric",
                                 month: "long",
@@ -207,8 +203,7 @@ export async function getStaticProps() {
         frontmatter: {
           ...p.frontmatter,
           readingTime: minutes,
-          excerpt:
-            p.frontmatter.excerpt || p.frontmatter.description || "",
+          excerpt: p.frontmatter.excerpt || p.frontmatter.description || "",
         },
       };
     })
@@ -217,7 +212,7 @@ export async function getStaticProps() {
       const db = new Date(b.frontmatter.date || 0).getTime();
       return db - da;
     })
-    .slice(0, 1);
+    .slice(0, 2); // ✅ show the two latest posts
 
   return { props: { latestPosts } };
 }
