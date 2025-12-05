@@ -15,6 +15,7 @@ const links = [
   { href: "/contact", label: "Contact" },
 ];
 
+// added back vercel 
 const CURRENT_YEAR = new Date().getFullYear();
 
 export default function Layout({ children }) {
