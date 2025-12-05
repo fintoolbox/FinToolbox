@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import Head from "next/head";
 
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
@@ -354,13 +355,11 @@ export default function TaxCalculator() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
                   <label className="flex flex-col">
                     <span className="text-slate-600">Income</span>
-                    <input
-                      type="number"
-                      min="0"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={income}
-                      onChange={(e) => setIncome(Number(e.target.value))}
-                      placeholder="e.g. 90000"
+                      onChange={(v) => setIncome(Number(v))}
+                      placeholder="e.g. 90,000"
                     />
                   </label>
 
@@ -412,13 +411,11 @@ export default function TaxCalculator() {
                   {maritalStatus === "couple" && (
                     <label className="flex flex-col">
                       <span className="text-slate-600">Partner income (annual)</span>
-                      <input
-                        type="number"
-                        min="0"
-                        className="border rounded px-2 py-1"
+                      <CurrencyInput
+                        className="w-full"
                         value={partnerIncome}
-                        onChange={(e) => setPartnerIncome(Number(e.target.value))}
-                        placeholder="e.g. 80000"
+                        onChange={(v) => setPartnerIncome(Number(v))}
+                        placeholder="e.g. 80,000"
                       />
                     </label>
                   )}
@@ -512,13 +509,11 @@ export default function TaxCalculator() {
         Salary sacrifice to super ($/year)
         <Tooltip text="Pre-tax super contributions. Reduces taxable income but is taxed at 15% in super. Subject to the concessional cap (includes employer SG) of $30,000 in 2025-2026." />
       </span>
-      <input
-        type="number"
-        min="0"
-        className="border rounded px-2 py-1"
+      <CurrencyInput
+        className="w-full"
         value={salarySacrifice}
-        onChange={(e) => setSalarySacrifice(Number(e.target.value || 0))}
-        placeholder="e.g. 10000"
+        onChange={(v) => setSalarySacrifice(Number(v || 0))}
+        placeholder="e.g. 10,000"
       />
     </label>
 
@@ -528,13 +523,11 @@ export default function TaxCalculator() {
         Other deductions ($/year)
         <Tooltip text="Income protection outside super, investment expenses, tax agent fees, eligible work-related expenses, charitable gifts, etc." />
       </span>
-      <input
-        type="number"
-        min="0"
-        className="border rounded px-2 py-1"
+      <CurrencyInput
+        className="w-full"
         value={otherDeductions}
-        onChange={(e) => setOtherDeductions(Number(e.target.value || 0))}
-        placeholder="e.g. 1500"
+        onChange={(v) => setOtherDeductions(Number(v || 0))}
+        placeholder="e.g. 1,500"
       />
     </label>
 

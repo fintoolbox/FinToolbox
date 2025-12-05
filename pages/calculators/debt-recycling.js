@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Head from "next/head";
 // import Layout from "../../components/Layout"; // not needed here
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import ChartTooltip from "@/components/ChartTooltip";
 import SectionCard from "@/components/SectionCard";
@@ -618,11 +619,10 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
               <span className="text-slate-600 flex items-center gap-1">
                 Home value ($)
               </span>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
+              <CurrencyInput
+                className="w-full"
                 value={homeValueStart}
-                onChange={(e) => setHomeValueStart(Number(e.target.value))}
+                onChange={(v) => setHomeValueStart(Number(v))}
               />
             </label>
 
@@ -644,11 +644,10 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
               <span className="text-slate-600 flex items-center gap-1">
                 Home loan balance ($)
               </span>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
+              <CurrencyInput
+                className="w-full"
                 value={homeLoanStart}
-                onChange={(e) => setHomeLoanStart(Number(e.target.value))}
+                onChange={(v) => setHomeLoanStart(Number(v))}
               />
             </label>
 
@@ -656,11 +655,10 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
               <span className="text-slate-600 flex items-center gap-1">
                 Offset account balance ($)
               </span>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
+              <CurrencyInput
+                className="w-full"
                 value={offsetBalanceStart}
-                onChange={(e) => setOffsetBalanceStart(Number(e.target.value))}
+                onChange={(v) => setOffsetBalanceStart(Number(v))}
               />
             </label>
 
@@ -669,13 +667,10 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
                 Initial deposit from offset ($)
                 <Tooltip text="The starting amount transferred from your offset into your home loan, then immediately redrawn as a deductible investment loan." />
               </span>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
+              <CurrencyInput
+                className="w-full"
                 value={kickstartFromOffset}
-                onChange={(e) =>
-                  setKickstartFromOffset(Number(e.target.value))
-                }
+                onChange={(v) => setKickstartFromOffset(Number(v))}
               />
             </label>
 
@@ -732,12 +727,11 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
               <span className="text-slate-600 flex items-center gap-1">
                 Monthly repayment ($/mo)
               </span>
-              <input
-                type="number"
-                className="border rounded px-2 py-1"
+              <CurrencyInput
+                className="w-full"
                 value={baseMonthlyRepayment}
-                onChange={(e) =>
-                  setBaseMonthlyRepayment(Number(e.target.value))
+                onChange={(v) =>
+                  setBaseMonthlyRepayment(Number(v))
                 }
               />
 

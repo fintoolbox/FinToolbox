@@ -1,6 +1,7 @@
 // pages/calculators/account-based-pension.js
 import { useMemo, useState, useEffect } from "react";
 import Head from "next/head";
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
@@ -291,13 +292,11 @@ export default function AccountBasedPensionCalculator() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
                   <label className="flex flex-col">
                     <span className="text-slate-600">Opening balance ($)</span>
-                    <input
-                      type="number"
+                    <CurrencyInput
                       min="0"
-                      inputMode="decimal"
-                      className="border rounded px-2 py-1"
+                      className="w-full"
                       value={openingBalance}
-                      onChange={(e) => setOpeningBalance(Number(e.target.value))}
+                      onChange={setOpeningBalance}
                     />
                   </label>
 
@@ -371,13 +370,11 @@ export default function AccountBasedPensionCalculator() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
                   <label className="flex flex-col">
                     <span className="text-slate-600">Requested annual income ($)</span>
-                    <input
-                      type="number"
+                    <CurrencyInput
                       min="0"
-                      inputMode="decimal"
-                      className="border rounded px-2 py-1"
+                      className="w-full"
                       value={requestedAnnual}
-                      onChange={(e) => setRequestedAnnual(Number(e.target.value))}
+                      onChange={setRequestedAnnual}
                     />
                   </label>
 

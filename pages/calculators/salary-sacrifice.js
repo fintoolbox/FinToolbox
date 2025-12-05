@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Head from "next/head";
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import ChartTooltip from "@/components/ChartTooltip";
 import SectionCard from "@/components/SectionCard";
@@ -456,14 +457,11 @@ export default function SalarySacrificeCalculator() {
                     <span className="text-slate-600 flex items-center gap-1">
                       Annual income ($)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={taxableIncomeBeforeSacrifice}
-                      onChange={(e) =>
-                        setTaxableIncomeBeforeSacrifice(
-                          Number(e.target.value)
-                        )
+                      onChange={(v) =>
+                        setTaxableIncomeBeforeSacrifice(Number(v))
                       }
                     />
                   </label>
@@ -487,12 +485,11 @@ export default function SalarySacrificeCalculator() {
                       Current super balance ($)
                       <Tooltip text="Your current super balance used as the starting point for the projection." />
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={currentSuperBalance}
-                      onChange={(e) =>
-                        setCurrentSuperBalance(Number(e.target.value))
+                      onChange={(v) =>
+                        setCurrentSuperBalance(Number(v))
                       }
                     />
                   </label>
@@ -557,12 +554,11 @@ export default function SalarySacrificeCalculator() {
                     <span className="text-slate-600 flex items-center gap-1">
                       Salary sacrifice per {payLabel} ($)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={salarySacrificePerPeriod}
-                      onChange={(e) =>
-                        setSalarySacrificePerPeriod(Number(e.target.value))
+                      onChange={(v) =>
+                        setSalarySacrificePerPeriod(Number(v))
                       }
                     />
                     <div className="text-[11px] text-slate-500 mt-1 leading-snug">

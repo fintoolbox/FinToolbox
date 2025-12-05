@@ -1,6 +1,7 @@
 // pages/calculators/investment-growth.js
 import { useMemo, useState } from "react";
 import Head from "next/head";
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
@@ -234,13 +235,11 @@ export default function InvestmentGrowth() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
                 <span className="text-slate-600">Initial amount ($)</span>
-                <input
-                  type="number"
+                <CurrencyInput
                   min="0"
-                  className="border rounded px-2 py-1"
+                  className="w-full"
                   value={initial}
-                  onChange={(e) => setInitial(e.target.value)}
-                  inputMode="decimal"
+                  onChange={setInitial}
                 />
               </label>
 
@@ -249,13 +248,11 @@ export default function InvestmentGrowth() {
                   Regular contribution ($)
                   <Tooltip text="Amount you add regularly at the end of each period." />
                 </span>
-                <input
-                  type="number"
+                <CurrencyInput
                   min="0"
-                  className="border rounded px-2 py-1"
+                  className="w-full"
                   value={contrib}
-                  onChange={(e) => setContrib(e.target.value)}
-                  inputMode="decimal"
+                  onChange={setContrib}
                 />
               </label>
 

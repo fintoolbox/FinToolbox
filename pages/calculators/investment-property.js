@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Head from "next/head";
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import ChartTooltip from "@/components/ChartTooltip";
 import SectionCard from "@/components/SectionCard";
@@ -514,6 +515,13 @@ export default function InvestmentPropertyCalculator() {
     }));
   };
 
+  const handleCurrencyChange = (field) => (raw) => {
+    setInputs((prev) => ({
+      ...prev,
+      [field]: raw === "" ? "" : Number(raw),
+    }));
+  };
+
   const { summary, cashflow } = useMemo(
     () => calculateInvestmentProperty(inputs),
     [inputs]
@@ -709,11 +717,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Purchase price ($)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.purchasePrice}
-                      onChange={handleChange("purchasePrice")}
+                      onChange={handleCurrencyChange("purchasePrice")}
                     />
                   </label>
 
@@ -721,11 +728,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Purchase costs ($)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.purchaseCosts}
-                      onChange={handleChange("purchaseCosts")}
+                      onChange={handleCurrencyChange("purchaseCosts")}
                     />
                     <span className="text-[11px] text-slate-500 mt-1">
                       Stamp duty, legals and other upfront costs.
@@ -737,11 +743,10 @@ export default function InvestmentPropertyCalculator() {
                       Building value ($)
                       <Tooltip text="Building value to calculate capital works deduction. Depreciated straight-line over 40 years." />
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.buildingValue}
-                      onChange={handleChange("buildingValue")}
+                      onChange={handleCurrencyChange("buildingValue")}
                     />
                   </label>
 
@@ -795,11 +800,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Weekly rent ($/week)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.weeklyRent}
-                      onChange={handleChange("weeklyRent")}
+                      onChange={handleCurrencyChange("weeklyRent")}
                     />
                   </label>
 
@@ -845,11 +849,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Loan amount ($)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.loanAmount}
-                      onChange={handleChange("loanAmount")}
+                      onChange={handleCurrencyChange("loanAmount")}
                     />
                     <span className="text-[11px] text-slate-500 mt-1">
                       Total purchase price + costs, less your deposit.
@@ -924,11 +927,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Council and water rates ($/yr)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.annualRates}
-                      onChange={handleChange("annualRates")}
+                      onChange={handleCurrencyChange("annualRates")}
                     />
                   </label>
 
@@ -936,11 +938,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Insurance ($/yr)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.annualInsurance}
-                      onChange={handleChange("annualInsurance")}
+                      onChange={handleCurrencyChange("annualInsurance")}
                     />
                   </label>
 
@@ -948,11 +949,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Strata / body corporate ($/yr)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.annualStrata}
-                      onChange={handleChange("annualStrata")}
+                      onChange={handleCurrencyChange("annualStrata")}
                     />
                   </label>
 
@@ -960,11 +960,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Land tax ($/yr)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.annualLandTax}
-                      onChange={handleChange("annualLandTax")}
+                      onChange={handleCurrencyChange("annualLandTax")}
                     />
                   </label>
 
@@ -972,11 +971,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Other expenses ($/yr)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.annualOther}
-                      onChange={handleChange("annualOther")}
+                      onChange={handleCurrencyChange("annualOther")}
                     />
                   </label>
 
@@ -1008,11 +1006,10 @@ export default function InvestmentPropertyCalculator() {
                     <span className="text-slate-600">
                       Current annual taxable income ($)
                     </span>
-                    <input
-                      type="number"
-                      className="border rounded px-2 py-1"
+                    <CurrencyInput
+                      className="w-full"
                       value={inputs.baseTaxableIncome}
-                      onChange={handleChange("baseTaxableIncome")}
+                      onChange={handleCurrencyChange("baseTaxableIncome")}
                     />
                    </label>
                    

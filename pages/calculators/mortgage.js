@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import Head from "next/head";
 import SEO from "@/components/SEO";
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
@@ -301,12 +302,11 @@ export default function MortgageCalculator() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
                 <span className="text-slate-600">Loan amount ($)</span>
-                <input
-                  type="number"
+                <CurrencyInput
                   min="0"
-                  className="border rounded px-2 py-1"
+                  className="w-full"
                   value={loanAmount}
-                  onChange={(e) => setLoanAmount(e.target.value)}
+                  onChange={setLoanAmount}
                 />
               </label>
 

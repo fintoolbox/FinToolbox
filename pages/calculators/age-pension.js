@@ -1,6 +1,7 @@
 // pages/calculators/age-pension.js
 import { useMemo, useState } from "react";
 import Head from "next/head";
+import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
@@ -327,12 +328,11 @@ export default function AgePensionCalculator() {
                   Non-deemed assets ($)
                   <Tooltip text="Home contents, vehicles etc. Included in the assets test but NOT deemed for income." />
                 </span>
-                <input
-                  type="number"
+                <CurrencyInput
                   min="0"
-                  className="border rounded px-2 py-1"
+                  className="w-full"
                   value={nonDeemedAssets}
-                  onChange={(e) => setNonDeemedAssets(e.target.value)}
+                  onChange={setNonDeemedAssets}
                 />
               </label>
 
@@ -341,12 +341,11 @@ export default function AgePensionCalculator() {
                   Financial assets subject to deeming ($)
                   <Tooltip text="Cash, term deposits, shares, managed funds, account-based pensions. Included in the assets test AND used to calculate deemed income." />
                 </span>
-                <input
-                  type="number"
+                <CurrencyInput
                   min="0"
-                  className="border rounded px-2 py-1"
+                  className="w-full"
                   value={finAssets}
-                  onChange={(e) => setFinAssets(e.target.value)}
+                  onChange={setFinAssets}
                 />
               </label>
             </div>
