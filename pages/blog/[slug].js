@@ -8,6 +8,7 @@ import Tooltip from "@/components/Tooltip";
 import MDXComponents from "@/components/MDXComponents";
 import ReadingTime from "@/components/ReadingTime";
 import { SITE_URL } from "@/lib/site";
+import { tagToSlug } from "@/utils/tags";
 
 export default function BlogPostPage({ source, frontmatter, slug }) {
   const siteUrl = SITE_URL;
@@ -104,6 +105,23 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
           <ReadingTime minutes={frontmatter?.readingTime} />
           {frontmatter?.author && <span>by {frontmatter.author}</span>}
         </div>
+
+        {Array.isArray(frontmatter?.tags) && frontmatter.tags.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {frontmatter.tags.map((tag) => {
+              const slugTag = tagToSlug(tag);
+              return (
+                <Link
+                  key={slugTag}
+                  href={`/blog/tags/${slugTag}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-800 transition hover:border-blue-200 hover:bg-blue-100"
+                >
+                  #{tag}
+                </Link>
+              );
+            })}
+          </div>
+        )}
 
         {/* Cover image */}
         {frontmatter?.coverImage && (
