@@ -150,7 +150,7 @@ export default function BlogPostPage({ source, frontmatter, slug }) {
 
         <div className="mt-8">
           <Link href="/blog" className="text-blue-700 hover:underline">
-            ← Back to blog
+            {"<- Back to blog"}
           </Link>
         </div>
       </div>

@@ -30,7 +30,7 @@ export default function BlogIndex({ posts }) {
     name: "FinToolbox Blog",
     url: pageUrl,
     description:
-      "Articles on personal finance, investing, tax and retirement for Australians – clear explanations with simple calculators.",
+      "Articles on personal finance, investing, tax and retirement for Australians - clear explanations with simple calculators.",
   };
 
   // ItemList for article listing on the index page
@@ -59,7 +59,7 @@ export default function BlogIndex({ posts }) {
       <div className="mx-auto max-w-3xl px-6 py-10">
         <SEO
           title="Blog | FinToolbox"
-          description="Articles on personal finance, investing, tax and retirement – clear explanations with simple calculators."
+          description="Articles on personal finance, investing, tax and retirement - clear explanations with simple calculators."
           url={pageUrl}
           image="/og-default.png"
         />
@@ -130,13 +130,13 @@ export default function BlogIndex({ posts }) {
 
             return (
               <li key={slug} className="border-b border-gray-200 pb-6">
-                <Link
-                  href={`/blog/${slug}`}
-                  className="group grid grid-cols-[112px_1fr] gap-4 sm:grid-cols-[192px_1fr] items-start"
-                >
+                <div className="grid grid-cols-[112px_1fr] gap-4 sm:grid-cols-[192px_1fr] items-start">
                   {/* Thumbnail (16:9) */}
                   {coverImage ? (
-                    <div className="relative h-[70px] w-[112px] sm:h-[108px] sm:w-[192px] overflow-hidden rounded-lg bg-gray-200">
+                    <Link
+                      href={`/blog/${slug}`}
+                      className="group relative block h-[70px] w-[112px] sm:h-[108px] sm:w-[192px] overflow-hidden rounded-lg bg-gray-200"
+                    >
                       <Image
                         src={coverImage}
                         alt={title || "Blog post thumbnail"}
@@ -145,7 +145,7 @@ export default function BlogIndex({ posts }) {
                         className="object-cover transition-transform duration-200 group-hover:scale-[1.02]"
                         priority={false}
                       />
-                    </div>
+                    </Link>
                   ) : (
                     <div
                       className="h-[70px] w-[112px] sm:h-[108px] sm:w-[192px] rounded-lg bg-gray-200"
@@ -155,8 +155,13 @@ export default function BlogIndex({ posts }) {
 
                   {/* Text block */}
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-900 group-hover:text-blue-700">
-                      {title}
+                    <h2 className="text-2xl font-semibold text-gray-900">
+                      <Link
+                        href={`/blog/${slug}`}
+                        className="hover:text-blue-700 transition-colors"
+                      >
+                        {title}
+                      </Link>
                     </h2>
 
                     {/* meta row */}
@@ -177,9 +182,12 @@ export default function BlogIndex({ posts }) {
 
                     <div className="mt-3">
                       {/* Expose a real link for SRs even though the whole card is clickable */}
-                      <span className="text-blue-700 hover:underline font-medium">
-                        Read more →
-                      </span>
+                      <Link
+                        href={`/blog/${slug}`}
+                        className="text-blue-700 hover:underline font-medium"
+                      >
+                        Read more -&gt;
+                      </Link>
                     </div>
 
                     {Array.isArray(post.frontmatter?.tags) && post.frontmatter.tags.length > 0 && (
@@ -191,7 +199,6 @@ export default function BlogIndex({ posts }) {
                               key={slugTag}
                               href={`/blog/tags/${slugTag}`}
                               className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-800 transition hover:border-blue-200 hover:bg-blue-100"
-                              onClick={(e) => e.stopPropagation()}
                             >
                               #{tag}
                             </Link>
@@ -200,7 +207,7 @@ export default function BlogIndex({ posts }) {
                       </div>
                     )}
                   </div>
-                </Link>
+                </div>
               </li>
             );
           })}
