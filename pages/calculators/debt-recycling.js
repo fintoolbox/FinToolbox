@@ -5,6 +5,7 @@ import Head from "next/head";
 // import Layout from "../../components/Layout"; // not needed here
 import CurrencyInput from "@/components/CurrencyInput";
 import Tooltip from "@/components/Tooltip";
+import { Printer } from "lucide-react";
 import ChartTooltip from "@/components/ChartTooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
@@ -554,6 +555,25 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
   return (
     <>
       <Head>
+        <style>{`
+          @media print {
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+            }
+            .recharts-responsive-container {
+              width: 100% !important;
+              height: 250px !important;
+            }
+          }
+        `}</style>
         <title>Debt Recycling Calculator (Australia) | FinToolbox</title>
         <meta
           name="description"
@@ -566,13 +586,15 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
       </Head>
 
       {/* Intro */}
-      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200 no-print">
   <h1 className="text-2xl font-bold text-slate-900">
     Debt Recycling Calculator
   </h1>
 </header>
   
 <div className="max-w-5xl mx-auto px-4 mt-4">
+<div className="no-print">
+
 {/* Intro info section */}
 <PageIntro tone="blue">
   <div className="space-y-2">
@@ -598,13 +620,14 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
   
 </div>
 
-<SubtleCtaLink className="mt-3" href="/blog/debt-recycling-strategy-australia">
+<SubtleCtaLink className="mt-3 " href="/blog/debt-recycling-strategy-australia">
   Not sure how debt recycling works? Read the full guide →
 </SubtleCtaLink>
+</div>
 
 
             {/* INPUT CARD */}
-      <div className="mt-6">
+      <div className="mt-6 no-print">
       <SectionCard title="Your assumptions">
         <div className="space-y-6">
         {/* Property & Home Loan */}
@@ -836,8 +859,79 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
       
     </div>
 
+    {/* STRATEGY EXPLANATION */}
+    <div className="mt-8 no-print">
+  <SectionCard>
+    {/* Added space-y-4 here to create vertical gaps between children */}
+    <div className="space-y-4"> 
+      
+      <div className="p-4 rounded-lg border border-slate-200">
+        <h4 className="font-semibold text-blue-900 mb-2">Strategy A: Pay down home loan</h4>
+        <p className="text-sm text-slate-700">
+          You simply pay down your home loan with your regular monthly repayments. No additional investing is done until the loan is fully paid off.
+        </p>
+      </div>
+
+      <div className="p-4 rounded-lg border border-slate-200">
+        <h4 className="font-semibold text-blue-900 mb-2">Strategy B: Debt recycling</h4>
+        <p className="text-sm text-slate-700">
+          You use the same monthly repayment amount, but implement debt recycling. As you pay down your home loan, you redraw the available equity as a separate tax-deductible investment loan to invest. Investment income is used to further accelerate home loan repayments.
+        </p>
+      </div>
+
+    </div>
+        
+      </SectionCard>
+    </div>
+
+    {/* --- RESULTS START HERE --- */}
+
+    
+
+    {/* SUMMARY – cards-in-card */}
+    <div className="mt-8 printable-section">
+      <SectionCard>
+        <SummaryGrid>
+          {/* Strategy A */}
+          <SummaryCard
+            label="Final net wealth (Strategy A)"
+            value={
+              results.yearsArr?.length
+                ? aud0(results.yearsArr[results.yearsArr.length - 1].netWealthA)
+                : "—"
+            }
+          />
+
+          {/* Strategy B with diff pill */}
+          {(() => {
+            const has = results.yearsArr?.length > 0;
+            const a = has ? results.yearsArr[results.yearsArr.length - 1].netWealthA : 0;
+            const b = has ? results.yearsArr[results.yearsArr.length - 1].netWealthB : 0;
+            const diff = b - a;
+            const tone = !has ? "neutral" : diff > 0 ? "positive" : diff < 0 ? "negative" : "neutral";
+            const badge = !has ? null : `${diff >= 0 ? "+" : ""}${aud0(diff)} vs A`;
+
+            return (
+              <SummaryCard
+                label="Final net wealth (Strategy B)"
+                value={has ? aud0(b) : "—"}
+                badgeText={badge}
+                badgeTone={tone}
+              />
+            );
+          })()}
+
+          {/* Debt-free year */}
+          <SummaryCard
+            label="Year you could clear all debt"
+            value={wipeoutYear ? `Year ${wipeoutYear}` : "Not within projection"}
+          />
+        </SummaryGrid>
+      </SectionCard>
+    </div>
+
             {/* CHART CARD */}
-      <div className="mt-8">
+      <div className="mt-8 printable-section">
         <SectionCard title="Net Wealth Over Time">
           <div className="w-full h-64">
             <ResponsiveContainer>
@@ -892,55 +986,8 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
         </SectionCard>
       </div>
 
-
-{/* SUMMARY – cards-in-card */}
-<div className="mt-8">
-  <SectionCard>
-    <SummaryGrid>
-      {/* Strategy A */}
-      <SummaryCard
-        label="Final net wealth (Strategy A)"
-        value={
-          results.yearsArr?.length
-            ? aud0(results.yearsArr[results.yearsArr.length - 1].netWealthA)
-            : "—"
-        }
-      />
-
-      {/* Strategy B with diff pill */}
-      {(() => {
-        const has = results.yearsArr?.length > 0;
-        const a = has ? results.yearsArr[results.yearsArr.length - 1].netWealthA : 0;
-        const b = has ? results.yearsArr[results.yearsArr.length - 1].netWealthB : 0;
-        const diff = b - a;
-        const tone = !has ? "neutral" : diff > 0 ? "positive" : diff < 0 ? "negative" : "neutral";
-        const badge = !has ? null : `${diff >= 0 ? "+" : ""}${aud0(diff)} vs A`;
-
-        return (
-          <SummaryCard
-            label="Final net wealth (Strategy B)"
-            value={has ? aud0(b) : "—"}
-            badgeText={badge}
-            badgeTone={tone}
-          />
-        );
-      })()}
-
-      {/* Debt-free year */}
-      <SummaryCard
-        label="Year you could clear all debt"
-        value={wipeoutYear ? `Year ${wipeoutYear}` : "Not within projection"}
-    
-      />
-    </SummaryGrid>
-  </SectionCard>
-</div>
-
-
-
-
             {/* DEBT-FREE CHART */}
-      <div className="mt-8">
+      <div className="mt-8 printable-section">
         <SectionCard title="When will I be debt free?">
           <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
             This compares how much you still owe on your home loan under{" "}
@@ -1007,12 +1054,22 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             year and paid CGT (including 50% CGT discount), would you have enough cash to
             pay off both your home loan and your investment loan?
           </p>
+          <div className="mt-8 flex justify-end no-print">
+      <button
+        type="button"
+        onClick={() => window.print()}
+        className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-800"
+      >
+        <Printer className="h-4 w-4" />
+        Print Results
+      </button>
+    </div>
         </SectionCard>
       </div>
 
 
             {/* COMPARISON TABLE */}
-      <div className="mt-8">
+      <div className="mt-8 no-print">
   <SectionCard
   title={
     <div className="flex-1 min-w-0 flex items-center gap-2">
@@ -1141,7 +1198,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
 
             {/* ASSUMPTIONS & REFERENCES */}
-      <div className="mt-8">
+      <div className="mt-8 no-print">
         <SectionCard title="How this calculator works">
           <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
             
@@ -1253,7 +1310,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
         </SectionCard>
       </div>
 </div>
-<div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+<div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
   <p>
     This calculator is general information only. It does not consider your
     personal objectives, financial situation, or needs. Speak to a qualified

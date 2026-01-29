@@ -1,6 +1,6 @@
 import Head from "next/head";
 import SEO from "@/components/SEO";
-import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ChartNoAxesColumnIncreasing, HousePlus } from "lucide-react";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ClipboardCheck, ChartNoAxesColumnIncreasing, HousePlus } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 <ChartNoAxesColumnIncreasing />
@@ -119,6 +119,14 @@ export default function CalculatorsIndex() {
     icon={HandCoins}
   >
     How much Age Pension you can receive
+  </CardLink>
+
+  <CardLink
+    href="/calculators/commonwealth-seniors-health-card"
+    title="Commonwealth Seniors Health Card"
+    icon={ClipboardCheck}
+  >   
+    Check your eligibility for CSHC
   </CardLink>
 
   
