@@ -19,6 +19,23 @@ function aud(n) {
   });
 }
 
+// --- CONSTANTS (Approximate 2024/2025 Rates) ---
+// Moved outside component to avoid recreation on every render (fixes exhaustive-deps)
+const RATES = {
+  singleNoKids: 762.70,
+  singleWithKids: 816.90,
+  partnered: 698.30,
+  energySupplement: {
+    single: 14.10,
+    partnered: 10.60,
+  },
+};
+
+const ASSET_LIMITS = {
+  single: { homeowner: 301750, nonHomeowner: 543750 },
+  partnered: { homeowner: 451500, nonHomeowner: 693500 }, // Combined assets
+};
+
 export default function JobSeekerCalculator() {
   // --- STATE ---
   const [relationshipStatus, setRelationshipStatus] = useState("single"); // 'single' | 'partnered'
@@ -27,23 +44,6 @@ export default function JobSeekerCalculator() {
   const [incomeFortnight, setIncomeFortnight] = useState(0);
   const [partnerIncomeFortnight, setPartnerIncomeFortnight] = useState(0);
   const [assets, setAssets] = useState(5000);
-
-  // --- CONSTANTS (Approximate 2024/2025 Rates) ---
-  // These are baselines. In a production app, these might be fetched from an API or config.
-  const RATES = {
-    singleNoKids: 762.70,
-    singleWithKids: 816.90,
-    partnered: 698.30,
-    energySupplement: {
-      single: 14.10,
-      partnered: 10.60,
-    },
-  };
-
-  const ASSET_LIMITS = {
-    single: { homeowner: 301750, nonHomeowner: 543750 },
-    partnered: { homeowner: 451500, nonHomeowner: 693500 }, // Combined assets
-  };
 
   // --- CALCULATION ---
   const results = useMemo(() => {
@@ -220,7 +220,7 @@ export default function JobSeekerCalculator() {
                 {relationshipStatus === "partnered" && (
                   <label className="flex flex-col">
                     <span className="text-slate-600 font-medium mb-1">
-                      Partner's gross income (per fortnight)
+                      Partner&apos;s gross income (per fortnight)
                     </span>
                     <CurrencyInput
                       className="w-full"
@@ -279,7 +279,7 @@ export default function JobSeekerCalculator() {
 
               {!results.isAssetIneligible && results.payment === 0 && results.incomeReduction > 0 && (
                 <div className="mt-4 p-4 bg-orange-50 border border-orange-100 rounded-md text-sm text-orange-800">
-                  <strong>Income Too High:</strong> Your income (or your partner's
+                  <strong>Income Too High:</strong> Your income (or your partner&apos;s
                   income) has reduced your payment to $0.
                 </div>
               )}
@@ -313,7 +313,7 @@ export default function JobSeekerCalculator() {
                   <span className="text-slate-800 font-medium">
                     Asset Test:
                   </span>{" "}
-                  The assets test for JobSeeker Payment is a "sudden death"
+                  The assets test for JobSeeker Payment is a &quot;sudden death&quot;
                   test. If your assessable assets exceed the limit for your
                   situation, your payment is reduced to $0. Your principal home
                   is exempt from the assets test.

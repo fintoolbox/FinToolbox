@@ -4,7 +4,7 @@ import Tooltip from "@/components/Tooltip";
 import SavingsGoalChart from "@/components/SavingsGoalChart";
 
 // Tailwind-styled elements + custom components available in MDX
-export default {
+const MDXComponents = {
   // Typography
   h1: (props) => <h1 className="mt-6 text-3xl font-bold" {...props} />,
   h2: (props) => <h2 className="mt-6 text-2xl font-bold" {...props} />,
@@ -34,3 +34,5 @@ export default {
   Tooltip,
   SavingsGoalChart,   // 👈 expose the chart component to MDX
 };
+
+export default MDXComponents;

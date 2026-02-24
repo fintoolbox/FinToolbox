@@ -1,5 +1,5 @@
 // pages/calculators/mortgage.js
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import Head from "next/head";
 import SEO from "@/components/SEO";
 import CurrencyInput from "@/components/CurrencyInput";
@@ -60,7 +60,7 @@ export default function MortgageCalculator() {
   );
 
   // Core simulation (returns totals, schedule rows, yearly chart points)
-  const simulate = (extraPerPeriod) => {
+  const simulate = useCallback((extraPerPeriod) => {
     const r = (Number(interest) || 0) / 100 / periods;
     let bal = principal;
     const base = baseRepayment;
@@ -142,16 +142,16 @@ export default function MortgageCalculator() {
       rows,
       yearlyPoints,
     };
-  };
+  }, [principal, interest, periods, termYears, baseRepayment]);
 
   // Baseline (no extra) vs With extra
   const simBase = useMemo(
     () => simulate(0),
-    [principal, interest, periods, termYears, baseRepayment]
+    [simulate]
   );
   const simExtra = useMemo(
     () => simulate(Number(extra) || 0),
-    [principal, interest, periods, termYears, baseRepayment, extra]
+    [simulate, extra]
   );
 
   // Payoff durations
