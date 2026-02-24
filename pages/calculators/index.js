@@ -1,6 +1,6 @@
 import Head from "next/head";
 import SEO from "@/components/SEO";
-import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ClipboardCheck, ChartNoAxesColumnIncreasing, HousePlus } from "lucide-react";
+import { Calculator, Home as HomeIcon, Repeat, HandCoins, PiggyBank, ChartColumn, ClipboardCheck, ChartNoAxesColumnIncreasing, HousePlus, Briefcase } from "lucide-react";
 import CardSection from "@/components/ui/CardSection";
 import CardLink from "@/components/ui/CardLink";
 <ChartNoAxesColumnIncreasing />
@@ -129,6 +129,13 @@ export default function CalculatorsIndex() {
     Check your eligibility for CSHC
   </CardLink>
 
+  <CardLink
+    href="/calculators/jobseeker"
+    title="JobSeeker Payment"
+    icon={Briefcase}
+  >
+    Estimate your fortnightly payment
+  </CardLink>
   
 </CardSection>
 
