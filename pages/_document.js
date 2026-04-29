@@ -5,7 +5,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        {/* No Google Fonts links here anymore */}
+        <meta name="google-adsense-account" content="ca-pub-4674539469430065" />
       </Head>
       <body className="font-sans">
         <Main />
