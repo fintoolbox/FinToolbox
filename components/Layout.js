@@ -6,6 +6,7 @@ import { useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/site";
+import AdSense from "./AdSense";
 import { inter } from "@/lib/fonts";
 
 const links = [
@@ -125,6 +126,9 @@ export default function Layout({ children }) {
 
       {/* Main content */}
       <main id="main" className="mx-auto max-w-5xl px-6 py-10">
+        {/* Site-wide Ad Banner */}
+        <AdSense adSlot="SITE_WIDE_TOP_BANNER" />
+        
         <Breadcrumbs />
         {children}
 

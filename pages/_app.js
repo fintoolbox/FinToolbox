@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
@@ -49,6 +50,15 @@ export default function App({ Component, pageProps }) {
             `}
           </Script>
         </>
+      )}
+
+      {/* 💸 Load Google AdSense script only if Client ID exists */}
+      {ADSENSE_CLIENT_ID && (
+        <Script
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+          crossOrigin="anonymous"
+          strategy="lazyOnload"
+        />
       )}
 
       {/* 🌐 Layout + Vercel analytics */}
