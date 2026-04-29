@@ -10,6 +10,7 @@ import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
 import ChartTooltip from "@/components/ChartTooltip";
+import { Printer } from "lucide-react";
 
 import {
   ResponsiveContainer,
@@ -255,6 +256,50 @@ export default function MortgageCalculator() {
         url={pageUrl}
         image="https://fintoolbox.com.au/og-default.png"
       />
+      <Head>
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
+      </Head>
+
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
       {/* Extra meta / JSON-LD that aren’t in SEO */}
       <Head>
         {/* JSON-LD: WebApplication */}
@@ -284,7 +329,7 @@ export default function MortgageCalculator() {
 
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Blue intro card */}
-        <PageIntro tone="blue">
+        <PageIntro tone="blue" className="no-print">
           <p>
             Compare your home loan under <strong>minimum repayments</strong> vs{" "}
             <strong>adding extra each period</strong>. See remaining balance,
@@ -292,12 +337,14 @@ export default function MortgageCalculator() {
           </p>
         </PageIntro>
 
-        <SubtleCtaLink className="mt-3" href="/blog/mortgage-repayment-calculator-australia">
-          Need help with calculating mortgage payments? Read the explainer →
-        </SubtleCtaLink>
+        <div className="no-print">
+          <SubtleCtaLink className="mt-3" href="/blog/mortgage-repayment-calculator-australia">
+            Need help with calculating mortgage payments? Read the explainer →
+          </SubtleCtaLink>
+        </div>
 
         {/* INPUTS – grouped like the house style */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Loan details">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
@@ -368,7 +415,7 @@ export default function MortgageCalculator() {
         </div>
 
         {/* KPI SUMMARY – house style */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard>
             <SummaryGrid>
               <SummaryCard
@@ -416,13 +463,23 @@ export default function MortgageCalculator() {
                 }
               />
             </SummaryGrid>
+            <div className="mt-6 flex justify-end no-print">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
+              >
+                <Printer className="h-4 w-4" />
+                Download Calculation (PDF)
+              </button>
+            </div>
           </SectionCard>
         </div>
 
         {/* CHART – balances by year */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Balance projection">
-            <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
+            <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl no-print">
               Remaining balance at the end of each year under minimum repayments vs. with your extra amount.
             </p>
 
@@ -494,7 +551,7 @@ export default function MortgageCalculator() {
         </div>
 
         {/* AMORTISATION TABLE */}
-        <div className="mt-8">
+        <div className="mt-8 no-print">
           <SectionCard title="Amortisation schedule (with extra)">
             <div className="flex items-center justify-between mb-3">
               <div />
@@ -590,7 +647,7 @@ export default function MortgageCalculator() {
         </div>
 
         {/* Footer disclaimer (house style) */}
-        <div className="max-w-5xl mx-auto mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+        <div className="max-w-5xl mx-auto mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
           <p>
             This calculator is general information only. It does not consider your personal objectives, financial situation,
             or needs. Consider speaking with a qualified professional.

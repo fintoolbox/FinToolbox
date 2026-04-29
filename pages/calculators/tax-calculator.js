@@ -9,6 +9,7 @@ import PageIntro from "@/components/PageIntro";
 import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
+import { Printer } from "lucide-react";
 
 // Currency formatter (house style)
 function aud0(n) {
@@ -313,7 +314,52 @@ export default function TaxCalculator() {
 
   return (
     <main>
-      {/* Keep your existing <Head> block exactly as-is above */}
+      <Head>
+        <title>{`${pageTitle} | FinToolbox`}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={pageUrl} />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
+      </Head>
+
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
 
       {/* Heading (matches Debt Recycling) */}
       <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
@@ -322,7 +368,7 @@ export default function TaxCalculator() {
 
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Blue intro card (PageIntro) */}
-        <PageIntro tone="blue">
+        <PageIntro tone="blue" className="no-print">
           <div className="space-y-2">
             <p>
               Estimate your Australian resident income tax for the 2025-2026 financial year, including Medicare levy,
@@ -337,13 +383,15 @@ export default function TaxCalculator() {
           </div>
         </PageIntro>
 
-        {/* Optional guide link */}
-        <SubtleCtaLink className="mt-3" href="/blog/how-to-pay-less-tax-in-australia">
-          Want to reduce your income tax? Read our guide →
-        </SubtleCtaLink>
+        <div className="no-print">
+          {/* Optional guide link */}
+          <SubtleCtaLink className="mt-3" href="/blog/how-to-pay-less-tax-in-australia">
+            Want to reduce your income tax? Read our guide →
+          </SubtleCtaLink>
+        </div>
 
         {/* INPUTS – single card, grouped, 3-col grid */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your assumptions">
             <div className="space-y-6">
               {/* Income & frequency */}
@@ -556,7 +604,7 @@ export default function TaxCalculator() {
         </div>
 
         {/* RESULTS – Summary cards */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard>
             <SummaryGrid>
               {/* NEW: show taxable income after deductions */}
@@ -611,14 +659,25 @@ export default function TaxCalculator() {
               </div>
             </div>
 
-            <div className="mt-3 text-[11px] text-slate-500 leading-snug">
+            <div className="mt-6 flex justify-end no-print">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
+              >
+                <Printer className="h-4 w-4" />
+                Download Calculation (PDF)
+              </button>
+            </div>
+
+            <div className="mt-3 text-[11px] text-slate-500 leading-snug no-print">
               MLS uses taxable income for simplicity. Real MLS uses “income for MLS purposes” (adds fringe benefits etc).
             </div>
           </SectionCard>
         </div>
 
         {/* ASSUMPTIONS */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Assumptions & references">
             <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
               <li>Resident brackets for 2025-2026 (excludes Medicare/offsets until applied below).</li>
@@ -633,7 +692,7 @@ export default function TaxCalculator() {
       </div>
 
       {/* Footer disclaimer (house style) */}
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
         <p>
           This calculator is general information only. It does not consider your personal objectives, financial situation,
           or needs. Consider speaking with a qualified professional.

@@ -19,25 +19,25 @@ function aud(n) {
   });
 }
 
-// --- CONSTANTS (Approximate 2024/2025 Rates) ---
+// --- CONSTANTS (Effective 20 March 2026 – 19 Sep 2026) ---
 // Moved outside component to avoid recreation on every render (fixes exhaustive-deps)
 const RATES = {
-  singleNoKids: 762.70,
-  singleWithKids: 816.90,
-  partnered: 698.30,
+  singleNoKids: 817.50, // Includes Energy Supplement
+  singleWithKids: 875.50, // Includes Energy Supplement and Pharmaceutical Allowance
+  partnered: 748.20, // Each, includes Energy Supplement
   energySupplement: {
-    single: 14.10,
-    partnered: 10.60,
+    single: 14.10, // Included in max rates
+    partnered: 10.60, // Included in max rates
   },
 };
 
 const ASSET_LIMITS = {
-  single: { homeowner: 301750, nonHomeowner: 543750 },
-  partnered: { homeowner: 451500, nonHomeowner: 693500 }, // Combined assets
+  single: { homeowner: 321500, nonHomeowner: 579500 }, //
+  partnered: { homeowner: 481500, nonHomeowner: 739500 }, // Combined assets
 };
 
 export default function JobSeekerCalculator() {
-  // --- STATE ---
+  // --- STATE (Initial values for demonstration) ---
   const [relationshipStatus, setRelationshipStatus] = useState("single"); // 'single' | 'partnered'
   const [hasChildren, setHasChildren] = useState(false);
   const [isHomeowner, setIsHomeowner] = useState(false);
@@ -49,18 +49,16 @@ export default function JobSeekerCalculator() {
   const results = useMemo(() => {
     let maxBaseRate = 0;
     let energySupp = 0;
-    let assetLimit = 0;
+    let assetLimit = 0; //
 
     // 1. Determine Max Rate & Asset Limit based on status
     if (relationshipStatus === "single") {
       maxBaseRate = hasChildren ? RATES.singleWithKids : RATES.singleNoKids;
-      energySupp = RATES.energySupplement.single;
       assetLimit = isHomeowner
         ? ASSET_LIMITS.single.homeowner
         : ASSET_LIMITS.single.nonHomeowner;
     } else {
       maxBaseRate = RATES.partnered;
-      energySupp = RATES.energySupplement.partnered;
       assetLimit = isHomeowner
         ? ASSET_LIMITS.partnered.homeowner
         : ASSET_LIMITS.partnered.nonHomeowner;
@@ -85,12 +83,12 @@ export default function JobSeekerCalculator() {
     // - $150 to $256: 50c reduction per dollar
     // - Over $256: 60c reduction per dollar
     let incomeReduction = 0;
-    const incomeFreeArea = 150;
-    const lowerTaperLimit = 256;
+    const incomeFreeArea = 150; //
+    const lowerTaperLimit = 256; //
 
     if (incomeFortnight > incomeFreeArea) {
       if (incomeFortnight <= lowerTaperLimit) {
-        incomeReduction += (incomeFortnight - incomeFreeArea) * 0.5;
+        incomeReduction += (incomeFortnight - incomeFreeArea) * 0.5; //
       } else {
         // Calculate reduction for the band between 150 and 256
         incomeReduction += (lowerTaperLimit - incomeFreeArea) * 0.5;
@@ -100,10 +98,9 @@ export default function JobSeekerCalculator() {
     }
 
     // 4. Partner Income Test (if applicable)
-    // Simplified: Partner income reduces your payment by 60c for every dollar over the partner cut-out threshold.
-    // We'll use a simplified threshold approximation for the partner income free area (~$1400).
+    // Partner income reduces your payment by 60c for every dollar over the partner income threshold.
     if (relationshipStatus === "partnered") {
-      const partnerIncomeFreeArea = 1400; 
+      const partnerIncomeFreeArea = 1415; //
       if (partnerIncomeFortnight > partnerIncomeFreeArea) {
         incomeReduction += (partnerIncomeFortnight - partnerIncomeFreeArea) * 0.6;
       }
@@ -136,9 +133,50 @@ export default function JobSeekerCalculator() {
           name="description"
           content="Estimate your fortnightly JobSeeker Payment based on your income, assets, and relationship status."
         />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
       </Head>
 
-      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200 no-print">
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900">
           JobSeeker Payment Calculator
         </h1>
@@ -291,40 +329,35 @@ export default function JobSeekerCalculator() {
                   className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
                 >
                   <Printer className="h-4 w-4" />
-                  Print Results
+                  Download Calculation (PDF)
                 </button>
               </div>
             </SectionCard>
           </div>
 
           {/* ASSUMPTIONS */}
-          <div className="mt-8 no-print">
-            <SectionCard title="Assumptions & How It Works">
+          <div className="mt-8 printable-section">
+            <SectionCard title="Assumptions & references">
               <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
                 <li>
                   <span className="text-slate-800 font-medium">
                     Rates & Thresholds:
-                  </span>{" "}
-                  The calculator uses approximate rates for the 2024-2025
-                  financial year. These values are subject to change and are for
-                  estimation purposes only.
+                  </span> The calculator uses rates and thresholds effective from 20 March 2026 to 19 September 2026. These values are subject to change and are for estimation purposes only.
                 </li>
                 <li>
                   <span className="text-slate-800 font-medium">
                     Asset Test:
-                  </span>{" "}
-                  The assets test for JobSeeker Payment is a &quot;sudden death&quot;
-                  test. If your assessable assets exceed the limit for your
-                  situation, your payment is reduced to $0. Your principal home
-                  is exempt from the assets test.
+                  </span> The assets test for JobSeeker Payment is a &quot;sudden death&quot; test. If your assessable assets exceed the limit for your situation, your payment is reduced to $0. Your principal home is exempt from the assets test.
                 </li>
                 <li>
                   <span className="text-slate-800 font-medium">
                     Personal Income Test Tapers:
-                  </span>{" "}
-                  Your payment is reduced based on your fortnightly income. The
-                  calculator applies a reduction of 50 cents for each dollar
-                  between $150 and $256, and 60 cents for each dollar over $256.
+                  </span> Your payment is reduced based on your fortnightly income. The calculator applies a reduction of 50 cents for each dollar between $150 and $256, and 60 cents for each dollar over $256.
+                </li>
+                <li>
+                  <span className="text-slate-800 font-medium">
+                    Partner Income Test:
+                  </span> If you are partnered, your payment is reduced by 60 cents for every dollar your partner earns over $1,415 per fortnight.
                 </li>
                 <li>
                   <span className="text-slate-800 font-medium">
@@ -341,8 +374,8 @@ export default function JobSeekerCalculator() {
           {/* DISCLAIMER */}
           <div className="mt-8 mb-12 text-[11px] text-slate-500 leading-snug no-print">
             <p>
-              This calculator provides an estimate only based on general JobSeeker
-              Payment rates and thresholds (approx. 2024/2025 values). It does not
+              This calculator provides an estimate only based on general JobSeeker Payment rates and thresholds (effective 20 March 2026 – 19 September 2026).
+              It does not
               account for Rent Assistance, Pharmaceutical Allowance, or Remote Area
               Allowance. Actual payments are determined by Centrelink.
             </p>

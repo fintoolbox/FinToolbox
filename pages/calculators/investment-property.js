@@ -10,6 +10,7 @@ import PageIntro from "@/components/PageIntro";
 import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
+import { Printer } from "lucide-react";
 
 import {
   LineChart,
@@ -669,7 +670,40 @@ export default function InvestmentPropertyCalculator() {
           rel="canonical"
           href="https://fintoolbox.com.au/calculators/investment-property"
         />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+          }
+        `}</style>
       </Head>
+
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
 
       {/* Header */}
       <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
@@ -680,7 +714,7 @@ export default function InvestmentPropertyCalculator() {
 
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Intro */}
-        <PageIntro tone="blue">
+        <PageIntro tone="blue" className="no-print">
           <div className="space-y-2">
             <p>
               Use this calculator to model an Australian investment
@@ -704,7 +738,7 @@ export default function InvestmentPropertyCalculator() {
         </SubtleCtaLink>
 
         {/* Inputs */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your assumptions">
             <div className="space-y-6">
               {/* Property & purchase */}
@@ -1024,7 +1058,7 @@ export default function InvestmentPropertyCalculator() {
         </div>
 
         {/* CASHFLOW TABLE – pivoted (line items down, years across) */}
-        <div className="mt-8">
+        <div className="mt-8 no-print">
           <SectionCard title="Cashflow breakdown by year">
            
             <div className="overflow-x-auto">
@@ -1126,7 +1160,7 @@ export default function InvestmentPropertyCalculator() {
 
             {/* SALE SUMMARY + NET POSITION CHART SIDE BY SIDE */}
 {lastYear && (
-  <div className="mt-8 grid gap-6 lg:grid-cols-2">
+  <div className="mt-8 grid gap-6 lg:grid-cols-2 printable-section">
     {/* LEFT: SALE SUMMARY TABLE – WIDER, BUT STILL TIDY */}
     <SectionCard title="Sale summary at end of holding period">
       <div className="overflow-x-auto">
@@ -1285,7 +1319,7 @@ export default function InvestmentPropertyCalculator() {
 )}
 
 {/* PROPERTY VALUE & LOAN BALANCE – TIGHTER, CLOSER COLUMNS */}
-<div className="mt-8">
+<div className="mt-8 no-print">
   <SectionCard title="Property value and loan balance over time">
     {/* Constrain max width so columns are physically closer */}
     <div className="overflow-x-auto">
@@ -1358,7 +1392,7 @@ export default function InvestmentPropertyCalculator() {
 </div>
 
        {/* AFTER-TAX CASHFLOW CHART – FULL WIDTH ONLY */}
-<div className="mt-8">
+<div className="mt-8 no-print">
   <SectionCard title="After-tax cashflow per year">
     <div className="w-full h-64">
       <ResponsiveContainer>
@@ -1415,8 +1449,8 @@ export default function InvestmentPropertyCalculator() {
 
 
         {/* How it works */}
-        <div className="mt-8">
-          <SectionCard title="How this calculator works">
+        <div className="mt-8 printable-section">
+          <SectionCard title="Assumptions & references">
             <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
               
               <li>

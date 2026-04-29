@@ -8,6 +8,7 @@ import PageIntro from "@/components/PageIntro";
 import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
+import { Printer } from "lucide-react";
 
 import {
   ResponsiveContainer,
@@ -149,6 +150,42 @@ export default function InvestmentGrowth() {
         <title>{`${pageTitle} | FinToolbox`}</title>
         <meta name="description" content={pageDescription} />
         <link rel="canonical" href={pageUrl} />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
 
         {/* Open Graph */}
         <meta property="og:title" content={`${pageTitle} | FinToolbox`} />
@@ -216,21 +253,28 @@ export default function InvestmentGrowth() {
         />
       </Head>
 
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Intro card */}
-        <PageIntro tone="blue">
+        <PageIntro tone="blue" className="no-print">
           <p>
             Project your balance with <strong>monthly compounding</strong> and <strong>regular contributions</strong>.
             Returns are shown net of annual fees.
           </p>
         </PageIntro>
 
-        <SubtleCtaLink className="mt-3" href="/blog/compound-interest-explained">
-          New to compounding? Read the explainer →
-        </SubtleCtaLink>
+        <div className="no-print">
+          <SubtleCtaLink className="mt-3" href="/blog/compound-interest-explained">
+            New to compounding? Read the explainer →
+          </SubtleCtaLink>
+        </div>
 
         {/* INPUTS */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your assumptions">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
@@ -318,20 +362,30 @@ export default function InvestmentGrowth() {
         </div>
 
         {/* KPI SUMMARY */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard>
             <SummaryGrid>
               <SummaryCard label="Final balance" value={fmt(sim.finalBalance)} />
               <SummaryCard label="Total contributions" value={fmt(sim.totalContrib)} />
               <SummaryCard label="Total earnings" value={fmt(sim.totalEarnings)} />
             </SummaryGrid>
+            <div className="mt-6 flex justify-end no-print">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
+              >
+                <Printer className="h-4 w-4" />
+                Download Calculation (PDF)
+              </button>
+            </div>
           </SectionCard>
         </div>
 
         {/* CHART */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Projection">
-            <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
+            <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl no-print">
               Yearly snapshot of total balance, amount contributed, and earnings.
             </p>
 
@@ -401,7 +455,7 @@ export default function InvestmentGrowth() {
         </div>
 
         {/* TABLE */}
-        <div className="mt-8">
+        <div className="mt-8 no-print">
           <SectionCard title="Yearly projection">
             <div className="overflow-x-auto">
               <table className="min-w-[720px] text-xs text-left">
@@ -432,7 +486,7 @@ export default function InvestmentGrowth() {
         </div>
 
         {/* FAQ */}
-        <div className="mt-8">
+        <div className="mt-8 no-print">
           <SectionCard title="FAQs">
             <div className="divide-y">
               {faq.map(({ q, a }, i) => (
@@ -450,7 +504,7 @@ export default function InvestmentGrowth() {
       </div>
 
       {/* Footer disclaimer (house style) */}
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
         <p>
           This calculator is general information only. It does not consider your personal objectives, financial situation,
           or needs. Consider speaking with a qualified professional.

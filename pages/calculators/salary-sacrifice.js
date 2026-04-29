@@ -10,6 +10,7 @@ import PageIntro from "@/components/PageIntro";
 import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
+import { Printer } from "lucide-react";
 
 import {
   ResponsiveContainer,
@@ -399,7 +400,48 @@ export default function SalarySacrificeCalculator() {
           rel="canonical"
           href="https://fintoolbox.com.au/calculators/salary-sacrifice"
         />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
       </Head>
+
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
 
       {/* Header */}
       <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
@@ -410,7 +452,7 @@ export default function SalarySacrificeCalculator() {
 
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Intro */}
-        <PageIntro tone="blue">
+        <PageIntro tone="blue" className="no-print">
           <div className="space-y-2">
             <p>
               <span className="font-semibold">
@@ -437,12 +479,14 @@ export default function SalarySacrificeCalculator() {
           </div>
         </PageIntro>
 
-        <SubtleCtaLink className="mt-3" href="/blog">
-          Want to learn more about salary sacrifice? Read the blog →
-        </SubtleCtaLink>
+        <div className="no-print">
+          <SubtleCtaLink className="mt-3" href="/blog">
+            Want to learn more about salary sacrifice? Read the blog →
+          </SubtleCtaLink>
+        </div>
 
         {/* INPUT CARD */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your assumptions">
             <div className="space-y-6 text-sm text-slate-700">
               {/* Income & super */}
@@ -628,7 +672,7 @@ export default function SalarySacrificeCalculator() {
         </div>
 
         {/* SUMMARY CARD */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Results">
             <SummaryGrid>
               {/* Take-home per period A */}
@@ -752,13 +796,22 @@ export default function SalarySacrificeCalculator() {
                 );
               })()}
             </SummaryGrid>
-
+            <div className="mt-6 flex justify-end no-print">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
+              >
+                <Printer className="h-4 w-4" />
+                Download Calculation (PDF)
+              </button>
+            </div>
             
           </SectionCard>
         </div>
 
         {/* CHART – Projection only */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Projected super balance">
             <div className="w-full h-64">
               <ResponsiveContainer>
@@ -816,7 +869,7 @@ export default function SalarySacrificeCalculator() {
         </div>
 
         {/* TABLE – Projection details with cumulative tax savings */}
-<div className="mt-8">
+<div className="mt-8 no-print">
   <SectionCard title="Projection details">
     <div className="overflow-x-auto">
       <table className="w-full table-fixed text-xs text-left">
@@ -892,7 +945,7 @@ export default function SalarySacrificeCalculator() {
 
 
         {/* ASSUMPTIONS */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="How this calculator works">
             <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
               <li>
@@ -944,7 +997,7 @@ export default function SalarySacrificeCalculator() {
       </div>
 
       {/* Disclaimer */}
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
         <p>
           This calculator is general information only. It does not consider your
           personal objectives, financial situation, or needs, and it uses

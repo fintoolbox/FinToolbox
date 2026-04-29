@@ -8,10 +8,11 @@ import PageIntro from "@/components/PageIntro";
 import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
+import { Printer } from "lucide-react";
 
 /** ─────────────────────────────────────────────────────────────────────
  * Age Pension Calculator – site-wide layout
- * Updated settings effective 20 Sep 2025 (Services Australia)
+ * Updated settings effective 20 March 2026 (Services Australia)
  * ────────────────────────────────────────────────────────────────────
  *
  * Max payment (per fortnight, before tax):
@@ -21,25 +22,25 @@ import SummaryCard from "@/components/SummaryCard";
  * Income test (standard rules):
  *  - Free area: $218 (single), $380 (couple combined)
  *  - Reduction: 50c per $1 over free area (single),
- *               25c each (i.e., 50c combined) per $1 over free area (couple)
+ *               50c combined per $1 over free area (couple)
  *
  * Assets test:
  *  - Full pension asset limits (homeowner / non-homeowner)
  *    Single: $321,500 / $579,500
  *    Couple combined: $481,500 / $739,500
  *  - Part-pension cut-offs
- *    Single: $714,500 / $972,500
- *    Couple combined: $1,074,000 / $1,332,000
+ *    Single: $722,000 / $980,000
+ *    Couple combined: $1,085,000 / $1,343,000
  *  - Taper: $3 per $1,000 (per fortnight) over the relevant threshold
  *
  * Deeming (financial assets only):
- *  - Singles: 0.75% to $64,200; 2.75% above
- *  - Couples combined: 0.75% to $106,200; 2.75% above
+ *  - Singles: 1.25% to $64,200; 3.25% above
+ *  - Couples combined: 1.25% to $106,200; 3.25% above
  */
 
 // ——— Maximum rates (per fortnight) ———
-const MAX_SINGLE_FT = 1178.70;
-const MAX_COUPLE_EACH_FT = 888.50;
+const MAX_SINGLE_FT = 1200.90;
+const MAX_COUPLE_EACH_FT = 905.20;
 const MAX_COUPLE_COMBINED_FT = MAX_COUPLE_EACH_FT * 2;
 
 // ——— Income test: free areas & taper ———
@@ -54,10 +55,10 @@ const FULL_LIMIT_SINGLE_NONHOME = 579500;
 const FULL_LIMIT_COUPLE_HOME_COMBINED = 481500;
 const FULL_LIMIT_COUPLE_NONHOME_COMBINED = 739500;
 
-const CUTOFF_SINGLE_HOME = 714500;
-const CUTOFF_SINGLE_NONHOME = 972500;
-const CUTOFF_COUPLE_HOME_COMBINED = 1074000;
-const CUTOFF_COUPLE_NONHOME_COMBINED = 1332000;
+const CUTOFF_SINGLE_HOME = 722000;
+const CUTOFF_SINGLE_NONHOME = 980000;
+const CUTOFF_COUPLE_HOME_COMBINED = 1085000;
+const CUTOFF_COUPLE_NONHOME_COMBINED = 1343000;
 
 // Taper: $3 per $1,000 per fortnight
 const ASSETS_TAPER_PER_1000_FT = 3;
@@ -65,8 +66,8 @@ const ASSETS_TAPER_PER_1000_FT = 3;
 // ——— Deeming thresholds & rates (from 20 Sep 2025) ———
 const DEEMING_THRESHOLD_SINGLE = 64200;
 const DEEMING_THRESHOLD_COUPLE_COMBINED = 106200;
-const DEEMING_LOWER_RATE = 0.0075; // 0.75% p.a.
-const DEEMING_UPPER_RATE = 0.0275; // 2.75% p.a.
+const DEEMING_LOWER_RATE = 0.0125; // 1.25% p.a.
+const DEEMING_UPPER_RATE = 0.0325; // 3.25% p.a.
 
 // ——— Work Bonus (simplified) ———
 const WORK_BONUS_FT = 300;
@@ -202,17 +203,71 @@ export default function AgePensionCalculator() {
   const pageUrl = "https://fintoolbox.com.au/calculators/age-pension";
   const pageTitle = "Age Pension Calculator (Australia)";
   const pageDescription =
-    "Estimate your Australian Age Pension using the income and assets tests, with deeming applied to financial assets. Updated for 20 Sep 2025.";
+    "Estimate your Australian Age Pension using the income and assets tests, with deeming applied to financial assets. Updated for 20 March 2026.";
 
   return (
     <main>
       {/* Heading (matches other calculators) */}
-      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
-        <h1 className="text-2xl font-bold text-slate-900">Age Pension Calculator (Australia)</h1>
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 site-header">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 leading-tight">Age Pension Calculator (Australia)</h1>
+          <p className="text-sm text-slate-500 no-print mt-1">Estimate eligibility and payments based on March 2026 rates.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => window.print()}
+          className="no-print inline-flex items-center gap-2 rounded-md bg-blue-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg hover:bg-blue-800 transition-all active:scale-95 shadow-blue-100"
+        >
+          <Printer className="h-4 w-4" />
+          Print Report (PDF)
+        </button>
       </header>
 
       {/* SEO head tag (kept from your version) */}
       <Head>
+        <style>{`
+          @media print {
+            @page {
+              margin: 2cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+              color: #1a1a1a;
+            }
+            .print-only {
+              display: block !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header.site-header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            /* Optimize summary display for PDF */
+            .summary-grid-print {
+              display: grid !important;
+              grid-template-columns: 1fr 1fr !important;
+              gap: 12px !important;
+            }
+            .summary-card-print {
+              border: 1px solid #e2e8f0 !important;
+              padding: 12px !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
         <title>{`${pageTitle} | FinToolbox`}</title>
         <meta name="description" content={pageDescription} />
         <link rel="canonical" href={pageUrl} />
@@ -267,27 +322,36 @@ export default function AgePensionCalculator() {
         />
       </Head>
 
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Report Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Blue intro card (house style) */}
-        <PageIntro tone="blue">
-          <div className="space-y-2">
-            <p>
-              Estimate your fortnightly <em>Age Pension</em> by applying both the{' '}
-              <strong>income test</strong> and the <strong>assets test</strong> — the lower result is paid.
-              Deeming is automatically applied to financial assets.
-            </p>
-            <p className="text-[12px] text-blue-900/80">
-              Settings reflect <strong>20 Sep 2025</strong> rates and thresholds.
-            </p>
-          </div>
-        </PageIntro>
+        <div className="no-print">
+          <PageIntro tone="blue">
+            <div className="space-y-2">
+              <p>
+                Estimate your fortnightly <em>Age Pension</em> by applying both the{' '}
+                <strong>income test</strong> and the <strong>assets test</strong> — the lower result is paid.
+                Deeming is automatically applied to financial assets.
+              </p>
+              <p className="text-[12px] text-blue-900/80">
+                Settings reflect <strong>20 March 2026</strong> rates and thresholds.
+              </p>
+            </div>
+          </PageIntro>
+        </div>
 
-        <SubtleCtaLink className="mt-3" href="/blog/age-pension-explained">
-          New to the Age Pension? Read the explainer →
-        </SubtleCtaLink>
+        <div className="no-print">
+          <SubtleCtaLink className="mt-3" href="/blog/age-pension-explained">
+            New to the Age Pension? Read the explainer →
+          </SubtleCtaLink>
+        </div>
 
         {/* INPUTS – grouped like your ABP layout */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Household & home">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
@@ -320,7 +384,7 @@ export default function AgePensionCalculator() {
           </SectionCard>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your assets">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
@@ -363,7 +427,7 @@ export default function AgePensionCalculator() {
           </SectionCard>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your income">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-700">
               <label className="flex flex-col">
@@ -424,48 +488,57 @@ export default function AgePensionCalculator() {
         </div>
 
         {/* RESULTS – Summary cards (house style) */}
-        <div className="mt-8">
-          <SectionCard>
-            <SummaryGrid>
-              <SummaryCard label="Income test result (per fortnight)" value={aud0(Math.round(incomeTestFt))} />
-              <SummaryCard label="Assets test result (per fortnight)" value={aud0(Math.round(assetsTestFt))} />
-              <SummaryCard
-                label={status === "couple" ? "Estimated pension (combined / fortnight)" : "Estimated pension (per fortnight)"}
-                value={aud0(Math.round(pensionFt))}
-              />
-              {status === "single" ? (
-                <SummaryCard label="Annual payment" value={aud0(Math.round(annualCombined))} />
-              ) : (
+        <div className="mt-8 printable-section">
+          {/* Print-only section to show parameters for the record */}
+          <div className="hidden print-only mb-10">
+            <h2 className="text-lg font-bold border-b-2 border-slate-900 mb-5 pb-1 uppercase tracking-wider text-slate-900">Report Parameters</h2>
+            <div className="grid grid-cols-2 gap-x-12 gap-y-3 text-[13px]">
+              <div className="flex justify-between border-b border-slate-100 pb-1"><span className="text-slate-500">Relationship Status</span> <span className="font-semibold capitalize">{status}</span></div>
+              <div className="flex justify-between border-b border-slate-100 pb-1"><span className="text-slate-500">Homeowner Status</span> <span className="font-semibold">{homeowner ? "Homeowner" : "Non-homeowner"}</span></div>
+              <div className="flex justify-between border-b border-slate-100 pb-1"><span className="text-slate-500">Financial Assets</span> <span className="font-semibold">{aud0(finAssets)}</span></div>
+              <div className="flex justify-between border-b border-slate-100 pb-1"><span className="text-slate-500">Non-Deemed Assets</span> <span className="font-semibold">{aud0(nonDeemedAssets)}</span></div>
+              <div className="flex justify-between border-b border-slate-100 pb-1"><span className="text-slate-500">Self Income (Fortnight)</span> <span className="font-semibold">{aud0(incomeFt)}</span></div>
+              {status === 'couple' && (
                 <>
-                  <SummaryCard label="Your pension (per fortnight)" value={aud0(Math.round(pensionEachFt))} />
-                  <SummaryCard label="Partner pension (per fortnight)" value={aud0(Math.round(pensionEachFt))} />
-                  <SummaryCard label="Combined annual payment" value={aud0(Math.round(annualCombined))} />
+                  <div className="flex justify-between border-b border-slate-100 pb-1"><span className="text-slate-500">Partner Income (Fortnight)</span> <span className="font-semibold">{aud0(partnerIncomeFt)}</span></div>
                 </>
               )}
-              <SummaryCard label="Deemed income (per fortnight)" value={aud0(Math.round(deemedIncomeFt))} />
-              <SummaryCard label="Total assessable assets" value={aud0(Math.round(totalAssets))} />
-            </SummaryGrid>
+            </div>
+          </div>
+
+          <SectionCard>
+            <div className="summary-grid-print">
+              <SummaryGrid>
+                <SummaryCard label="Income test result (pf)" value={aud0(Math.round(incomeTestFt))} />
+                <SummaryCard label="Assets test result (pf)" value={aud0(Math.round(assetsTestFt))} />
+                <SummaryCard
+                  label={status === "couple" ? "Estimated pension (combined/pf)" : "Estimated pension (pf)"}
+                  value={aud0(Math.round(pensionFt))}
+                />
+                {status === "single" ? (
+                  <SummaryCard label="Annual payment" value={aud0(Math.round(annualCombined))} />
+                ) : (
+                  <>
+                    <SummaryCard label="Your pension (pf)" value={aud0(Math.round(pensionEachFt))} />
+                    <SummaryCard label="Partner pension (pf)" value={aud0(Math.round(pensionEachFt))} />
+                    <SummaryCard label="Combined annual payment" value={aud0(Math.round(annualCombined))} />
+                  </>
+                )}
+                <SummaryCard label="Deemed income (pf)" value={aud0(Math.round(deemedIncomeFt))} />
+                <SummaryCard label="Total assessable assets" value={aud0(Math.round(totalAssets))} />
+              </SummaryGrid>
+            </div>
           </SectionCard>
         </div>
 
         {/* ASSUMPTIONS & REFERENCES */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Assumptions & references">
             <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
-              <li>
-                Max rates (20 Sep 2025): single {aud0(MAX_SINGLE_FT)}, couple each {aud0(MAX_COUPLE_EACH_FT)} (combined {aud0(MAX_COUPLE_COMBINED_FT)}).
-              </li>
-              <li>
-                Income test free areas: {aud0(INCOME_FREE_AREA_SINGLE_FT)} (single), {aud0(INCOME_FREE_AREA_COUPLE_COMBINED_FT)} (couple combined).
-                Taper: 50c per $1 over free area (combined for couples).
-              </li>
-              <li>
-                Assets test limits & cut-offs as listed above; taper ${ASSETS_TAPER_PER_1000_FT} per $1,000 per fortnight over the full-pension limit.
-              </li>
-              <li>
-                Deeming (20 Sep 2025): {`${(DEEMING_LOWER_RATE * 100).toFixed(2)}%`} to ${DEEMING_THRESHOLD_SINGLE.toLocaleString()} (single) / ${DEEMING_THRESHOLD_COUPLE_COMBINED.toLocaleString()} (couple combined),
-                then {`${(DEEMING_UPPER_RATE * 100).toFixed(2)}%`}.
-              </li>
+              <li>Max rates (20 March 2026): single {aud0(MAX_SINGLE_FT)}, couple each {aud0(MAX_COUPLE_EACH_FT)} (combined {aud0(MAX_COUPLE_COMBINED_FT)}).</li>
+              <li>Income test free areas: {aud0(INCOME_FREE_AREA_SINGLE_FT)} (single), {aud0(INCOME_FREE_AREA_COUPLE_COMBINED_FT)} (couple combined). Taper: 50c per $1 over free area (combined for couples).</li>
+              <li>Assets test limits & cut-offs as listed above; taper ${ASSETS_TAPER_PER_1000_FT} per $1,000 per fortnight over the full-pension limit.</li>
+              <li>Deeming (20 March 2026): {`${(DEEMING_LOWER_RATE * 100).toFixed(2)}%`} to ${DEEMING_THRESHOLD_SINGLE.toLocaleString()} (single) / ${DEEMING_THRESHOLD_COUPLE_COMBINED.toLocaleString()} (couple combined), then {`${(DEEMING_UPPER_RATE * 100).toFixed(2)}%`}.</li>
               <li>
                 Work Bonus (simplified): if ticked, we disregard the first {aud0(WORK_BONUS_FT)} of each eligible person’s employment income per fortnight before applying the income test.
                 Carry-forward “Work Bonus balance” is not modelled.
@@ -476,7 +549,7 @@ export default function AgePensionCalculator() {
       </div>
 
       {/* Footer disclaimer (house style) */}
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
         <p>
           This calculator is general information only. It does not consider your personal objectives, financial situation,
           or needs. Consider speaking with a qualified professional.

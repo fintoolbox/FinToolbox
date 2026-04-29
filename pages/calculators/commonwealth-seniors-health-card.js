@@ -7,6 +7,7 @@ import Tooltip from "@/components/Tooltip";
 import SectionCard from "@/components/SectionCard";
 import PageIntro from "@/components/PageIntro";
 import SubtleCtaLink from "@/components/SubtleCtaLink";
+import { Printer } from "lucide-react";
 
 // ---------------
 // Helpers
@@ -28,19 +29,19 @@ function toNumber(value, fallback = 0) {
 }
 
 /**
- * Calculate Deemed Income on Account-Based Pensions (2025-26 Rates).
+ * Calculate Deemed Income on Account-Based Pensions (2026 Rates).
  *
- * Deeming rates (from 20 Sep 2025):
- * - Lower rate: 0.75%
- * - Upper rate: 2.75%
+ * Deeming rates (effective March 2026):
+ * - Lower rate: 1.25%
+ * - Upper rate: 3.25%
  *
  * Thresholds:
  * - Single: $64,200
  * - Couple (combined): $106,200
  */
 function calculateDeeming(balance, status) {
-  const lowerRate = 0.0075;
-  const upperRate = 0.0275;
+  const lowerRate = 0.0125;
+  const upperRate = 0.0325;
   
   let threshold = 64200;
   if (status === "couple" || status === "separated") {
@@ -58,7 +59,7 @@ function calculateDeeming(balance, status) {
 
 /**
  * Core calculation for CSHC Eligibility.
- * Based on 20 Sep 2025 thresholds.
+ * Based on March 2026 thresholds.
  */
 function calculateCSHC(inputs) {
   const status = inputs.relationshipStatus || "single";
@@ -164,15 +165,55 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
         </title>
         <meta
           name="description"
-          content="Check your eligibility for the Commonwealth Seniors Health Card (CSHC) based on the latest 2025-26 income thresholds and deeming rates."
+          content="Check your eligibility for the Commonwealth Seniors Health Card (CSHC) based on the latest March 2026 income thresholds and deeming rates."
         />
         <link
           rel="canonical"
           href="https://fintoolbox.com.au/calculators/commonwealth-seniors-health-card"
         />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
       </Head>
 
-      {/* Header */}
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
       <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900">
           Commonwealth Seniors Health Card Calculator
@@ -181,28 +222,35 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
 
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Intro */}
-        <PageIntro tone="blue">
-          <div className="space-y-2">
-            <p>
-              The Commonwealth Seniors Health Card (CSHC) provides cheaper health care and medicines to older Australians who do not qualify for the Age Pension.
-            </p>
-            <p>
-              Use this calculator to test your eligibility against the <strong>income test</strong>. There is no assets test for this card.
-            </p>
-          </div>
-        </PageIntro>
+        <div className="no-print">
+          <PageIntro tone="blue">
+            <div className="space-y-2">
+              <p>
+                The Commonwealth Seniors Health Card (CSHC) provides cheaper health care and medicines to older Australians who do not qualify for the Age Pension.
+              </p>
+              <p>
+                Use this calculator to test your eligibility against the <strong>income test</strong>. There is no assets test for this card.
+              </p>
+              <p className="text-[12px] text-blue-900/80">
+                Settings reflect <strong>March 2026</strong> rates and thresholds.
+              </p>
+            </div>
+          </PageIntro>
+        </div>
 
-        <SubtleCtaLink
-          className="mt-3"
-          href="/blog/commonwealth-seniors-health-card-guide"
-        >
-          Read the full guide to the Commonwealth Seniors Health Card →
-        </SubtleCtaLink>
+        <div className="no-print">
+          <SubtleCtaLink
+            className="mt-3"
+            href="/blog/commonwealth-seniors-health-card-guide"
+          >
+            Read the full guide to the Commonwealth Seniors Health Card →
+          </SubtleCtaLink>
+        </div>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-12">
           
           {/* LEFT COLUMN: INPUTS */}
-          <div className="lg:col-span-7 space-y-6">
+          <div className="lg:col-span-7 space-y-6 no-print">
             <SectionCard title="Your details">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-slate-700">
                 <label className="flex flex-col">
@@ -341,7 +389,7 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
 
           {/* RIGHT COLUMN: RESULTS */}
           <div className="lg:col-span-5 space-y-6">
-            <SectionCard title="Eligibility Result">
+            <SectionCard title="Eligibility Result" className="printable-section">
               <div className={`p-4 rounded-lg border-l-4 mb-6 ${
                 isEligible 
                   ? "bg-emerald-50 border-emerald-500 text-emerald-900" 
@@ -366,7 +414,7 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
                 <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                   <span className="text-slate-600 flex items-center gap-1">
                     Deemed Income
-                    <Tooltip text="Income assumed to be earned from your account-based pensions using current deeming rates (0.75% / 2.75%)." />
+                    <Tooltip text="Income assumed to be earned from your account-based pensions using current deeming rates (1.25% / 3.25%)." />
                   </span>
                   <span className="font-medium text-slate-900">{aud0(deemedIncome)}</span>
                 </div>
@@ -381,9 +429,20 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
                   <span>{aud0(totalThreshold)}</span>
                 </div>
               </div>
+
+              <div className="mt-6 flex justify-end no-print">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
+                >
+                  <Printer className="h-4 w-4" />
+                  Download Calculation (PDF)
+                </button>
+              </div>
             </SectionCard>
 
-            <SectionCard title="How it works">
+            <SectionCard title="Assumptions & references" className="printable-section">
               <ul className="list-disc pl-5 space-y-2 text-xs text-slate-600">
                 <li>
                   <strong>Age Requirement:</strong> You must be of Age Pension age (currently 67).
@@ -392,7 +451,7 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
                   <strong>Income Test:</strong> The test assesses your Adjusted Taxable Income (ATI) plus deemed income from account-based pensions.
                 </li>
                 <li>
-                  <strong>Deeming:</strong> Since 2015, account-based pensions are subject to deeming for the CSHC. The current rates (Jan 2026) are 0.75% on the lower threshold and 2.75% on the excess.
+                  <strong>Deeming:</strong> Account-based pensions are subject to deeming for the CSHC. The current rates (March 2026) are 1.25% on the lower threshold and 3.25% on the excess.
                 </li>
                 <li>
                   <strong>No Assets Test:</strong> Unlike the Age Pension, the CSHC does not have an assets test.
@@ -404,9 +463,9 @@ export default function CommonwealthSeniorsHealthCardCalculator() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
         <p>
-          This calculator is provided for general information only and is based on rates applicable as of January 2026. It does not constitute financial or legal advice. Eligibility is determined by Services Australia at the time of application.
+          This calculator is provided for general information only and is based on rates applicable as of March 2026. It does not constitute financial or legal advice. Eligibility is determined by Services Australia at the time of application.
         </p>
       </div>
     </>

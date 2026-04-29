@@ -9,6 +9,7 @@ import SubtleCtaLink from "@/components/SubtleCtaLink";
 import SummaryGrid from "@/components/SummaryGrid";
 import SummaryCard from "@/components/SummaryCard";
 import ChartTooltip from "@/components/ChartTooltip";
+import { Printer } from "lucide-react";
 
 import {
   ResponsiveContainer,
@@ -249,8 +250,49 @@ export default function AccountBasedPensionCalculator() {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
+        <style>{`
+          @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .printable-section {
+              display: block !important;
+              page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
+            }
+          }
+        `}</style>
       </Head>
       
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
       {/* Heading (matches Debt Recycling) */}
       <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900">
@@ -260,7 +302,7 @@ export default function AccountBasedPensionCalculator() {
 
       <div className="max-w-5xl mx-auto px-4 mt-4">
         {/* Blue intro card */}
-        <PageIntro tone="blue">
+        <PageIntro tone="blue" className="no-print">
           <div className="space-y-2">
             <p>
               Estimate your retirement income from an account-based pension using
@@ -274,13 +316,15 @@ export default function AccountBasedPensionCalculator() {
           </div>
         </PageIntro>
 
-        {/* Optional explainer link (edit or remove if you don’t have this post yet) */}
-        <SubtleCtaLink className="mt-3" href="/blog/how-to-use-an-account-based-pension-calculator">
-          New to account-based pensions? Read the explainer →
-        </SubtleCtaLink>
+        <div className="no-print">
+          {/* Optional explainer link (edit or remove if you don’t have this post yet) */}
+          <SubtleCtaLink className="mt-3" href="/blog/how-to-use-an-account-based-pension-calculator">
+            New to account-based pensions? Read the explainer →
+          </SubtleCtaLink>
+        </div>
 
         {/* INPUTS – single card, grouped, 3-col grid */}
-        <div className="mt-6">
+        <div className="mt-6 no-print">
           <SectionCard title="Your assumptions">
             <div className="space-y-6">
               {/* Opening + Age + Horizon */}
@@ -433,7 +477,7 @@ export default function AccountBasedPensionCalculator() {
         </div>
 
         {/* CHART – Income */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Income projection">
             <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
               Annual pension paid (indexed by CPI if enabled). If requested income is below the minimum in a year,
@@ -476,7 +520,7 @@ export default function AccountBasedPensionCalculator() {
         </div>
 
         {/* CHART – Balance */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Account balance projection">
             <p className="text-[11px] text-slate-600 leading-snug mb-4 max-w-3xl">
               Estimated end-of-year balance after income, earnings and fees.
@@ -518,7 +562,7 @@ export default function AccountBasedPensionCalculator() {
         </div>
 
         {/* RESULTS – summary cards */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard>
             <SummaryGrid>
               <SummaryCard label="Total income withdrawn" value={aud0(sim.totals.totalIncome)} />
@@ -534,11 +578,21 @@ export default function AccountBasedPensionCalculator() {
                 {depletionNote}
               </p>
             </div>
+            <div className="mt-6 flex justify-end no-print">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700"
+              >
+                <Printer className="h-4 w-4" />
+                Download Calculation (PDF)
+              </button>
+            </div>
           </SectionCard>
         </div>
 
         {/* TABLE – year by year */}
-        <div className="mt-8">
+        <div className="mt-8 no-print">
           <SectionCard title="Year-by-year breakdown">
             <div className="overflow-x-auto">
               <table className="min-w-[900px] text-xs text-left">
@@ -578,7 +632,7 @@ export default function AccountBasedPensionCalculator() {
         </div>
 
         {/* ASSUMPTIONS */}
-        <div className="mt-8">
+        <div className="mt-8 printable-section">
           <SectionCard title="Assumptions & references">
             <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
               <li>If the requested amount is below the legislated minimum in any year, the minimum is paid instead.</li>
@@ -591,7 +645,7 @@ export default function AccountBasedPensionCalculator() {
       </div>
 
       {/* Footer disclaimer (house style) */}
-      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug">
+      <div className="max-w-5xl mx-auto px-4 mt-12 mb-12 text-[11px] text-slate-500 leading-snug no-print">
         <p>
           This calculator is general information only. It does not consider your personal objectives, financial situation,
           or needs.

@@ -557,9 +557,15 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
       <Head>
         <style>{`
           @media print {
+            @page {
+              margin: 1.5cm;
+              size: A4;
+            }
             body {
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
+              background: white !important;
+              font-size: 11pt;
             }
             .no-print {
               display: none !important;
@@ -567,10 +573,25 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
             .printable-section {
               display: block !important;
               page-break-inside: avoid;
+              width: 100% !important;
+              margin-bottom: 1.5rem !important;
             }
             .recharts-responsive-container {
               width: 100% !important;
               height: 250px !important;
+            }
+            header {
+              border-bottom: 2px solid #000 !important;
+              padding-bottom: 1rem !important;
+              margin-bottom: 2rem !important;
+            }
+            .grid {
+              display: block !important;
+            }
+            .grid > div {
+              border: 1px solid #e2e8f0 !important;
+              margin-bottom: 0.5rem !important;
+              page-break-inside: avoid;
             }
           }
         `}</style>
@@ -585,8 +606,13 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
         />
       </Head>
 
+      <div className="hidden print:flex justify-between items-center mb-6 text-slate-500 text-[10px] border-b pb-2 px-4 max-w-5xl mx-auto">
+        <span>fintoolbox.com.au</span>
+        <span>Calculation Date: {new Date().toLocaleDateString('en-AU')}</span>
+      </div>
+
       {/* Intro */}
-      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200 no-print">
+      <header className="max-w-5xl mx-auto px-4 pb-6 border-b border-slate-200">
   <h1 className="text-2xl font-bold text-slate-900">
     Debt Recycling Calculator
   </h1>
@@ -1061,7 +1087,7 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
         className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-gray-800"
       >
         <Printer className="h-4 w-4" />
-        Print Results
+        Download Calculation (PDF)
       </button>
     </div>
         </SectionCard>
@@ -1198,8 +1224,8 @@ const wipeoutChartData = results.yearsArr?.map((row) => ({
 
 
             {/* ASSUMPTIONS & REFERENCES */}
-      <div className="mt-8 no-print">
-        <SectionCard title="How this calculator works">
+      <div className="mt-8 printable-section">
+        <SectionCard title="Assumptions & references">
           <ul className="list-disc pl-5 space-y-3 text-sm text-slate-600">
             
             <li>
