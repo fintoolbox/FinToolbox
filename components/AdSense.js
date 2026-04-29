@@ -15,7 +15,7 @@ export default function AdSense({ adSlot }) {
       <ins
         className="adsbygoogle"
         style={{ display: 'block' }}
-        data-ad-client="ca-pub-4674539469430065" // Replace with your actual publisher ID
+        data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
         data-ad-slot={adSlot}
         data-ad-format="auto"
         data-full-width-responsive="true"
