@@ -126,28 +126,29 @@ export default function Layout({ children }) {
 
       {/* Main content */}
       <main id="main" className="mx-auto max-w-5xl px-6 py-10">
+        {/* Sticky Buy Me a Coffee Button */}
+        <div className="sticky top-[65px] z-10 mb-6 flex justify-start">
+          <Script
+            src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+            data-name="bmc-button"
+            data-slug="fintoolbox"
+            data-color="#FFDD00"
+            data-emoji="☕"
+            data-font="Cookie"
+            data-text="Buy me a coffee"
+            data-outline-color="#000000"
+            data-font-color="#000000"
+            data-coffee-color="#ffffff"
+            strategy="afterInteractive"
+          />
+        </div>
+
         <Breadcrumbs />
         {children}
 
         {/* Footer */}
         <footer className="mt-10 border-t bg-white">
           <div className="px-6 py-6 text-sm text-gray-600">
-            <div className="mb-6 flex justify-start">
-              <Script
-                src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-                data-name="bmc-button"
-                data-slug="fintoolbox"
-                data-color="#FFDD00"
-                data-emoji="☕"
-                data-font="Cookie"
-                data-text="Buy me a coffee"
-                data-outline-color="#000000"
-                data-font-color="#000000"
-                data-coffee-color="#ffffff"
-                strategy="afterInteractive"
-              />
-            </div>
-
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <p>© {CURRENT_YEAR} FinToolbox. General information only.</p>
               <div className="flex gap-4">
