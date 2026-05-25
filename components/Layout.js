@@ -127,21 +127,25 @@ export default function Layout({ children }) {
       {/* Main content */}
       <main id="main" className="mx-auto max-w-5xl px-6 py-10">
         {/* Sticky Buy Me a Coffee Button */}
-        <div className="sticky top-[65px] z-10 mb-6 flex justify-start">
-          <Script
-            src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-            data-name="bmc-button"
-            data-slug="fintoolbox"
-            data-color="#FFDD00"
-            data-emoji="☕"
-            data-font="Cookie"
-            data-text="Buy me a coffee"
-            data-outline-color="#000000"
-            data-font-color="#000000"
-            data-coffee-color="#ffffff"
-            strategy="afterInteractive"
-          />
-        </div>
+        <div 
+          className="sticky top-[72px] z-10 mb-6 flex justify-start"
+          dangerouslySetInnerHTML={{
+            __html: `
+              <script
+                data-name="bmc-button"
+                data-slug="fintoolbox"
+                data-color="#FFDD00"
+                data-emoji="☕"
+                data-font="Cookie"
+                data-text="Buy me a coffee"
+                data-outline-color="#000000"
+                data-font-color="#000000"
+                data-coffee-color="#ffffff"
+                src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+              ></script>
+            `
+          }}
+        />
 
         <Breadcrumbs />
         {children}
