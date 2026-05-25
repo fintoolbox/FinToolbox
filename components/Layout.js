@@ -71,14 +71,35 @@ export default function Layout({ children }) {
       {/* Header / nav */}
       <header className="sticky top-0 z-20 border-b bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            className="text-xl font-bold text-gray-900 transition-colors hover:text-blue-700"
-            aria-label="FinToolbox — Financial Calculators & Tools for Australians"
-          >
-            FinToolbox
-            <span className="sr-only"> — Financial Calculators &amp; Tools for Australians</span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-xl font-bold text-gray-900 transition-colors hover:text-blue-700"
+              aria-label="FinToolbox — Financial Calculators & Tools for Australians"
+            >
+              FinToolbox
+              <span className="sr-only"> — Financial Calculators &amp; Tools for Australians</span>
+            </Link>
+            <div 
+              className="scale-75 origin-left hidden sm:block"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  <script
+                    data-name="bmc-button"
+                    data-slug="fintoolbox"
+                    data-color="#FFDD00"
+                    data-emoji="☕"
+                    data-font="Cookie"
+                    data-text="Buy me a coffee"
+                    data-outline-color="#000000"
+                    data-font-color="#000000"
+                    data-coffee-color="#ffffff"
+                    src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+                  ></script>
+                `
+              }}
+            />
+          </div>
 
           {/* Desktop nav */}
           <nav className="hidden items-center gap-5 text-sm sm:flex" aria-label="Primary">
@@ -126,27 +147,6 @@ export default function Layout({ children }) {
 
       {/* Main content */}
       <main id="main" className="mx-auto max-w-5xl px-6 py-10">
-        {/* Sticky Buy Me a Coffee Button */}
-        <div 
-          className="sticky top-[72px] z-10 mb-6 flex justify-start"
-          dangerouslySetInnerHTML={{
-            __html: `
-              <script
-                data-name="bmc-button"
-                data-slug="fintoolbox"
-                data-color="#FFDD00"
-                data-emoji="☕"
-                data-font="Cookie"
-                data-text="Buy me a coffee"
-                data-outline-color="#000000"
-                data-font-color="#000000"
-                data-coffee-color="#ffffff"
-                src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-              ></script>
-            `
-          }}
-        />
-
         <Breadcrumbs />
         {children}
 
